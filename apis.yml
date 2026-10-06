@@ -1,0 +1,33 @@
+aid: tickerinside
+name: TickerInside
+description: 'TickerInside is a company surfaced via the API Evangelist harvest backlog (source: new-submission)
+  and added to the network as a stub for full-pipeline profiling.'
+url: https://raw.githubusercontent.com/api-evangelist/tickerinside/refs/heads/main/apis.yml
+x-type: company
+x-source: harvest:new-submission
+x-tier: stub
+x-tier-reason: harvest
+specificationVersion: '0.20'
+created: '2026-10-06'
+modified: '2026-10-06'
+tags:
+- Company
+apis: []
+maintainers:
+- FN: Kin Lane
+  email: kin@apievangelist.com
+- FN: APIs.json
+  email: info@apis.io
+common:
+- type: Website
+  url: https://tickerinside.com/apis.json
+- type: Documentation
+  url: https://tickerinside.com/api
+x-submission-notes: 'relist check: clear: not on the delisting registry. Data sourced from issuer files
+  / SEC filings (CC BY 4.0, holdings history separate terms) -- public-data republishing, not platform
+  scraping. Submitter asks for the whole /api/v1/ API.'
+x-submission-probe: root 200; /apis.json 200 application/apis+json (0.19); /api/openapi.json 200, 16 paths,
+  server https://tickerinside.com/api/v1, no auth; /llms.txt 200; /docs and invented path 404 (real 404).
+  GET /api/v1/fund/SPY.json -> 301 -> spy.json 200 real holdings JSON; unknown endpoint -> 404 JSON not_covered.
+  MCP POST https://tickerinside.com/mcp initialize -> 200, serverInfo tickerinside 1.8.0, tools+prompts.
+x-submitted-by: contact@tickerinside.com (apis.io/add, 2026-10-06T10:09:47.987Z)
