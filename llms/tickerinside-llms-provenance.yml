@@ -1,0 +1,6 @@
+generated: '2026-10-06'
+method: probed
+generator: harvest-llms.py
+source: https://tickerinside.com/llms.txt
+bytes: 8826
+note: saved verbatim; the provider's own document

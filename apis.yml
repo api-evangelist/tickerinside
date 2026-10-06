@@ -1,33 +1,95 @@
 aid: tickerinside
 name: TickerInside
-description: 'TickerInside is a company surfaced via the API Evangelist harvest backlog (source: new-submission)
-  and added to the network as a stub for full-pipeline profiling.'
+description: TickerInside provides a free, open, machine‑readable JSON API of US ETF holdings. It serves each fund's holdings with weights, source
+  dates, and links to securities, enabling programs and assistants to query ETF compositions without authentication. Data is sourced from issuer
+  filings and SEC documents, offered under CC BY 4.0 (holdings history has separate terms).
 url: https://raw.githubusercontent.com/api-evangelist/tickerinside/refs/heads/main/apis.yml
 x-type: company
 x-source: harvest:new-submission
-x-tier: stub
-x-tier-reason: harvest
+x-tier: profiled
+x-tier-reason: enrichment pass 2026-10-06 (modular-v1; was harvest)
 specificationVersion: '0.20'
 created: '2026-10-06'
 modified: '2026-10-06'
 tags:
-- Company
-apis: []
+- ETF
+- finance
+- open-data
+- SEC-filings
+- holdings
 maintainers:
 - FN: Kin Lane
   email: kin@apievangelist.com
 - FN: APIs.json
   email: info@apis.io
 common:
+- type: CLI
+  url: cli/tickerinside-cli.yml
+- type: Security
+  url: security/tickerinside-vulnerability-disclosure.yml
+- type: Conformance
+  url: conformance/tickerinside-conformance.yml
+- type: LLMsTxt
+  url: llms/tickerinside-llms.txt
+- type: SecurityTxt
+  url: well-known/tickerinside-security.txt
+- type: WellKnown
+  url: well-known/tickerinside-well-known.yml
+- type: Hosts
+  url: hosts/tickerinside-hosts.yml
+- type: Vendors
+  url: vendors/tickerinside-vendors.yml
+- type: SDKs
+  url: packages/tickerinside-packages.yml
+- type: Packages
+  url: packages/tickerinside-packages.yml
+- type: Support
+  url: https://tickerinside.com/support/
+- type: StatusPage
+  url: https://tickerinside.com/status/
+- type: APIReference
+  url: https://tickerinside.com/api/
+- type: VulnerabilityDisclosure
+  url: security/tickerinside-vulnerability-disclosure.yml
+- type: DomainSecurity
+  url: security/tickerinside-domain-security.yml
 - type: Website
   url: https://tickerinside.com/apis.json
 - type: Documentation
   url: https://tickerinside.com/api
-x-submission-notes: 'relist check: clear: not on the delisting registry. Data sourced from issuer files
-  / SEC filings (CC BY 4.0, holdings history separate terms) -- public-data republishing, not platform
-  scraping. Submitter asks for the whole /api/v1/ API.'
-x-submission-probe: root 200; /apis.json 200 application/apis+json (0.19); /api/openapi.json 200, 16 paths,
-  server https://tickerinside.com/api/v1, no auth; /llms.txt 200; /docs and invented path 404 (real 404).
-  GET /api/v1/fund/SPY.json -> 301 -> spy.json 200 real holdings JSON; unknown endpoint -> 404 JSON not_covered.
-  MCP POST https://tickerinside.com/mcp initialize -> 200, serverInfo tickerinside 1.8.0, tools+prompts.
+- type: OpenAPI
+  url: https://tickerinside.com/api/openapi.json
+- type: TermsOfService
+  url: https://tickerinside.com/legal/
+- type: PrivacyPolicy
+  url: https://tickerinside.com/api/#privacy
+apis:
+- name: TickerInside API
+  description: Holdings of 5,244 US ETFs as static JSON, no auth.
+  humanURL: https://tickerinside.com/api
+  baseURL: https://tickerinside.com/api/v1
+  aid: tickerinside:tickerinside-api
+x-submission-notes: 'relist check: clear: not on the delisting registry. Data sourced from issuer files / SEC filings (CC BY 4.0, holdings history
+  separate terms) -- public-data republishing, not platform scraping. Submitter asks for the whole /api/v1/ API.'
+x-submission-probe: root 200; /apis.json 200 application/apis+json (0.19); /api/openapi.json 200, 16 paths, server https://tickerinside.com/api/v1,
+  no auth; /llms.txt 200; /docs and invented path 404 (real 404). GET /api/v1/fund/SPY.json -> 301 -> spy.json 200 real holdings JSON; unknown
+  endpoint -> 404 JSON not_covered. MCP POST https://tickerinside.com/mcp initialize -> 200, serverInfo tickerinside 1.8.0, tools+prompts.
 x-submitted-by: contact@tickerinside.com (apis.io/add, 2026-10-06T10:09:47.987Z)
+x-coverage:
+  state: unreadable
+  reason: no-machine-readable-spec
+  method: derived
+  generated: '2026-10-06'
+  generator: derive-coverage.py (pre-flight evidence)
+  detail: the company publishes developer documentation but serves no machine-readable contract from it
+  evidence:
+  - url: https://tickerinside.com/mcp
+    status: null
+  - url: https://tickerinside.com/apis.json
+    status: 200
+x-enrichment:
+  date: '2026-10-06'
+  status: enriched
+  artifacts_added: 15
+  pass: modular-v1
+  engine: identity=local,contract=local,surfaces=local,docs=local,regulatory=local

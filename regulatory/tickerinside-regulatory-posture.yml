@@ -1,0 +1,13 @@
+generated: '2026-10-06'
+method: probed
+source: https://tickerinside.com/legal/
+signals:
+  data_subject_request:
+    url: https://tickerinside.com/legal/
+    section: Terms of use
+    note: Indicates that data subject requests are governed by the terms at request time.
+    evidence:
+      - source: https://tickerinside.com/legal/
+        http_status: 200
+        fetched: "true"
+        quote: "The terms that apply to a request are the ones on this page on the day it is made."

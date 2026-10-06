@@ -1,0 +1,4 @@
+Contact: mailto:contact@tickerinside.com
+Expires: 2027-04-04T15:18:01Z
+Preferred-Languages: en
+Canonical: https://tickerinside.com/.well-known/security.txt

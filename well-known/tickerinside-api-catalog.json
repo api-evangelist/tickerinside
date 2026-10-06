@@ -1,0 +1,31 @@
+{
+  "linkset": [
+    {
+      "anchor": "https://tickerinside.com/api/v1/",
+      "service-desc": [
+        {
+          "href": "https://tickerinside.com/api/openapi.json",
+          "type": "application/vnd.oai.openapi+json"
+        }
+      ],
+      "service-doc": [
+        {
+          "href": "https://tickerinside.com/api/",
+          "type": "text/html"
+        }
+      ],
+      "service-meta": [
+        {
+          "href": "https://tickerinside.com/apis.json",
+          "type": "application/apis+json"
+        }
+      ],
+      "status": [
+        {
+          "href": "https://tickerinside.com/api/v1/status.json",
+          "type": "application/json"
+        }
+      ]
+    }
+  ]
+}

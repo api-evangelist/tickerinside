@@ -1,0 +1,45 @@
+generated: '2026-10-06'
+method: searched
+generator: extract-docs-artifacts.py (local)
+source: https://tickerinside.com/agent/
+sources:
+- https://tickerinside.com/agent/
+install:
+- method: npx
+  command: npx -y tickerinside-mcp@latest
+commands:
+- group: list_funds
+  commands:
+  - tickerinside-mcp list_funds
+- group: fund_profile
+  commands:
+  - tickerinside-mcp fund_profile
+- group: compare_funds
+  commands:
+  - tickerinside-mcp compare_funds
+- group: compare_stocks
+  commands:
+  - tickerinside-mcp compare_stocks
+- group: overlap_matrix
+  commands:
+  - tickerinside-mcp overlap_matrix
+- group: look_through
+  commands:
+  - tickerinside-mcp look_through
+- group: risk_decomposition
+  commands:
+  - tickerinside-mcp risk_decomposition
+- group: stock_exposure
+  commands:
+  - tickerinside-mcp stock_exposure
+- group: etf_ownership
+  commands:
+  - tickerinside-mcp etf_ownership
+- group: fund_history
+  commands:
+  - tickerinside-mcp fund_history
+- group: fund_changes
+  commands:
+  - tickerinside-mcp fund_changes
+binary: tickerinside-mcp
+docs: https://tickerinside.com/agent/

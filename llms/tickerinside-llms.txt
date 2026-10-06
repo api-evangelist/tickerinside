@@ -1,0 +1,87 @@
+# TickerInside
+
+> TickerInside is an open, machine-readable database of US ETF holdings, with the source and date of each holding. Its free JSON API serves the holdings of 5,244 US ETFs with their weights, which ETFs hold a stock and at what weight, and the overlap of any two stock ETFs. No key, no sign-up, CORS open, CC BY 4.0 except the holdings history. Every file carries its dates: `as_of`, the price date (2026-10-05 today), and `holdings_as_of`, the date of each fund's holdings file (VOO: 2026-08-31).
+
+5,244 US ETFs covered: 688 read from their issuers' own files every weekday night; 1,895 from their latest SEC filing, which is months older; and 905 fixed income funds, 234 multi-asset funds, 1,217 derivative-based funds, 131 trusts and pools and 174 funds from their sponsors' files. The counts of the day: https://tickerinside.com/api/v1/index.json
+
+Fetch the JSON with curl or fetch and parse it; a browsing tool that summarizes pages drops fields and dates. Tickers go in the path in lower case, a share class keeps its dot (brk.b); follow redirects.
+
+```sh
+curl -sL https://tickerinside.com/api/v1/sec/nvda.json | python3 -c "import json;print(json.load(open(0))['holders'][:3])"
+# [['GXPT', 20.54, '2026-10-05'], ['VGT', 17.7869, '2026-08-31'], ['VUSG', 17.5579, '2026-10-06']]
+```
+
+Each row is [fund, weight in percent, date of that fund's file], heaviest first.
+
+Rules for agents:
+
+1. Give `holdings_as_of` beside any holdings figure, `as_of` beside any price or return figure, and `cite_as` under it; link its page where you can, else name TickerInside.
+2. Name the overlap measure: `by_weight`, `share_of_a` or `share_of_b`. VOO and QQQ overlap 54.0% by weight, yet 92.7% of QQQ is in tickers VOO also holds.
+3. Null means missing, never zero.
+4. /sec/ is for a stock, /fund/ for a fund. A line listed abroad (7203.JP) has no stock file: /sec/ gives its holders only (`coverage` `holders_only`), from the shard /holders/{c}.json.
+5. /compare/ has only the 15 pairs in index.json `written_comparisons`; the other order answers 301. Compute any other pair from two /fund files.
+6. In /history/, a restated step has no `entered`, `exited` or `moved`: use a default (`step.get("entered", [])`). `reverted` lists lines that came back one file after they left: a glitch in the issuer's file, not trades. Skip a key of digits and a letter that entered in between at about the same weight: it stood in for the line.
+7. The history files are not CC BY 4.0 (https://tickerinside.com/legal/#history): fetch them one fund per request, never on a schedule to store them.
+8. New data lands each weekday night: the build starts at 22:00 UTC and is due by 02:00 UTC. Each build changes status.json `built_at`; `as_of` changes only with new prices. Fetch the whole set and holders.json (5.2 MB) at most once per build, with a User-Agent that names your program.
+
+Glossary:
+
+- Issuer layer: the 690 funds read each weekday night from their issuers' own files; `source_layer` issuer.
+- SEC layer: the 1,944 funds read from their latest SEC Form N-PORT filing, months older; `source_layer` sec_nport.
+- Written comparison: one of the 15 pairs with a /compare/ file (index.json `written_comparisons`).
+- Line listed abroad: a holding traded outside the US, keyed with its market (7203.JP is Toyota in Tokyo).
+- Other layers: fixed income, multi-asset, derivative-based, trust, sponsor-file and prospectus funds: under /fund/ with `holdings_kind`, in full under /etf/ (index.json `tickers_bond`, etc.).
+- Key scheme: how keys are written; scheme 2 adds the market to lines listed abroad (`aliases` maps old keys).
+- Restated step: a history step from a change of keys or of reading, not a trade (`restated: true`).
+
+## API
+
+- [OpenAPI 3.1](https://tickerinside.com/api/openapi.json): every endpoint and field, typed, with real answers
+- [API catalog](https://tickerinside.com/.well-known/api-catalog): the API's description, reference and status, as a linkset
+- [GET /sec/{ticker}.json](https://tickerinside.com/api/sections/endpoints/sec.md): One stock and the ETFs that hold it (sec is for security, not the SEC)
+- [GET /fund/{ticker}.json](https://tickerinside.com/api/sections/endpoints/fund.md): One fund: holdings, their date, cost, returns, risk
+- [GET /index.json](https://tickerinside.com/api/sections/endpoints/index.md): What is covered, and the date of the data
+- [GET /funds.json](https://tickerinside.com/api/sections/endpoints/funds.md): Every fund, one line each
+- [GET /holders.json](https://tickerinside.com/api/sections/endpoints/holders.md): The issuer-layer funds that hold each security
+- [GET /holders/{c}.json](https://tickerinside.com/api/sections/endpoints/holders-shard.md): holders.json by first character, plus SEC-layer holders of keys with no stock file
+- [GET /securities.json](https://tickerinside.com/api/sections/endpoints/securities.md): Every security held, and by how many funds
+- [GET /compare/{a}-vs-{b}.json](https://tickerinside.com/api/sections/endpoints/compare.md): A written comparison: overlap measured three ways, correlation
+- [GET /ownership.json](https://tickerinside.com/api/sections/endpoints/ownership.md): How much of each stock the ETFs hold, at least
+- [GET /history.json](https://tickerinside.com/api/sections/endpoints/history.md): Every fund with a history (history terms)
+- [GET /history/{ticker}.json](https://tickerinside.com/api/sections/endpoints/history-ticker.md): One fund's changes, file by file (history terms)
+
+## Docs
+
+- [llms-full.txt](https://tickerinside.com/llms-full.txt): the whole reference in one file (210 KB), with each field's unit, source and licence
+- [AGENTS.md](https://tickerinside.com/AGENTS.md): the API in one block for a project's AGENTS.md or CLAUDE.md
+- [Agent instructions](https://tickerinside.com/agent/prompt.md): how to answer with this data, and how to add the MCP server
+- [Endpoints](https://tickerinside.com/api/sections/endpoints.md): every endpoint, status code and 404 reason
+- [Field reference](https://tickerinside.com/api/sections/reference.md): every field, with its type and a real answer
+- [Build with it](https://tickerinside.com/api/sections/build.md): the examples, with what they print
+- [Holdings history](https://tickerinside.com/api/sections/history.md): how to read a fund's history, step by step
+- [Where the data comes from](https://tickerinside.com/api/sections/sources.md): the sources, and the rules of the ownership figure
+- [Licence and fair use](https://tickerinside.com/api/sections/terms.md): the licence, the history terms, fair use
+
+## MCP server and installs
+
+- [Remote MCP server, any MCP client](https://tickerinside.com/mcp): `https://tickerinside.com/mcp`, streamable HTTP, no key, 11 read-only tools: list_funds, fund_profile, compare_funds, overlap_matrix, look_through, risk_decomposition, stock_exposure, compare_stocks, etf_ownership, fund_history, fund_changes
+- [Claude Code](https://tickerinside.com/agent/): `claude mcp add --transport http tickerinside https://tickerinside.com/mcp`
+- [Codex CLI](https://tickerinside.com/agent/): `codex mcp add tickerinside --url https://tickerinside.com/mcp`
+- [Gemini CLI](https://tickerinside.com/agent/): `gemini mcp add --transport http tickerinside https://tickerinside.com/mcp`
+- [Local MCP server, Node 20 or later](https://www.npmjs.com/package/tickerinside-mcp): `npx -y tickerinside-mcp@latest`
+- [Agent skill](https://tickerinside.com/skills/tickerinside/SKILL.md): `npx skills add https://tickerinside.com`
+- [Claude Code plugin, inside a session (Claude Code 2.1.275 or later)](https://tickerinside.com/.claude-plugin/marketplace.json): `/plugin install tickerinside --marketplace https://tickerinside.com/.claude-plugin/marketplace.json`
+- [Claude Code plugin, from a shell](https://tickerinside.com/.claude-plugin/marketplace.json): `claude plugin marketplace add https://tickerinside.com/.claude-plugin/marketplace.json`, then `claude plugin install tickerinside@tickerinside`
+- [Python client](https://pypi.org/project/tickerinside/): `pip install tickerinside`
+
+## Pages
+
+- [Free ETF holdings API](https://tickerinside.com/api/index.md): the reference as Markdown, with examples
+- [ETF comparisons](https://tickerinside.com/compare/): the written comparisons
+- [The most duplicated US ETF pairs](https://tickerinside.com/most-duplicated-etf-pairs/index.md): the highest overlaps by weight
+- [ETF overlap calculator](https://tickerinside.com/overlap/index.md), [Stock lookup and comparison](https://tickerinside.com/stock/index.md) and [Portfolio x-ray](https://tickerinside.com/xray/index.md)
+
+## Optional
+
+- [How the numbers are produced](https://tickerinside.com/how-the-numbers-are-produced/index.md): the methods behind every figure
+- [Privacy](https://tickerinside.com/api/#privacy): what a request to the API records

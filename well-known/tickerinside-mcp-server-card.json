@@ -1,0 +1,30 @@
+{
+  "$schema": "https://static.modelcontextprotocol.io/schemas/v1/server-card.schema.json",
+  "name": "com.tickerinside/tickerinside-mcp",
+  "version": "1.8.0",
+  "title": "TickerInside",
+  "description": "Holdings, overlap, correlation and look-through risk for US ETFs, from issuer files, with no key.",
+  "websiteUrl": "https://tickerinside.com/agent/",
+  "icons": [
+    {
+      "src": "https://tickerinside.com/apple-touch-icon.png",
+      "mimeType": "image/png",
+      "sizes": [
+        "180x180"
+      ]
+    }
+  ],
+  "remotes": [
+    {
+      "type": "streamable-http",
+      "url": "https://tickerinside.com/mcp",
+      "supportedProtocolVersions": [
+        "2026-07-28",
+        "2025-11-25",
+        "2025-06-18",
+        "2025-03-26",
+        "2024-11-05"
+      ]
+    }
+  ]
+}

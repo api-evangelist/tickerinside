@@ -1,0 +1,15 @@
+generated: '2026-10-06'
+method: probed
+generator: harvest-packages.py
+source: registry metadata endpoints (registry.npmjs.org, pypi.org, rubygems.org, api.nuget.org, packagist.org, crates.io)
+ownership_rule: 'official: true only when the registry metadata (homepage, repository, author, URLs) names the provider''s domain (security/tickerinside-domain-security.yml,
+  security/tickerinside-vulnerability-disclosure.yml, tickerinside.com) or its accepted GitHub org.'
+packages:
+- name: tickerinside
+  registry: pypi
+  url: https://pypi.org/project/tickerinside/
+  language: Python
+  official: true
+  version: 0.3.0
+  published: '2026-09-30'
+  evidence: metadata names tickerinside.com
