@@ -11,3 +11,12 @@ signals:
         http_status: 200
         fetched: "true"
         quote: "The terms that apply to a request are the ones on this page on the day it is made."
+  data_retention:
+    url: https://tickerinside.com/privacy/
+    section: How long
+    note: Records of API requests are retained for three months.
+    evidence:
+      - source: https://tickerinside.com/privacy/
+        http_status: 200
+        fetched: "true"
+        quote: "A request to the API, to the MCP server, to a feed or for a file for agents writes one pseudonymous usage record, kept three months."

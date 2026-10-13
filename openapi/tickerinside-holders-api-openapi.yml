@@ -1,0 +1,437 @@
+openapi: 3.2.0
+info:
+  title: TickerInside Holders API
+  version: '1'
+  summary: Holdings of 5,433 US ETFs, which ETFs hold a stock, and overlap, as static JSON.
+  description: TickerInside is an open, machine-readable database of US ETF holdings, with the source and date of each holding.
+  termsOfService: https://tickerinside.com/terms/
+  contact:
+    name: TickerInside
+    email: contact@tickerinside.com
+    url: https://tickerinside.com/api/
+  license:
+    name: CC BY 4.0
+    identifier: CC-BY-4.0
+servers:
+- url: https://tickerinside.com/api/v1
+  description: Static JSON files, and five answers computed from them when asked. No key.
+security: []
+tags:
+- name: Holders
+paths:
+  /holders/{c}.json:
+    get:
+      operationId: getHoldersShard
+      summary: Who holds what, one first character
+      description: 'The reverse index split by the first character of the key: a.json to z.json, and 0.json for a key that starts with any other character (7203.JP is in 0.json, AZN.GB in a.json). Each shard holds the part of holders.json for its keys, with their names and figures under facts. It also holds what holders.json does not: the SEC-layer funds that hold a key with no stock file, such as a line listed abroad, under holders_sec_nport, and the old keys of its first character under aliases. It is the source of the holders-only answers under /sec/. 0.json is the largest shard (3.0 MB). The same content is split again by the key''s first digit, in /api/v1/holders/0/0.json to /api/v1/holders/0/9.json (7203.JP is in 0/7.json), for a client that wants a smaller file. Ask for the key''s first character in lower case, or 0 when it is not a letter. The files are a.json to z.json, 0.json, and 0/0.json to 0/9.json; any other address under /api/v1/holders/ answers 404, reason not_a_shard.'
+      externalDocs:
+        url: https://tickerinside.com/api/#holders-shard
+      responses:
+        '200':
+          description: 'The file. The example is a real answer, shortened: long lists and maps keep their first entries.'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HoldersShard'
+              example:
+                as_of: '2026-10-09'
+                holdings_as_of:
+                  CNRG: '2026-10-09'
+                  CWI: '2026-10-09'
+                  BMVP: '2026-10-10'
+                funds:
+                  CNRG: State Street SPDR S&P Kensho Clean Power ETF
+                  CWI: State Street SPDR MSCI ACWI ex-US ETF
+                  BMVP: Invesco Bloomberg MVP Multi-factor ETF
+                facts:
+                  A:
+                    n: Agilent Technologies
+                    r1: 25.8
+                    r3: 57.8
+                    vol: 31.6
+                    mdd3: -33.1
+                    cap_b: 48.2
+                    pe: 33.7
+                    yield: 0.59
+                    page: true
+                  A0009K0.KR:
+                    n: Aimed Bio Inc
+                  A00680K.KR:
+                    n: Mirae Asset Securities 2P
+                holders:
+                  ACA:
+                  - - CNRG
+                    - 4.1788
+                  - - PSCI
+                    - 2.3523
+                  - - VIOG
+                    - 0.5649
+                  AES:
+                  - - CNRG
+                    - 3.5632
+                  - - RSPU
+                    - 3.3439
+                  - - PEY
+                    - 2.3046
+                  AVA:
+                  - - PSCU
+                    - 3.1195
+                  - - CNRG
+                    - 2.9203
+                  - - PEY
+                    - 2.408
+                holders_sec_nport:
+                  ACWI:
+                  - - HF
+                    - 6.9817
+                  - - AAAA
+                    - 2.04
+                  - - AQLG
+                    - 0.3449
+                  ABVX:
+                  - - AADR
+                    - 3.1198
+                  - - GVIP
+                    - 2.209
+                  - - MEDI
+                    - 2.1642
+                  ASX:
+                  - - CHPY
+                    - 3.7805
+                  - - NSI
+                    - 3.5964
+                  - - SOXY
+                    - 2.6191
+                sec_nport_as_of:
+                  AAAA: '2026-07-31'
+                  AADR: '2026-06-30'
+                  ABLD: '2026-07-31'
+                aliases:
+                  A000070:
+                  - 000070.KR
+                  A000080:
+                  - 000080.KR
+                  A000100:
+                  - 000100.KR
+                license: CC BY 4.0
+                attribution: Credit TickerInside with a link to this file, or to the page that shows the figure, wherever the medium allows a link, and by name where it does not. How you mark the link is up to you.
+        '301':
+          description: 'The address was not written the way the file is: an upper case ticker, a share class written BRK-B or BRK/B, a missing .json, or punctuation at the end. Follow the Location header (curl -L).'
+        '304':
+          description: 'Not modified: the ETag of your copy, sent in If-None-Match, is still current. Files are cached five minutes.'
+        '404':
+          description: 'reason not_a_shard: the address is not one of a.json to z.json, 0.json or 0/0.json to 0/9.json; holders names the shard of the key.'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/NotCovered'
+        '503':
+          description: 'The file could not be served just then: retry after a minute. uptime says whether the site fails its own checks.'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Unavailable'
+      parameters:
+      - name: c
+        in: path
+        required: true
+        description: 'The first character of the key, lower case: a to z, or 0 for any other character (AZN.GB is in a.json, 7203.JP in 0.json).'
+        schema:
+          type: string
+          pattern: ^[a-z0]$
+        example: a
+      tags:
+      - Holders
+components:
+  schemas:
+    NotCovered:
+      type: object
+      additionalProperties: true
+      required:
+      - error
+      - ticker
+      - message
+      - docs
+      properties:
+        error:
+          type: string
+          const: not_covered
+          description: 'Always not_covered, whatever the reason: read reason and the next address.'
+        reason:
+          type: string
+          enum:
+          - has_security_file
+          - in_another_layer
+          - is_a_fund
+          - no_written_comparison
+          - not_a_shard
+          - not_held_by_daily_funds
+          - not_held
+          - earlier_key
+          - no_such_endpoint
+          - not_in_directory
+          - no_file
+          - funds_not_covered
+          - etn
+          - other_product
+          - no_filing_yet
+          - not_in_sec_list
+          - other_fund
+          - stale_filing
+          - no_prospectus_found
+          - not_in_archive
+          - holdings_at_date_not_enabled
+          - invalid_date
+          - before_history
+          description: 'Every code is explained on /contract/#reasons. not_in_directory: a fund address with no file, for a ticker not in the directory of US-listed funds; a ticker of the directory with no file gets the code universe.json gives it (etn, no_filing_yet and the others), and no_file when the directory was not read. not_held: under /sec/, no covered fund holds the key; earlier_key: an old key, with reads_as. no_such_endpoint: no endpoint at the address. funds_not_covered: several funds of /overlap or /lookthrough, with reasons. in_another_layer: sent only to the TickerInside clients released before /fund/ answered for a fund of the other layers too (see holdings_kind); etf gives the fund''s file. has_security_file: a ticker asked for as a fund has a stock file (see security). is_a_fund: a ticker asked for as a stock is a covered fund (see fund, and holders for the funds that hold it). no_written_comparison: no comparison file for this pair in either order (see fund_files and written_comparisons). not_a_shard: an address under /api/v1/holders/ that is not a shard (see holders). Under /api/v1/history/: not_in_archive: the fund has no history file (see history). holdings_at_date_not_enabled: holdings at a date are not served yet, and every valid date answers this (see changes). invalid_date: the date is not a calendar date, or is after today. before_history: the date is before the fund''s first file (see first), answered only once holdings at a date are served. Under /api/v1/flows/: reason not_held_by_daily_funds: no fund read daily from its issuer''s files held the key or moved it in the last 20 trading days; summary names the night''s summary.'
+        ticker:
+          type:
+          - string
+          - 'null'
+          description: What was asked for, upper case; null when the address names no single ticker, such as a pair under /compare/.
+        message:
+          type: string
+          description: What happened and where to look next, in words.
+        docs:
+          type: string
+          description: The reference.
+        security:
+          type: string
+          description: 'With has_security_file: the stock file of the ticker, or its holders-only answer.'
+        reads_as:
+          type: array
+          items:
+            type: string
+          description: 'Under /sec/, for an old key written before lines listed abroad carried their market (7203): the keys it reads as now, from the aliases of holders. Absent otherwise.'
+        fund:
+          type: string
+          description: 'With is_a_fund: the fund file of the ticker.'
+        etf:
+          type: string
+          description: 'With in_another_layer: the file of the fund, /api/v1/etf/{ticker}.json.'
+        holders:
+          type: string
+          description: 'The shard of the key''s first character: /api/v1/holders/{c}.json, c a to z, or 0 for any other character (7203.JP is in 0.json). It lists the covered funds that hold the key, from issuer files and from SEC filings, with or without a stock file.'
+        pair:
+          type:
+          - array
+          - 'null'
+          items:
+            type: string
+          description: 'With no_written_comparison: the two tickers asked for, upper case, or null when the address names no pair.'
+        written_comparisons:
+          type: array
+          items:
+            type: object
+            additionalProperties: true
+            properties:
+              pair:
+                type: array
+                items:
+                  type: string
+              url:
+                type: string
+          description: 'With no_written_comparison: the pairs that have a comparison file, as index.json lists them.'
+        fund_files:
+          type: array
+          items:
+            type: string
+          description: 'With no_written_comparison: the fund files of the tickers asked for that are covered funds, to compute the overlap from.'
+        covered:
+          type: string
+          description: 'What is covered: /api/v1/securities.json after a /sec/ address with no reason, /api/v1/index.json otherwise.'
+        not_covered:
+          type: array
+          items:
+            type: string
+          description: 'Under /overlap, /lookthrough and /diversify: the tickers asked for that are not covered.'
+        reasons:
+          type: object
+          additionalProperties:
+            type: string
+          description: 'Under /overlap, /lookthrough and /diversify: the reason code of each ticker of not_covered.'
+        covered_issuers:
+          type: array
+          items:
+            type: string
+          description: 'Under /overlap and /lookthrough: the issuers whose own files are read; the other covered funds are read from SEC filings.'
+        history:
+          type: string
+          description: 'With not_in_archive: the list of the funds that have a history.'
+        changes:
+          type: string
+          description: 'With holdings_at_date_not_enabled: the fund''s changes file, served today.'
+        first:
+          type:
+          - string
+          - 'null'
+          description: 'With before_history: the date of the fund''s oldest file. before_history is answered only once holdings at a date are served.'
+        date:
+          type: string
+          description: 'With invalid_date, holdings_at_date_not_enabled or before_history: the date asked for.'
+        summary:
+          type: string
+          description: 'With not_held_by_daily_funds: the night''s flows, /api/v1/flows.json.'
+    Unavailable:
+      type: object
+      additionalProperties: true
+      required:
+      - error
+      - message
+      - status
+      - uptime
+      properties:
+        error:
+          type: string
+          const: unavailable
+        message:
+          type: string
+        status:
+          type: string
+          description: The nightly report.
+        uptime:
+          type: string
+          description: 'The live checks: whether the site fails its own checks.'
+    HoldersShard:
+      type: object
+      properties:
+        as_of:
+          type:
+          - string
+          - 'null'
+          description: The price date.
+        holdings_as_of:
+          type:
+          - object
+          - 'null'
+          additionalProperties:
+            type:
+            - string
+            - 'null'
+          description: The date of each issuer-layer fund's holdings file, keyed by ticker, for every issuer-layer fund.
+        funds:
+          type:
+          - object
+          - 'null'
+          additionalProperties:
+            type:
+            - string
+            - 'null'
+          description: Ticker to fund name for the issuer-layer funds. The names of SEC-layer funds are in /api/v1/funds.json, under sec_funds.
+        facts:
+          type: object
+          additionalProperties:
+            type: object
+            additionalProperties: true
+            properties:
+              n:
+                type:
+                - string
+                - 'null'
+              r1:
+                type:
+                - number
+                - 'null'
+              r3:
+                type:
+                - number
+                - 'null'
+              vol:
+                type:
+                - number
+                - 'null'
+              mdd3:
+                type:
+                - number
+                - 'null'
+              cap_b:
+                type:
+                - number
+                - 'null'
+              pe:
+                type:
+                - number
+                - 'null'
+              yield:
+                type:
+                - number
+                - 'null'
+              page:
+                type: boolean
+          description: 'For each key of this shard the data can describe: n, the name, and where known r1, r3, vol, mdd3, cap_b, pe and yield, in the units of a stock file. page is true when the stock has a page.'
+        holders:
+          type:
+          - object
+          - 'null'
+          additionalProperties:
+            type: array
+            items:
+              type: array
+              prefixItems:
+              - title: fund
+                type: string
+              - title: weight
+                type: number
+              items:
+                type:
+                - number
+                - string
+          description: 'The part of holders.json for the keys of this shard: each key to the issuer-layer funds that hold it, as [fund ticker, weight percent], heaviest first. Each row''s date is in holdings_as_of.'
+        holders_sec_nport:
+          type:
+          - object
+          - 'null'
+          additionalProperties:
+            type: array
+            items:
+              type: array
+              prefixItems:
+              - title: fund
+                type: string
+              - title: weight
+                type: number
+              items:
+                type:
+                - number
+                - string
+          description: Each key of this shard that has no stock file, such as a line listed abroad, to the SEC-layer funds that hold it, as [fund ticker, weight percent], heaviest first. Each row's date is in sec_nport_as_of. A key with a stock file has its SEC-layer holders in that file.
+        sec_nport_as_of:
+          type:
+          - object
+          - 'null'
+          additionalProperties:
+            type:
+            - string
+            - 'null'
+          description: Each SEC-layer fund listed in holders_sec_nport, to the quarter end its filing describes.
+        aliases:
+          type: object
+          additionalProperties:
+            type: array
+            items:
+              type: string
+          description: 'The old keys whose first character is this shard''s, each with the keys it reads as now: 7203 reads as 7203.JP and 7203.SA. Unlike holders.json, it also lists a key that reads only as itself with its market (NESN as NESN.CH). Absent from a shard with no old key.'
+        license:
+          type:
+          - string
+          - 'null'
+          description: The licence the data is published under.
+        attribution:
+          type:
+          - string
+          - 'null'
+          description: 'How to credit the data: a link to this file where the medium allows one, the name where it does not.'
+      additionalProperties: true
+      required:
+      - as_of
+      - holdings_as_of
+      - funds
+      - facts
+      - holders
+      - holders_sec_nport
+      - sec_nport_as_of
+      - license
+      - attribution
+externalDocs:
+  description: The reference, with examples and recipes
+  url: https://tickerinside.com/api/

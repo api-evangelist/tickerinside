@@ -1,0 +1,225 @@
+openapi: 3.2.0
+info:
+  title: TickerInside Holders.json API
+  version: '1'
+  summary: Holdings of 5,433 US ETFs, which ETFs hold a stock, and overlap, as static JSON.
+  description: TickerInside is an open, machine-readable database of US ETF holdings, with the source and date of each holding.
+  termsOfService: https://tickerinside.com/terms/
+  contact:
+    name: TickerInside
+    email: contact@tickerinside.com
+    url: https://tickerinside.com/api/
+  license:
+    name: CC BY 4.0
+    identifier: CC-BY-4.0
+servers:
+- url: https://tickerinside.com/api/v1
+  description: Static JSON files, and five answers computed from them when asked. No key.
+security: []
+tags:
+- name: Holders.json
+paths:
+  /holders.json:
+    get:
+      operationId: getHolders
+      summary: Who holds what, issuer files
+      description: 'The reverse index of the 690 issuer files: for each of the 18,754 securities their funds hold, which of them hold it and at what weight. One file of 5.2 MB, the right shape for a client that loads it once and walks it. SEC-layer funds are not in it. A stock''s SEC-layer holders are in /api/v1/sec/{ticker}.json, under holders_sec_nport, and those of a key with no stock file are in the shard of its first character, /api/v1/holders/{c}.json.'
+      externalDocs:
+        url: https://tickerinside.com/api/#holders
+      responses:
+        '200':
+          description: 'The file. The example is a real answer, shortened: long lists and maps keep their first entries.'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Holders'
+              example:
+                as_of: '2026-10-09'
+                holdings_as_of:
+                  CNRG: '2026-10-09'
+                  CWI: '2026-10-09'
+                  BMVP: '2026-10-10'
+                funds:
+                  XLC: Communication Services Select Sector SPDR Fund
+                  XLY: Consumer Discretionary Select Sector SPDR Fund
+                  XLP: Consumer Staples Select Sector SPDR Fund
+                securities: 18754
+                names:
+                  CEG: Constellation Energy
+                  ACA: Arcosa, Inc.
+                  BE: Bloom Energy Corporation
+                note: 'For each security, the funds holding it as [ticker, weight percent], heaviest first. Weights come from the issuer file dated in holdings_as_of. A security listed outside the United States is keyed by its local code and its market, a two letter country code: 7203.JP is Toyota in Tokyo and 7203.SA Elm in Riyadh. aliases gives the keys written before that, when the local code alone was the key, with the keys each reads as now: SAN reads as SAN (the Santander ADR in New York), SAN.ES (Banco Santander in Madrid) and SAN.FR (Sanofi in Paris). A key that reads only as itself with its market after it (NESN as NESN.CH) is listed in the holders shard of its first letter. The Toronto line of a Canadian company that also trades in New York is the same shares, keyed by the US ticker (RY). The funds known from SEC Form N-PORT filings are not in this file: a stock''s own file lists them (holders_sec_nport in /api/v1/sec/{ticker}.json), and for a security with no file of its own, such as a line listed abroad, the holders shard of its first character does (holders_sec_nport in /api/v1/holders/a.json for AZN.GB).'
+                holders:
+                  CEG:
+                  - - XLU
+                    - 7.5454
+                  - - IDU
+                    - 6.2344
+                  - - VPU
+                    - 5.8862
+                  ACA:
+                  - - CNRG
+                    - 4.1788
+                  - - PSCI
+                    - 2.3523
+                  - - VIOG
+                    - 0.5649
+                  BE:
+                  - - HYDR
+                    - 18.8
+                  - - ICLN
+                    - 9.6952
+                  - - IBAT
+                    - 8.5879
+                aliases:
+                  '000100':
+                  - 000100.CN
+                  - 000100.KR
+                  '000155':
+                  - 000155.CN
+                  - 000155.KR
+                  '000157':
+                  - 000157.CN
+                  - 000157.KR
+                license: CC BY 4.0
+                attribution: Credit TickerInside with a link to this file, or to the page that shows the figure, wherever the medium allows a link, and by name where it does not. How you mark the link is up to you.
+                source: https://tickerinside.com/how-the-numbers-are-produced/
+        '304':
+          description: 'Not modified: the ETag of your copy, sent in If-None-Match, is still current. Files are cached five minutes.'
+        '503':
+          description: 'The file could not be served just then: retry after a minute. uptime says whether the site fails its own checks.'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Unavailable'
+      tags:
+      - Holders.json
+components:
+  schemas:
+    Holders:
+      type: object
+      properties:
+        as_of:
+          type:
+          - string
+          - 'null'
+          description: The price date.
+        holdings_as_of:
+          type:
+          - object
+          - 'null'
+          additionalProperties:
+            type:
+            - string
+            - 'null'
+          description: The date of each issuer-layer fund's holdings file, keyed by ticker.
+        funds:
+          type:
+          - object
+          - 'null'
+          additionalProperties:
+            type:
+            - string
+            - 'null'
+          description: Ticker to fund name for the issuer-layer funds, and for a few other funds the price data names, and for other funds the price data names. Use index.json tickers, not this map, as the list of covered funds.
+        securities:
+          type:
+          - integer
+          - 'null'
+          description: How many distinct securities the issuer-layer funds hold between them, the length of holders.
+        names:
+          type:
+          - object
+          - 'null'
+          additionalProperties:
+            type:
+            - string
+            - 'null'
+          description: 'Ticker to company name for every security the data can name: from the price data for the stocks with a history, from the issuer files for the rest.'
+        note:
+          type:
+          - string
+          - 'null'
+          description: How to read the holders map.
+        holders:
+          type:
+          - object
+          - 'null'
+          additionalProperties:
+            type: array
+            items:
+              type: array
+              prefixItems:
+              - title: fund
+                type: string
+              - title: weight
+                type: number
+              items:
+                type:
+                - number
+                - string
+          description: 'The index itself: for each security, the issuer-layer funds that hold it, as [fund ticker, weight percent], heaviest first. A security is one listed line. A US line is keyed by its ticker, and a dot and one letter mark a US share class (BRK.B). Any other line is keyed by its local code and its market, a dot and a two letter country code (7203.JP, SAN.FR). The Toronto line of a Canadian company that also trades in New York is the same shares, under the US ticker (RY). Preferred shares a file writes under their issuer''s common ticker are under that ticker and .PFD, three letters and never a market (JPM.PFD). That key holds every series of JPMorgan''s preferred stock a fund holds, and in a preferred stock fund any other income security filed under the ticker, such as a business development company''s listed notes. It is a US line of its own, so a preferred stock fund is never listed among the holders of the common stock.'
+        aliases:
+          type:
+          - object
+          - 'null'
+          additionalProperties:
+            type:
+            - array
+            - 'null'
+            items:
+              type:
+              - 'null'
+              - string
+          description: 'The keys written before lines listed abroad were keyed with their market, when a local code alone was the key. Each maps to the keys it reads as now, the US line first and then the heaviest: 7203 reads as 7203.JP (Toyota) and 7203.SA (Elm), A005930 as 005930.KR. A key that became several was several companies or lines under one code. The shard of each old key''s first character lists them all. This file leaves out a key that reads only as itself with its market after it (NESN as NESN.CH).'
+        license:
+          type:
+          - string
+          - 'null'
+          description: The licence the data is published under.
+        attribution:
+          type:
+          - string
+          - 'null'
+          description: 'How to credit the data: a link to this file where the medium allows one, the name where it does not.'
+        source:
+          type:
+          - string
+          - 'null'
+          description: Where the method behind these figures is written down.
+      additionalProperties: true
+      required:
+      - as_of
+      - holdings_as_of
+      - funds
+      - securities
+      - names
+      - note
+      - holders
+      - aliases
+      - license
+      - attribution
+      - source
+    Unavailable:
+      type: object
+      additionalProperties: true
+      required:
+      - error
+      - message
+      - status
+      - uptime
+      properties:
+        error:
+          type: string
+          const: unavailable
+        message:
+          type: string
+        status:
+          type: string
+          description: The nightly report.
+        uptime:
+          type: string
+          description: 'The live checks: whether the site fails its own checks.'
+externalDocs:
+  description: The reference, with examples and recipes
+  url: https://tickerinside.com/api/

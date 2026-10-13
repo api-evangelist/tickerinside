@@ -1,0 +1,323 @@
+openapi: 3.2.0
+info:
+  title: TickerInside Ownership.json API
+  version: '1'
+  summary: Holdings of 5,433 US ETFs, which ETFs hold a stock, and overlap, as static JSON.
+  description: TickerInside is an open, machine-readable database of US ETF holdings, with the source and date of each holding.
+  termsOfService: https://tickerinside.com/terms/
+  contact:
+    name: TickerInside
+    email: contact@tickerinside.com
+    url: https://tickerinside.com/api/
+  license:
+    name: CC BY 4.0
+    identifier: CC-BY-4.0
+servers:
+- url: https://tickerinside.com/api/v1
+  description: Static JSON files, and five answers computed from them when asked. No key.
+security: []
+tags:
+- name: Ownership.json
+paths:
+  /ownership.json:
+    get:
+      operationId: getOwnership
+      summary: ETF ownership, every stock
+      description: 'The ETF ownership ledger. For each of the 3,592 stocks with a figure, most held first: the share of its shares outstanding held by the covered US ETFs, at least, how many funds were counted, and the basis. The basis is company when the percent is of the company, every class counted, and class when it is of the ticker''s class alone. Then the share of the money in the covered US stock ETFs that sits in the ten largest US companies, and the companies held by the most funds. Each figure''s parts and dates are in the stock''s file, /api/v1/sec/{ticker}.json, under etf_ownership: shares_held, shares_outstanding and shares_outstanding_as_of, funds_counted, and holdings_dates {oldest, newest}. Here as_of is the newest holdings date counted, not a price date. A lower bound, never an estimate of the whole: shares held by ETFs outside the coverage, and by covered funds whose count could not be used, are not in it. One exception: the count of shares outstanding is used when it is at most 2% below a current independent count, so a figure can be up to about 2% of itself too high. The holdings and the count of shares carry different dates, both published.'
+      externalDocs:
+        url: https://tickerinside.com/api/#ownership
+      responses:
+        '200':
+          description: 'The file. The example is a real answer, shortened: long lists and maps keep their first entries.'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Ownership'
+              example:
+                as_of: '2026-10-12'
+                method: ti-ownership/1
+                method_url: https://tickerinside.com/api/v1/methods.json
+                count: 3592
+                note: 'Each entry is [ticker, at least this percent held by the covered US ETFs, how many funds were counted, basis], most held first. With basis company the percent is of the company''s shares outstanding, every class counted; with basis class it is of the outstanding shares of the ticker''s class alone, which is not the company''s figure. most_widely_held carries the same basis. A lower bound: funds not covered, and covered funds whose count could not be used, are not in it. The parts of each figure, its dates and its source are in the stock''s file, /api/v1/sec/{ticker}.json, under etf_ownership. A measurement, not investment advice.'
+                stocks:
+                - - EU
+                  - 35.04
+                  - 23
+                  - company
+                - - ATEN
+                  - 34.97
+                  - 105
+                  - company
+                - - URG
+                  - 34.84
+                  - 21
+                  - company
+                refused:
+                  class_unknown: 16
+                  count_below_independent: 333
+                  count_mismatch: 44
+                  count_too_old: 3
+                  no_fund_counted: 337
+                  no_independent_count: 48
+                  no_sec_count: 557
+                  split_between_dates: 119
+                  under_0_01_pct: 6
+                refused_reasons:
+                  class_unknown: the company's filing does not say which class this ticker is
+                  count_below_independent: the SEC's count is more than 2% below a current independent count of the same shares, so the percent would be too high
+                  count_mismatch: the SEC's count is far above an independent count of the same shares, so it counts other shares
+                  count_too_old: the company's count is more than 400 days older than the holdings
+                  no_fund_counted: no covered fund's share count could be used
+                  no_independent_count: no independent count to check the SEC's count against
+                  no_sec_count: the SEC data gives no count of the company's shares
+                  split_between_dates: a split of the stock falls after the date of the SEC's count, which is in the old shares
+                  under_0_01_pct: the counted funds hold less than 0.01% of the shares, below the two decimals of the figure
+                top10_share:
+                  pct: 28.9
+                  companies:
+                  - NVDA
+                  - AAPL
+                  - GOOGL
+                  funds: 1488
+                  funds_without_net_assets: 0
+                  net_assets_dates:
+                    oldest: '2026-01-31'
+                    newest: '2026-10-10'
+                most_widely_held:
+                - - NVDA
+                  - Nvidia
+                  - 746
+                  - 11.36
+                  - company
+                - - GOOGL
+                  - Alphabet Inc.
+                  - 744
+                  - 9.08
+                  - company
+                - - MSFT
+                  - Microsoft
+                  - 716
+                  - 11.32
+                  - company
+                held_back: null
+                docs: https://tickerinside.com/api/#ownership
+                license: CC BY 4.0
+                attribution: Credit TickerInside with a link to this file, or to the page that shows the figure, wherever the medium allows a link, and by name where it does not. How you mark the link is up to you.
+        '304':
+          description: 'Not modified: the ETag of your copy, sent in If-None-Match, is still current. Files are cached five minutes.'
+        '503':
+          description: 'The file could not be served just then: retry after a minute. uptime says whether the site fails its own checks.'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Unavailable'
+      tags:
+      - Ownership.json
+components:
+  schemas:
+    Ownership:
+      type: object
+      properties:
+        as_of:
+          type:
+          - string
+          - 'null'
+          description: The newest holdings date among the issuer files the ledger was counted from. Here as_of is a holdings date, not the price date.
+        method:
+          type: string
+          description: The method and its version, ti-ownership/1.
+        method_url:
+          type: string
+          description: Where the method is written down, with its test vectors.
+        count:
+          type: integer
+          description: How many stocks have a figure, the length of stocks.
+        note:
+          type: string
+          description: How to read the entries.
+        stocks:
+          type: array
+          items:
+            type: array
+            prefixItems:
+            - title: ticker
+              type: string
+            - title: percent
+              type: number
+            - title: funds
+              type: integer
+            - title: basis
+              type: string
+            items:
+              type:
+              - number
+              - string
+          description: 'One entry per stock with a figure, most held first, as [ticker, at least this percent held by the covered US ETFs, how many funds were counted, basis]. basis is as in the stock file. company: the percent is of the company''s shares outstanding, every class counted. class: it is of the ticker''s class alone, which is not the company''s figure (Clearway''s class C, while its classes A, B and D are left out). Two tickers of one company on a company basis carry the same figure.'
+        refused:
+          type: object
+          additionalProperties:
+            type: integer
+          description: How many stocks with a file have no figure, by reason.
+        refused_reasons:
+          type: object
+          additionalProperties:
+            type: string
+          description: Those reasons in words.
+        top10_share:
+          type:
+          - object
+          - 'null'
+          additionalProperties: true
+          required:
+          - pct
+          - companies
+          - funds
+          - funds_without_net_assets
+          - net_assets_dates
+          properties:
+            pct:
+              type:
+              - number
+              - 'null'
+              description: The share, in percent, rounded to one decimal. A share of the money, not a bound, so it is rounded to nearest.
+            companies:
+              type: array
+              items:
+                type: string
+              description: 'The ten companies, one ticker each: the largest by the market data''s capitalisation among the US companies any covered fund holds. A US company is a stock the price data places in a sector, or one whose company files 10-K and 10-Q reports with the SEC. A company with no stock file here is ranked like the others, and its weight in each fund counts in pct. A stock has a file with at least 110 of the 156 weekly returns, or with fewer when a fund read from an issuer file or a stock ETF from SEC filings holds it in a file dated since it listed, the price data has its closes since its listing, or a year of them, the last at most five sessions old, and Nasdaq Trader''s directory lists it under its name.'
+            funds:
+              type: integer
+              description: How many funds it is measured over.
+            funds_without_net_assets:
+              type: integer
+              description: How many US stock funds were left out because their files state no net assets.
+            net_assets_dates:
+              type:
+              - object
+              - 'null'
+              required:
+              - oldest
+              - newest
+              additionalProperties: true
+              properties:
+                oldest:
+                  type: string
+                newest:
+                  type: string
+              description: 'The oldest and newest date of the net assets used: issuer figures are current, SEC filings months old.'
+          description: 'The share of the money in the covered US stock ETFs that sits in the ten largest US companies by market value. It gives pct, the companies, and funds, how many funds it is measured over: those whose net assets are at least 80% in US-listed stocks. It also gives how many such funds were left out for want of stated net assets, and the oldest and newest date of the net assets used. Each fund counts by its own net assets, a Vanguard fund by its ETF class''s alone. The ten are ranked among every US company a covered fund holds, whether or not it has a stock file here. The weight of a company without a file counts as US stock like any other.'
+        most_widely_held:
+          type:
+          - array
+          - 'null'
+          items:
+            type: array
+            prefixItems:
+            - title: ticker
+              type: string
+            - title: company
+              type:
+              - string
+              - 'null'
+            - title: funds
+              type: integer
+            - title: percent
+              type:
+              - number
+              - 'null'
+            - title: basis
+              type:
+              - string
+              - 'null'
+            items:
+              type:
+              - 'null'
+              - number
+              - string
+          description: 'The 25 companies held by the most covered funds, both layers, one line per company. Each line is [ticker, company name, how many covered funds hold any of its listed classes, the ticker''s pct_lower_bound or null, its basis or null]. A fund holding two classes of the company (GOOGL and GOOG) is one fund. The ticker is the company''s class held by the most funds. Its pct_lower_bound is that stock file''s figure, of the company or of the ticker''s class alone as basis says (Visa''s is its class A''s). A fund whose row under a ticker is another security is not counted: a preferred stock fund, a row named as a preferred share, or a filing whose row is listed under abroad. A line listed abroad has a key of its own (7203.JP beside TM) and is never counted for a US company.'
+        held_back:
+          type:
+          - object
+          - 'null'
+          additionalProperties: true
+          required:
+          - reason
+          - failures
+          - examples
+          - figures
+          - last_figures
+          - last_as_of
+          properties:
+            reason:
+              type: string
+              description: above_100, fewer_figures or error.
+            failures:
+              type: integer
+              description: How many stocks came to over 100% tonight.
+            examples:
+              type: array
+              items:
+                type: string
+              description: Up to five of them.
+            figures:
+              type: integer
+              description: How many figures tonight's ledger has.
+            last_figures:
+              type:
+              - integer
+              - 'null'
+              description: How many the ledger served has.
+            last_as_of:
+              type:
+              - string
+              - 'null'
+              description: The as_of of the ledger served.
+          description: Null on a normal night. When tonight's ledger is held back, the figures served are those of the last ledger that passed, each with its own dates, and this says why. reason is above_100 when more than five stocks come to over 100% with no split to explain them; failures says how many, and examples which. It is fewer_figures when tonight's ledger has more than 20% fewer figures than the last one that passed (figures, last_figures), a night that lost an input. It is error when the ledger could not be computed tonight; top10_share is then null and most_widely_held empty. A fewer_figures hold lasts at most seven days of holdings dates (last_as_of is the date of the ledger served); after that the lower count is published. The ledger served keeps only the stocks that have a file tonight.
+        docs:
+          type: string
+          description: Where this file is documented.
+        license:
+          type: string
+          description: The licence the data is published under.
+        attribution:
+          type: string
+          description: 'How to credit the data: a link to this file where the medium allows one, the name where it does not.'
+      additionalProperties: true
+      required:
+      - as_of
+      - method
+      - method_url
+      - count
+      - note
+      - stocks
+      - refused
+      - refused_reasons
+      - top10_share
+      - most_widely_held
+      - held_back
+      - docs
+      - license
+      - attribution
+    Unavailable:
+      type: object
+      additionalProperties: true
+      required:
+      - error
+      - message
+      - status
+      - uptime
+      properties:
+        error:
+          type: string
+          const: unavailable
+        message:
+          type: string
+        status:
+          type: string
+          description: The nightly report.
+        uptime:
+          type: string
+          description: 'The live checks: whether the site fails its own checks.'
+externalDocs:
+  description: The reference, with examples and recipes
+  url: https://tickerinside.com/api/

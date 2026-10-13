@@ -1,0 +1,9 @@
+generated: '2026-10-12'
+method: probed
+source: https://tickerinside.com/mcp
+status: "200"
+deployment:
+  mode: remote
+  endpoint: https://tickerinside.com/mcp
+  auth: none
+  verified: probed

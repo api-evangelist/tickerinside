@@ -1,0 +1,746 @@
+openapi: 3.2.0
+info:
+  title: TickerInside Index.json API
+  version: '1'
+  summary: Holdings of 5,433 US ETFs, which ETFs hold a stock, and overlap, as static JSON.
+  description: TickerInside is an open, machine-readable database of US ETF holdings, with the source and date of each holding.
+  termsOfService: https://tickerinside.com/terms/
+  contact:
+    name: TickerInside
+    email: contact@tickerinside.com
+    url: https://tickerinside.com/api/
+  license:
+    name: CC BY 4.0
+    identifier: CC-BY-4.0
+servers:
+- url: https://tickerinside.com/api/v1
+  description: Static JSON files, and five answers computed from them when asked. No key.
+security: []
+tags:
+- name: Index.json
+paths:
+  /index.json:
+    get:
+      operationId: getIndex
+      summary: What exists
+      description: What exists, and the date of the data. Start here if you are pulling the whole set.
+      externalDocs:
+        url: https://tickerinside.com/api/#index
+      responses:
+        '200':
+          description: 'The file. The example is a real answer, shortened: long lists and maps keep their first entries.'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Index'
+              example:
+                as_of: '2026-10-09'
+                coverage:
+                  funds: 690
+                  securities_held: 18754
+                  what: 'US listed ETFs from iShares, SPDR, Vanguard, Invesco and Global X, each from the issuer''s own full holdings file. Beside them, 1,982 other US stock ETFs, listed under tickers_sec, come from their latest public SEC Form N-PORT filing, which describes the portfolio at a quarter end, usually two to four months back; each of their fund files gives that date as report_date. From the same filings: 924 fixed income ETFs (tickers_bond), 250 multi-asset ETFs (tickers_multi_asset) and 1,398 derivative-based ETFs (tickers_derivative). 131 trusts and commodity pools (tickers_trust) come from their own SEC filings. 140 funds from their sponsors'' own files (tickers_sponsor), too new for a Form N-PORT, are read from the holdings their sponsors publish on their own sites. 282 more (tickers_prospectus) have a file from their prospectus and no holdings yet.'
+                  sec_nport: 1982
+                  sec_nport_periods:
+                    oldest: '2026-01-31'
+                    newest: '2026-08-31'
+                  sec_nport_age:
+                    low_months: 2
+                    high_months: 4
+                    text: two to four months
+                  sec_nport_bonds: 924
+                  sec_nport_multi_asset: 250
+                  sec_nport_derivatives: 1398
+                  trust_filings: 131
+                  sponsor_files: 140
+                  prospectus: 282
+                  funds_total: 5515
+                  universe:
+                    etfs: 5717
+                    covered: 5433
+                    pct: 95.0
+                    by_layer:
+                      issuer_files: 688
+                      sec_nport: 1952
+                      sec_nport_derivatives: 1365
+                      sec_nport_bonds: 922
+                      sec_nport_multi_asset: 235
+                      trust_filings: 131
+                      sponsor_files: 140
+                    prospectus: 282
+                    with_file: 5715
+                    with_objective: 282
+                    not_covered:
+                      no_prospectus_found: 2
+                    etns: 53
+                    other_products: 1
+                    outside_universe: 82
+                    file_date: '2026-10-12'
+                    available: true
+                    source: Nasdaq Trader symbol directory (nasdaqtraded.txt)
+                    sentence: 5,433 of the 5,717 US-listed ETFs in Nasdaq Trader's symbol directory of 2026-10-12 have holdings here (95.0%), and 282 more have a file from their prospectus, with the objective it states and no holdings.
+                    all_us_etfs: true
+                    headline: All US ETFs
+                    claim: 'All US ETFs: 5,715 of the 5,717 in Nasdaq Trader''s symbol directory of 2026-10-12 have a file, 5,433 with holdings and 282 with the objective their prospectus states; the 2 listed most recently get theirs on the nights after.'
+                    assets:
+                      net_assets_b: 15961.5
+                      with_holdings_b: 15941.7
+                      pct: 99.9
+                      funds_sized: 5451
+                      funds_unsized: 266
+                      unsized_with_holdings: 124
+                      basis: Net assets of each ETF in US dollars, from the fund's own filing or file where it gives one and from market data otherwise; a fund the market data puts at 0.0 billion (under 50 million dollars) counts at that figure; only the totals are published.
+                      sentence: null
+                  stocks_with_file: 5055
+                  stocks_with_weekly_series: 4675
+                  pages:
+                    funds: 526
+                    stocks: 350
+                  issuers:
+                  - iShares
+                  - Invesco
+                  - State Street SPDR
+                  - Global X
+                  - Vanguard
+                endpoints:
+                  funds: https://tickerinside.com/api/v1/funds.json
+                  fund: https://tickerinside.com/api/v1/fund/{ticker}.json
+                  etf: https://tickerinside.com/api/v1/etf/{ticker}.json
+                  security: https://tickerinside.com/api/v1/sec/{ticker}.json
+                  holders: https://tickerinside.com/api/v1/holders.json
+                  holders_shard: https://tickerinside.com/api/v1/holders/{c}.json
+                  securities: https://tickerinside.com/api/v1/securities.json
+                  identifiers: https://tickerinside.com/api/v1/identifiers.json
+                  universe: https://tickerinside.com/api/v1/universe.json
+                  compare: https://tickerinside.com/api/v1/compare/{a}-vs-{b}.json
+                  overlap: https://tickerinside.com/api/v1/overlap?funds={a},{b}
+                  lookthrough: https://tickerinside.com/api/v1/lookthrough?portfolio={ticker}:{weight},{ticker}:{weight}
+                  batch: https://tickerinside.com/api/v1/batch?funds={a},{b}
+                  screen: https://tickerinside.com/api/v1/screen?holds={ticker}
+                  diversify: https://tickerinside.com/api/v1/diversify?have={a},{b}&try={c}
+                  ownership: https://tickerinside.com/api/v1/ownership.json
+                  methods: https://tickerinside.com/api/v1/methods.json
+                  history: https://tickerinside.com/api/v1/history.json
+                  fund_history: https://tickerinside.com/api/v1/history/{ticker}.json
+                  status: https://tickerinside.com/api/v1/status.json
+                  uptime: https://tickerinside.com/api/v1/uptime.json
+                  manifest: https://tickerinside.com/api/v1/manifest.json
+                  changelog: https://tickerinside.com/api/v1/changelog.json
+                  deprecations: https://tickerinside.com/api/v1/deprecations.json
+                  corrections: https://tickerinside.com/api/v1/corrections.json
+                  openapi: https://tickerinside.com/api/openapi.json
+                  docs_markdown: https://tickerinside.com/api/index.md
+                tickers:
+                - AAXJ
+                - ACWI
+                - ACWV
+                tickers_sec:
+                - AAAA
+                - AADR
+                - AAEQ
+                tickers_derivative:
+                - AALG
+                - AAOG
+                - AAOX
+                tickers_trust:
+                - AAAU
+                - AGQ
+                - ARKB
+                tickers_bond:
+                - AAA
+                - AAAC
+                - AAAP
+                tickers_multi_asset:
+                - AAPR
+                - ABUF
+                - ABXB
+                tickers_sponsor:
+                - AAUB
+                - ACQQ
+                - ACRT
+                tickers_prospectus:
+                - AAAD
+                - AAOZ
+                - ACBE
+                written_comparisons:
+                - pair:
+                  - VOO
+                  - VTI
+                  url: https://tickerinside.com/api/v1/compare/voo-vs-vti.json
+                - pair:
+                  - QQQ
+                  - VGT
+                  url: https://tickerinside.com/api/v1/compare/qqq-vs-vgt.json
+                - pair:
+                  - SCHD
+                  - SCHG
+                  url: https://tickerinside.com/api/v1/compare/schd-vs-schg.json
+                without_file:
+                  etn:
+                  - AIQD
+                  - AIQU
+                  - AMJB
+                  no_prospectus_found:
+                  - HFIX
+                  - OCTI
+                  other_product:
+                  - IPB
+                docs: https://tickerinside.com/api/
+                license: CC BY 4.0
+                attribution: Credit TickerInside with a link to this file, or to the page that shows the figure, wherever the medium allows a link, and by name where it does not. How you mark the link is up to you.
+                terms: https://tickerinside.com/legal/
+        '304':
+          description: 'Not modified: the ETag of your copy, sent in If-None-Match, is still current. Files are cached five minutes.'
+        '503':
+          description: 'The file could not be served just then: retry after a minute. uptime says whether the site fails its own checks.'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Unavailable'
+      tags:
+      - Index.json
+components:
+  schemas:
+    Index:
+      type: object
+      properties:
+        as_of:
+          type:
+          - string
+          - 'null'
+          description: The price date across the whole site.
+        coverage:
+          type: object
+          properties:
+            funds:
+              type:
+              - integer
+              - 'null'
+            securities_held:
+              type:
+              - integer
+              - 'null'
+            what:
+              type:
+              - string
+              - 'null'
+            sec_nport:
+              type:
+              - integer
+              - 'null'
+            sec_nport_periods:
+              type: object
+              properties:
+                oldest:
+                  type:
+                  - string
+                  - 'null'
+                newest:
+                  type:
+                  - string
+                  - 'null'
+              additionalProperties: true
+            sec_nport_age:
+              type: object
+              properties:
+                low_months:
+                  type:
+                  - number
+                  - 'null'
+                high_months:
+                  type:
+                  - number
+                  - 'null'
+                text:
+                  type:
+                  - string
+                  - 'null'
+              additionalProperties: true
+            sec_nport_bonds:
+              type:
+              - number
+              - 'null'
+            sec_nport_multi_asset:
+              type:
+              - number
+              - 'null'
+            sec_nport_derivatives:
+              type:
+              - number
+              - 'null'
+            trust_filings:
+              type:
+              - number
+              - 'null'
+            sponsor_files:
+              type:
+              - number
+              - 'null'
+            prospectus:
+              type:
+              - number
+              - 'null'
+            funds_total:
+              type:
+              - integer
+              - 'null'
+            universe:
+              type: object
+              properties:
+                etfs:
+                  type:
+                  - number
+                  - 'null'
+                covered:
+                  type:
+                  - number
+                  - 'null'
+                pct:
+                  type:
+                  - number
+                  - 'null'
+                by_layer:
+                  type: object
+                  properties:
+                    issuer_files:
+                      type:
+                      - number
+                      - 'null'
+                    sec_nport:
+                      type:
+                      - number
+                      - 'null'
+                    sec_nport_derivatives:
+                      type:
+                      - number
+                      - 'null'
+                    sec_nport_bonds:
+                      type:
+                      - number
+                      - 'null'
+                    sec_nport_multi_asset:
+                      type:
+                      - number
+                      - 'null'
+                    trust_filings:
+                      type:
+                      - number
+                      - 'null'
+                    sponsor_files:
+                      type:
+                      - number
+                      - 'null'
+                  additionalProperties: true
+                prospectus:
+                  type:
+                  - number
+                  - 'null'
+                with_file:
+                  type:
+                  - number
+                  - 'null'
+                with_objective:
+                  type:
+                  - number
+                  - 'null'
+                not_covered:
+                  type: object
+                  properties:
+                    no_prospectus_found:
+                      type:
+                      - number
+                      - 'null'
+                    no_filing_yet:
+                      type:
+                      - number
+                      - 'null'
+                    not_in_sec_list:
+                      type:
+                      - number
+                      - 'null'
+                    other_fund:
+                      type:
+                      - number
+                      - 'null'
+                    stale_filing:
+                      type:
+                      - number
+                      - 'null'
+                  additionalProperties: true
+                etns:
+                  type:
+                  - number
+                  - 'null'
+                other_products:
+                  type:
+                  - number
+                  - 'null'
+                outside_universe:
+                  type:
+                  - number
+                  - 'null'
+                file_date:
+                  type:
+                  - string
+                  - 'null'
+                available:
+                  type:
+                  - boolean
+                  - 'null'
+                source:
+                  type:
+                  - string
+                  - 'null'
+                sentence:
+                  type:
+                  - string
+                  - 'null'
+                all_us_etfs:
+                  type:
+                  - boolean
+                  - 'null'
+                headline:
+                  type:
+                  - string
+                  - 'null'
+                claim:
+                  type:
+                  - string
+                  - 'null'
+                assets:
+                  type: object
+                  properties:
+                    net_assets_b:
+                      type:
+                      - number
+                      - 'null'
+                    with_holdings_b:
+                      type:
+                      - number
+                      - 'null'
+                    pct:
+                      type:
+                      - number
+                      - 'null'
+                    funds_sized:
+                      type:
+                      - number
+                      - 'null'
+                    funds_unsized:
+                      type:
+                      - number
+                      - 'null'
+                    unsized_with_holdings:
+                      type:
+                      - number
+                      - 'null'
+                    basis:
+                      type:
+                      - string
+                      - 'null'
+                    sentence: {}
+                  additionalProperties: true
+              additionalProperties: true
+            stocks_with_file:
+              type:
+              - integer
+              - 'null'
+            stocks_with_weekly_series:
+              type:
+              - integer
+              - 'null'
+            pages:
+              type: object
+              properties:
+                funds:
+                  type:
+                  - integer
+                  - 'null'
+                stocks:
+                  type:
+                  - integer
+                  - 'null'
+              additionalProperties: true
+            issuers:
+              type:
+              - array
+              - 'null'
+              items:
+                type:
+                - 'null'
+                - string
+          additionalProperties: true
+          description: 'The coverage counts. funds: the issuer-layer funds. securities_held: the distinct securities they hold. what: the universe in words. sec_nport: the SEC-layer funds, with the oldest and newest quarter end their filings describe in sec_nport_periods, and how old their holdings are on the day of the build in sec_nport_age (the 10th to the 90th percentile in whole months, low_months to high_months, and in words, text); sec_nport_bonds, sec_nport_multi_asset, sec_nport_derivatives, trust_filings, sponsor_files and prospectus, the other layers. Then the figures every page prints: funds_total, every layer, the US ETFs covered; universe, the coverage measured against the US-listed ETFs (see universe.json); stocks_with_file, the stocks with a file under /sec/, and stocks_with_weekly_series, those whose file carries the weekly series, at least 110 of the 156 weekly returns; pages, the funds and stocks with a page; issuers, the issuers whose files are read, largest first.'
+        endpoints:
+          type: object
+          properties:
+            funds:
+              type:
+              - string
+              - 'null'
+            fund:
+              type:
+              - string
+              - 'null'
+            etf:
+              type:
+              - string
+              - 'null'
+            security:
+              type:
+              - string
+              - 'null'
+            holders:
+              type:
+              - string
+              - 'null'
+            holders_shard:
+              type:
+              - string
+              - 'null'
+            securities:
+              type:
+              - string
+              - 'null'
+            identifiers:
+              type:
+              - string
+              - 'null'
+            universe:
+              type:
+              - string
+              - 'null'
+            compare:
+              type:
+              - string
+              - 'null'
+            overlap:
+              type:
+              - string
+              - 'null'
+            lookthrough:
+              type:
+              - string
+              - 'null'
+            batch:
+              type:
+              - string
+              - 'null'
+            screen:
+              type:
+              - string
+              - 'null'
+            diversify:
+              type:
+              - string
+              - 'null'
+            ownership:
+              type:
+              - string
+              - 'null'
+            methods:
+              type:
+              - string
+              - 'null'
+            history:
+              type:
+              - string
+              - 'null'
+            fund_history:
+              type:
+              - string
+              - 'null'
+            status:
+              type:
+              - string
+              - 'null'
+            uptime:
+              type:
+              - string
+              - 'null'
+            manifest:
+              type:
+              - string
+              - 'null'
+            changelog:
+              type:
+              - string
+              - 'null'
+            deprecations:
+              type:
+              - string
+              - 'null'
+            corrections:
+              type:
+              - string
+              - 'null'
+            openapi:
+              type:
+              - string
+              - 'null'
+            docs_markdown:
+              type:
+              - string
+              - 'null'
+          additionalProperties: true
+          description: The endpoints as URL templates, so a client can find them without reading the reference. fund answers for every fund; etf is the file of a fund listed under tickers_derivative, tickers_trust, tickers_bond, tickers_multi_asset, tickers_sponsor or tickers_prospectus. holders_shard is the template of the holders shards, {c} being the key's first character in lower case, a to z, or 0 for any other. It also gives the OpenAPI description (openapi), the reference in Markdown (docs_markdown), the nightly report (status) and the live checks (uptime).
+        tickers:
+          type:
+          - array
+          - 'null'
+          items:
+            type:
+            - 'null'
+            - string
+          description: 'Every issuer-layer fund, as a sorted list: the funds read from their issuers'' own files. This is the universe the census of pairs and the file ages count over; a stock page counts these funds and the funds of tickers_sec.'
+        tickers_sec:
+          type:
+          - array
+          - 'null'
+          items:
+            type:
+            - 'null'
+            - string
+          description: 'Every SEC-layer fund, as a sorted list: the other US stock ETFs, served from their latest SEC Form N-PORT filing. Each has a fund file like the funds above, dated to the quarter end its filing describes, and a page only in a published cohort.'
+        tickers_derivative:
+          type:
+          - array
+          - 'null'
+          items:
+            type:
+            - 'null'
+            - string
+          description: Every derivative-based fund, sorted. Its file is under /etf/.
+        tickers_trust:
+          type:
+          - array
+          - 'null'
+          items:
+            type:
+            - 'null'
+            - string
+          description: Every trust and commodity pool that files no Form N-PORT, sorted. Its file is under /etf/.
+        tickers_bond:
+          type:
+          - array
+          - 'null'
+          items:
+            type:
+            - 'null'
+            - string
+          description: Every fixed income fund, sorted. Its file is under /etf/.
+        tickers_multi_asset:
+          type:
+          - array
+          - 'null'
+          items:
+            type:
+            - 'null'
+            - string
+          description: Every multi-asset fund, sorted. Its file is under /etf/.
+        tickers_sponsor:
+          type:
+          - array
+          - 'null'
+          items:
+            type:
+            - 'null'
+            - string
+          description: Every sponsor-file fund, sorted.
+        tickers_prospectus:
+          type:
+          - array
+          - 'null'
+          items:
+            type:
+            - 'null'
+            - string
+          description: Every prospectus-file fund, sorted.
+        written_comparisons:
+          type:
+          - array
+          - 'null'
+          items:
+            type: object
+            properties:
+              pair:
+                type:
+                - array
+                - 'null'
+                items:
+                  type:
+                  - 'null'
+                  - string
+              url:
+                type:
+                - string
+                - 'null'
+            additionalProperties: true
+          description: 'The written comparisons: the pairs with a page written by hand, each with the URL of its JSON. A pair''s file exists only in the order listed here. Any two tickers above can still be compared from their two fund files.'
+        without_file:
+          type: object
+          additionalProperties:
+            type: array
+            items:
+              type: string
+          description: The directory's tickers with no file, by the reason a fund address's 404 gives.
+        docs:
+          type:
+          - string
+          - 'null'
+          description: The reference for these endpoints.
+        license:
+          type:
+          - string
+          - 'null'
+          description: The licence the data is published under.
+        attribution:
+          type:
+          - string
+          - 'null'
+          description: 'How to credit the data: a link to this file where the medium allows one, the name where it does not.'
+        terms:
+          type:
+          - string
+          - 'null'
+          description: 'The legal notice: who publishes, the licence of the current snapshots served here, and the separate terms of the historical archive.'
+      additionalProperties: true
+      required:
+      - as_of
+      - coverage
+      - endpoints
+      - tickers
+      - tickers_sec
+      - tickers_derivative
+      - tickers_trust
+      - tickers_bond
+      - tickers_multi_asset
+      - tickers_sponsor
+      - tickers_prospectus
+      - written_comparisons
+      - docs
+      - license
+      - attribution
+      - terms
+    Unavailable:
+      type: object
+      additionalProperties: true
+      required:
+      - error
+      - message
+      - status
+      - uptime
+      properties:
+        error:
+          type: string
+          const: unavailable
+        message:
+          type: string
+        status:
+          type: string
+          description: The nightly report.
+        uptime:
+          type: string
+          description: 'The live checks: whether the site fails its own checks.'
+externalDocs:
+  description: The reference, with examples and recipes
+  url: https://tickerinside.com/api/

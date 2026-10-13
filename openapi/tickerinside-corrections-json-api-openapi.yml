@@ -1,0 +1,259 @@
+openapi: 3.2.0
+info:
+  title: TickerInside Corrections.json API
+  version: '1'
+  summary: Holdings of 5,433 US ETFs, which ETFs hold a stock, and overlap, as static JSON.
+  description: TickerInside is an open, machine-readable database of US ETF holdings, with the source and date of each holding.
+  termsOfService: https://tickerinside.com/terms/
+  contact:
+    name: TickerInside
+    email: contact@tickerinside.com
+    url: https://tickerinside.com/api/
+  license:
+    name: CC BY 4.0
+    identifier: CC-BY-4.0
+servers:
+- url: https://tickerinside.com/api/v1
+  description: Static JSON files, and five answers computed from them when asked. No key.
+security: []
+tags:
+- name: Corrections.json
+paths:
+  /corrections.json:
+    get:
+      operationId: getCorrections
+      summary: The corrections registry
+      description: 'Each figure that was published wrong and then corrected, newest first: the day the correction reached the files, the families of files it touched, the tickers, and what the files said before and say since. The same entries are on /contract/.'
+      externalDocs:
+        url: https://tickerinside.com/api/#corrections
+      responses:
+        '200':
+          description: 'The file. The example is a real answer, shortened: long lists and maps keep their first entries.'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Corrections'
+              example:
+                count: 12
+                newest: '2026-10-08'
+                kinds:
+                  reading: How an issuer file or a filing was read
+                  keys: How securities are keyed
+                  ticker: A ticker reused or moved
+                  prices: Price data
+                  flows: ETF flows
+                entries:
+                - id: 2026-10-08-flows-merger-ranked-as-selling
+                  date: '2026-10-08'
+                  kind: flows
+                  title: A merger was ranked as ETF selling
+                  scope:
+                  - flows
+                  tickers:
+                  - BLFS
+                  - RGEN
+                  tickers_complete: true
+                  before: 'The ETF flows of the first night ranked BLFS among the largest net reductions of the day: the funds'' BLFS lines left their files when BLFS merged into RGEN, which read as sales.'
+                  after: A corporate action is published as one, dated at the first close where any of its lines were flagged, and its securities leave the rankings of that close.
+                  changelog: null
+                - id: 2026-10-04-spcx-ticker-moved-to-spck
+                  date: '2026-10-04'
+                  kind: ticker
+                  title: A fund was served under a ticker that now names a company
+                  scope:
+                  - fund
+                  - sec
+                  - holders
+                  tickers:
+                  - SPCX
+                  - SPCK
+                  tickers_complete: true
+                  before: The SPAC and New Issue ETF trades as SPCK, and Nasdaq Trader's directory of 2 October 2026 gives SPCX to Space Exploration Technologies' Class A common stock. The SEC's ticker file still gave the fund's series SPCX, so /api/v1/fund/spcx.json served the fund's filing under the company's ticker.
+                  after: The fund is served as SPCK, from the same filing, and SPCX's one file is the company's stock file under /api/v1/sec/. A fund whose every ticker now names a company of another name is refused.
+                  changelog: null
+                - id: 2026-10-04-ishares-weights-from-market-values
+                  date: '2026-10-04'
+                  kind: reading
+                  title: iShares lines under 0.005% were read as 0.00%
+                  scope:
+                  - fund
+                  - sec
+                  - holders
+                  - compare
+                  - history
+                  tickers:
+                  - ITOT
+                  tickers_complete: false
+                  before: 'iShares prints each weight rounded to two decimals, so a line under 0.005% of a fund read 0.00%: 1,287 of ITOT''s 2,448 lines on its file of 1 October 2026, which the overlap figures left out.'
+                  after: Each weight is computed from the row's market value, to six decimals, when the market values agree with the printed weights within the rounding. The overlap figures keep 2,440 lines of that file, and ITOT's overlap with VTI's file of 31 August 2026 went from 93.0% to 95.4%. The holdings history reads the step to the first file weighted this way as a restatement, not as trades.
+                  changelog: null
+                contract: https://tickerinside.com/contract/
+                report: 'A figure that looks wrong: write to the contact address on /support/ with the page or file, the figure and the source it disagrees with.'
+                docs: https://tickerinside.com/api/#versions
+                license: CC BY 4.0
+                attribution: Credit TickerInside with a link to this file, or to the page that shows the figure, wherever the medium allows a link, and by name where it does not. How you mark the link is up to you.
+        '304':
+          description: 'Not modified: the ETag of your copy, sent in If-None-Match, is still current. Files are cached five minutes.'
+        '503':
+          description: 'The file could not be served just then: retry after a minute. uptime says whether the site fails its own checks.'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Unavailable'
+      tags:
+      - Corrections.json
+components:
+  schemas:
+    Corrections:
+      type: object
+      properties:
+        count:
+          type:
+          - number
+          - 'null'
+          description: How many corrections.
+        newest:
+          type:
+          - string
+          - 'null'
+          description: The date of the newest.
+        kinds:
+          type: object
+          additionalProperties:
+            type: string
+          description: Each kind of correction, by code, in words.
+        entries:
+          type: array
+          items:
+            type: object
+            properties:
+              id:
+                type:
+                - string
+                - 'null'
+                description: The correction's id. It does not change.
+              date:
+                type:
+                - string
+                - 'null'
+                description: The day the correction reached the files.
+              kind:
+                type:
+                - string
+                - 'null'
+                description: Its kind, a code of kinds.
+              title:
+                type:
+                - string
+                - 'null'
+                description: What was wrong, in one line.
+              scope:
+                type:
+                - array
+                - 'null'
+                items:
+                  type:
+                  - 'null'
+                  - string
+                description: 'The families of files it touched, as the manifest names them without the slash: fund, etf, sec, holders, compare, history, flows, ownership.'
+              tickers:
+                type:
+                - array
+                - 'null'
+                items:
+                  type:
+                  - 'null'
+                  - string
+                description: 'The funds and securities whose figures were wrong, wherever the files list them: every one when tickers_complete is true, examples otherwise.'
+              tickers_complete:
+                type:
+                - boolean
+                - 'null'
+                description: Whether tickers lists every fund and security whose figures were wrong.
+              before:
+                type:
+                - string
+                - 'null'
+                description: What the files said, with the figures.
+              after:
+                type:
+                - string
+                - 'null'
+                description: What they say since, with the figures.
+              changelog:
+                type:
+                - string
+                - 'null'
+                description: The id of the changelog.json entry that announced it, or null.
+            additionalProperties: true
+            required:
+            - id
+            - date
+            - kind
+            - title
+            - scope
+            - tickers
+            - tickers_complete
+            - before
+            - after
+            - changelog
+          description: Every correction, newest first; their fields are described below.
+        contract:
+          type:
+          - string
+          - 'null'
+          description: 'The data contract this file belongs to: /contract/.'
+        report:
+          type:
+          - string
+          - 'null'
+          description: How to report a figure that looks wrong.
+        docs:
+          type:
+          - string
+          - 'null'
+          description: Where this file is documented.
+        license:
+          type:
+          - string
+          - 'null'
+          description: The licence the file is published under.
+        attribution:
+          type:
+          - string
+          - 'null'
+          description: 'How to credit the data: a link to this file where the medium allows one, the name where it does not.'
+      additionalProperties: true
+      required:
+      - count
+      - newest
+      - kinds
+      - entries
+      - contract
+      - report
+      - docs
+      - license
+      - attribution
+    Unavailable:
+      type: object
+      additionalProperties: true
+      required:
+      - error
+      - message
+      - status
+      - uptime
+      properties:
+        error:
+          type: string
+          const: unavailable
+        message:
+          type: string
+        status:
+          type: string
+          description: The nightly report.
+        uptime:
+          type: string
+          description: 'The live checks: whether the site fails its own checks.'
+externalDocs:
+  description: The reference, with examples and recipes
+  url: https://tickerinside.com/api/

@@ -1,0 +1,215 @@
+openapi: 3.2.0
+info:
+  title: TickerInside History.json API
+  version: '1'
+  summary: Holdings of 5,433 US ETFs, which ETFs hold a stock, and overlap, as static JSON.
+  description: TickerInside is an open, machine-readable database of US ETF holdings, with the source and date of each holding.
+  termsOfService: https://tickerinside.com/terms/
+  contact:
+    name: TickerInside
+    email: contact@tickerinside.com
+    url: https://tickerinside.com/api/
+  license:
+    name: CC BY 4.0
+    identifier: CC-BY-4.0
+servers:
+- url: https://tickerinside.com/api/v1
+  description: Static JSON files, and five answers computed from them when asked. No key.
+security: []
+tags:
+- name: History.json
+paths:
+  /history.json:
+    get:
+      operationId: getHistoryIndex
+      summary: Holdings history, every fund
+      description: 'Every issuer-layer fund that has a history here, with the dates of its oldest and newest files in the archive, how many file dates it holds, how often the issuer publishes, and the address of its history file. Not under CC BY 4.0: the history terms apply (license, terms). Fetching this list or many funds'' history files on a schedule to store them is not allowed.'
+      externalDocs:
+        url: https://tickerinside.com/api/#history-index
+      responses:
+        '200':
+          description: 'The file. The example is a real answer, shortened: long lists and maps keep their first entries.'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HistoryIndex'
+              example:
+                as_of: '2026-10-12'
+                since: '2026-07-31'
+                count: 697
+                funds:
+                - t: AAXJ
+                  first: '2026-09-02'
+                  last: '2026-10-09'
+                  file_dates: 27
+                  cadence: daily
+                  traded_pp_from: '2026-09-29'
+                  ended: null
+                  url: https://tickerinside.com/api/v1/history/aaxj.json
+                - t: ACWI
+                  first: '2026-09-01'
+                  last: '2026-10-09'
+                  file_dates: 27
+                  cadence: daily
+                  traded_pp_from: '2026-09-29'
+                  ended: null
+                  url: https://tickerinside.com/api/v1/history/acwi.json
+                - t: ACWV
+                  first: '2026-09-02'
+                  last: '2026-10-09'
+                  file_dates: 27
+                  cadence: daily
+                  traded_pp_from: '2026-09-29'
+                  ended: null
+                  url: https://tickerinside.com/api/v1/history/acwv.json
+                holdings_at: null
+                note: 'One file per fund read from its issuer''s own files, from the first file the archive holds: each file date, and what changed from one file to the next, weights only. previous names the file each step is compared with, so a gap and a monthly file show. A step marked restated is a change of the keys or of the reading of the files, not a trade. A fund no longer read from its issuer''s files keeps its history to its last file, whose date ended gives; the other funds known from SEC filings have no history here.'
+                docs: https://tickerinside.com/api/#history
+                license: TickerInside history terms
+                terms: https://tickerinside.com/legal/#history
+                attribution: Credit TickerInside with a link to this file, or to the page that shows the figure, wherever the medium allows a link, and by name where it does not. How you mark the link is up to you. Free per request, commercial use included; republishing the archive as a whole or a substantial part of it, and extracting it systematically, are not allowed.
+        '304':
+          description: 'Not modified: the ETag of your copy, sent in If-None-Match, is still current. Files are cached five minutes.'
+        '503':
+          description: 'The file could not be served just then: retry after a minute. uptime says whether the site fails its own checks.'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Unavailable'
+      tags:
+      - History.json
+components:
+  schemas:
+    HistoryIndex:
+      type: object
+      additionalProperties: true
+      properties:
+        as_of:
+          type:
+          - string
+          - 'null'
+          description: The newest file date any fund's history reaches. Here as_of is a holdings file date, not the price date.
+        since:
+          type:
+          - string
+          - 'null'
+          description: The oldest file date any fund's history starts from. It is not the day the archive began, which is since in status.json, under data.archive.
+        count:
+          type:
+          - integer
+          description: How many funds have a history file, the length of funds.
+        funds:
+          type: array
+          items:
+            type: object
+            additionalProperties: true
+            properties:
+              t:
+                type:
+                - string
+                description: The fund's ticker.
+              first:
+                type:
+                - string
+                description: The date of the oldest file of the fund in the archive.
+              last:
+                type:
+                - string
+                description: The date of the newest.
+              file_dates:
+                type:
+                - integer
+                description: How many file dates the archive holds for the fund.
+              cadence:
+                type:
+                - string
+                - 'null'
+                enum:
+                - daily
+                - monthly
+                - irregular
+                - null
+                description: daily when the median gap between two files is at most four days, monthly when it is 25 to 35 days, irregular otherwise; null with a single file.
+              traded_pp_from:
+                type:
+                - string
+                - 'null'
+                description: The date of the first step whose two files both carry share counts, from which traded_pp is measured; null when there is none yet.
+              ended:
+                type:
+                - string
+                - 'null'
+                description: Last issuer file's date once no longer read, else null.
+              url:
+                type:
+                - string
+                description: The fund's history file.
+            required:
+            - t
+            - first
+            - last
+            - file_dates
+            - cadence
+            - traded_pp_from
+            - ended
+            - url
+          description: One entry per fund with a history, ended or not; its fields are described below.
+        holdings_at:
+          type:
+          - string
+          - 'null'
+          description: The address of a fund's holdings at a date, with {ticker} and {date} to fill, once it is served; null until then. Today any valid date answers 404 not_covered, with reason holdings_at_date_not_enabled and the address of the fund's changes file.
+        note:
+          type:
+          - string
+          description: How to read the files.
+        docs:
+          type:
+          - string
+          description: Where the files are documented.
+        license:
+          type:
+          - string
+          description: 'The terms the history is published under: TickerInside''s history terms, not CC BY 4.0.'
+        terms:
+          type:
+          - string
+          description: The terms in full, on the legal notice.
+        attribution:
+          type:
+          - string
+          description: How to credit it, a link to the file where the medium allows one and the name where it does not, then what the history terms allow.
+      required:
+      - as_of
+      - since
+      - count
+      - funds
+      - holdings_at
+      - note
+      - docs
+      - license
+      - terms
+      - attribution
+    Unavailable:
+      type: object
+      additionalProperties: true
+      required:
+      - error
+      - message
+      - status
+      - uptime
+      properties:
+        error:
+          type: string
+          const: unavailable
+        message:
+          type: string
+        status:
+          type: string
+          description: The nightly report.
+        uptime:
+          type: string
+          description: 'The live checks: whether the site fails its own checks.'
+externalDocs:
+  description: The reference, with examples and recipes
+  url: https://tickerinside.com/api/

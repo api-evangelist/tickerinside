@@ -1,0 +1,500 @@
+openapi: 3.2.0
+info:
+  title: TickerInside Manifest.json API
+  version: '1'
+  summary: Holdings of 5,433 US ETFs, which ETFs hold a stock, and overlap, as static JSON.
+  description: TickerInside is an open, machine-readable database of US ETF holdings, with the source and date of each holding.
+  termsOfService: https://tickerinside.com/terms/
+  contact:
+    name: TickerInside
+    email: contact@tickerinside.com
+    url: https://tickerinside.com/api/
+  license:
+    name: CC BY 4.0
+    identifier: CC-BY-4.0
+servers:
+- url: https://tickerinside.com/api/v1
+  description: Static JSON files, and five answers computed from them when asked. No key.
+security: []
+tags:
+- name: Manifest.json
+paths:
+  /manifest.json:
+    get:
+      operationId: getManifest
+      summary: The manifest of a build
+      description: 'Written last by every build: when it ran, the version of the API''s shape and of the calculations, each source with its version, date and age in days, and one sha256 for each family of files. The sha256 of every file under /api/v1/ is in /api/v1/sha256sums.txt.gz, in the format of sha256sum. Give built_at and calculation.version beside a figure to cite the exact state it comes from. The list holds every file under /api/v1/ but the manifest and the list. A family''s sha256 is the digest of its lines of the list, so it is the same on two nights whose files of that family did not change.'
+      externalDocs:
+        url: https://tickerinside.com/api/#manifest
+      responses:
+        '200':
+          description: 'The file. The example is a real answer, shortened: long lists and maps keep their first entries.'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Manifest'
+              example:
+                manifest_version: 1
+                built_at: '2026-10-12T20:11:17Z'
+                build_date: '2026-10-12'
+                schema:
+                  api: v1
+                  digest: 9ff17bb34c55185b6a888017ce6d934258167e618250f3d4dcf57e8d21065fe9
+                  openapi: https://tickerinside.com/api/openapi.json
+                calculation:
+                  version: d73f8adc860345e2
+                  methods:
+                  - id: ti-ownership/1
+                    since: '2026-09-28'
+                  - id: ti-ownership-index/1
+                    since: '2026-10-09'
+                  - id: ti-overlap/1
+                    since: '2026-10-09'
+                  readers:
+                    key_scheme: 2
+                    sec_nport_parse: 6
+                    sec_nport_derive: 7
+                    expense_ratio_read: 4
+                    sponsor_file_read: 1
+                    prospectus_read: 2
+                    fund_shape: 3
+                    sec_shape: 2
+                    issuer_file_read: 2
+                    price_read: 1
+                    returns_and_risk: 2
+                    computed_answers: 3
+                sources:
+                - id: prices
+                  name: End-of-day prices
+                  version: null
+                  date: '2026-10-09'
+                  age_days: 3
+                  oldest: null
+                  oldest_age_days: null
+                  median_age_days: null
+                  funds: null
+                - id: issuer
+                  name: Issuers' own holdings files
+                  version: null
+                  date: '2026-10-12'
+                  age_days: 0
+                  oldest: '2026-08-31'
+                  oldest_age_days: 42
+                  median_age_days: 3
+                  funds: 690
+                - id: sec_nport
+                  name: SEC Form N-PORT filings, stock ETFs
+                  version: 2026q3
+                  date: '2026-08-31'
+                  age_days: 42
+                  oldest: '2026-01-31'
+                  oldest_age_days: 254
+                  median_age_days: 104
+                  funds: 1982
+                files:
+                  count: 12613
+                  bytes: 193304133
+                  list: https://tickerinside.com/api/v1/sha256sums.txt.gz
+                  list_sha256: 85f31ad4e1fece95ef9aad06ae13483549141f5fcf58afa90cf74a57bdeae32a
+                  format: 'sha256sum: one line per file, its sha256 in hex, two spaces, and its path from the site''s root. Mirror the files under those paths, then run gunzip -c sha256sums.txt.gz | sha256sum -c.'
+                families:
+                  changelog.json:
+                    files: 1
+                    bytes: 40155
+                    sha256: 97483a1ab1f8c079bb7f849b1ed0bbd650972dc756aff5ef54ef299b8dda69f2
+                  compare/:
+                    files: 15
+                    bytes: 80800
+                    sha256: 2a3f75ad80627b39b923c346a5bf3ea9e5435ce59be4ce6cffd0cb6ae48b97d0
+                  corrections.json:
+                    files: 1
+                    bytes: 9307
+                    sha256: f05fde0e0688a874312346f98c3733be05ab21690b5a1c79513cbc7c3131f300
+                  deprecations.json:
+                    files: 1
+                    bytes: 9058
+                    sha256: 779e76fe9c7ecc45b3d638f2d6876b8ff40cc7ff06193dcebc089bc15a3fd12d
+                  diversify/:
+                    files: 960
+                    bytes: 6072858
+                    sha256: e74d19efaaac66ef1f26de07985f912c5f830128f4d5c5f86993b4fe215b49aa
+                  etf/:
+                    files: 3125
+                    bytes: 48063599
+                    sha256: 4022ace0c57538bce8b667154ea3f74ca4c1c5d2c1e0522788bb2647c5451552
+                  flows.csv:
+                    files: 1
+                    bytes: 1963019
+                    sha256: 8edf15bf1462b8e9cb8516416650ee59a0941304664e90cf187aeec2b5ed8476
+                  flows.json:
+                    files: 1
+                    bytes: 45659
+                    sha256: d1593076519b69c2df078937bc61e19f1268697a47d23498ace237ea65e5c29a
+                  flows/:
+                    files: 27
+                    bytes: 8228747
+                    sha256: 6b61371158ba76083d59c226a6d2ca6cbc4cee21a4af05efaf0a620ec165c577
+                  fund/:
+                    files: 2672
+                    bytes: 19573888
+                    sha256: ca82e9363068b16bfb5ab6f2c16cc46174c0668c2698e2423fc850b27fb46446
+                  funds-columns.json:
+                    files: 1
+                    bytes: 537178
+                    sha256: 72c1396b0948466686d9bae364e364d5b81111b55fea1a08f369326ab574ce2d
+                  funds.csv:
+                    files: 1
+                    bytes: 896250
+                    sha256: 1aa22f6de2640d96442b4f33dbcaa162017fe7b839871dcddf4a89f1ba6fc75e
+                  funds.json:
+                    files: 1
+                    bytes: 1548484
+                    sha256: 452eacc90101397d035a1fddada03b6cf65d1cb2ce7f26335c78e82d6f192631
+                  history.json:
+                    files: 1
+                    bytes: 131946
+                    sha256: e5b6dcdc9d44a728fbd2d4ed4569fea8f7056ff3d9127553c9b6173c630b6b98
+                  history/:
+                    files: 697
+                    bytes: 9808332
+                    sha256: bfe5d23ebe4e861cfb2d8acfa2eb7d5e4cad61924f67b28a83c0863085d8b992
+                  holders.json:
+                    files: 1
+                    bytes: 5175299
+                    sha256: 8ba002d44420d902ec93c700459288385906bad114c86e91dadbda561d9bdd74
+                  holders/:
+                    files: 37
+                    bytes: 13946313
+                    sha256: fad6225ca6d8e924e65c67a39757989b1972417139065ec66077a1061bf38cfb
+                  identifiers.csv:
+                    files: 1
+                    bytes: 1059491
+                    sha256: 3f6c33f5d1f459338339f809f25ec327cf400ad64e2c9fb92e609f56ced1819f
+                  identifiers.json:
+                    files: 1
+                    bytes: 1289445
+                    sha256: f48b41f619495bd7446b4af377370919eb4bf1ff1c739b1d684c8bdbd4de2214
+                  index.json:
+                    files: 1
+                    bytes: 46463
+                    sha256: 65108cb7b2a6ce2275572333708922d9c5c84997b0a8168eaba950b6976108a6
+                  methods.json:
+                    files: 1
+                    bytes: 34747
+                    sha256: 3df3b05949149ba6ac83295724aa2da19529111ce834038b69a0e4ee0290773c
+                  ownership-index.csv:
+                    files: 1
+                    bytes: 262191
+                    sha256: cfebe9cd7fec473219370d6f0b93fb2c7b70b91f2918f806ae861a5e22844794
+                  ownership-index.json:
+                    files: 1
+                    bytes: 322790
+                    sha256: 0b8c2771cd197ce840e7289fc107cff2f469ced7072fd54090a9ed878ca63c11
+                  ownership-index/:
+                    files: 2
+                    bytes: 185302
+                    sha256: 13b9567cc5303ce512715fdb30bcb7875f611e45d92de6aaf949ea59aa8a9122
+                  ownership.json:
+                    files: 1
+                    bytes: 100639
+                    sha256: 955efe48b5f6a0ad6adc316fbc6c9c0a48f5e5d4eebf3350462b4907c7d33aba
+                  sec/:
+                    files: 5055
+                    bytes: 70708309
+                    sha256: 19d440cfef339fcb64d7012c77de1c46eb809d9c59d54306a7dfeac884d60a6b
+                  securities.csv:
+                    files: 1
+                    bytes: 846707
+                    sha256: a1644db09304aac094c63e715d475307c95dd999f35e1de22e94042dae7b973c
+                  securities.json:
+                    files: 1
+                    bytes: 937485
+                    sha256: b531784726c5aa3d581ddaded65a31429dc9489926c74decd4acb73e4bf8beee
+                  status.json:
+                    files: 1
+                    bytes: 3389
+                    sha256: 8f34fd00202d06f14d279bb3cf47e5591d75d4e04828d62d6149e065fe6500f0
+                  universe.json:
+                    files: 1
+                    bytes: 451311
+                    sha256: 8c857ca1f3cfa35f345b5f2dc5503975b142dbb75caf6f21f3b30eee2f30e41a
+                  xray/:
+                    files: 2
+                    bytes: 924972
+                    sha256: b014b639adc71f0e7ea808b26c6b1825f0d429c1aede48ffe348897290133c92
+                methods_url: https://tickerinside.com/api/v1/methods.json
+                contract: https://tickerinside.com/contract/
+                docs: https://tickerinside.com/api/#versions
+                license: CC BY 4.0
+                attribution: Credit TickerInside with a link to this file, or to the page that shows the figure, wherever the medium allows a link, and by name where it does not. How you mark the link is up to you.
+        '304':
+          description: 'Not modified: the ETag of your copy, sent in If-None-Match, is still current. Files are cached five minutes.'
+        '503':
+          description: 'The file could not be served just then: retry after a minute. uptime says whether the site fails its own checks.'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Unavailable'
+      tags:
+      - Manifest.json
+components:
+  schemas:
+    Manifest:
+      type: object
+      properties:
+        manifest_version:
+          type:
+          - number
+          - 'null'
+          description: 'The version of this file''s own shape: 1. A field added keeps it.'
+        built_at:
+          type:
+          - string
+          - 'null'
+          description: When the build that wrote every file listed here ran, in UTC. Give it beside a figure to cite the exact state it comes from.
+        build_date:
+          type:
+          - string
+          - 'null'
+          description: The day of built_at.
+        schema:
+          type: object
+          properties:
+            api:
+              type:
+              - string
+              - 'null'
+              description: 'The version in the path: v1. Inside it, fields are added, never removed or retyped.'
+            digest:
+              type:
+              - string
+              - 'null'
+              description: 'The sha256 of the tables the API reference and the OpenAPI description are written from: the names of the fields and codes and the types they fix, without their words. It is read from the code, never from a night''s files, so the night''s data never moves it; a field, a code or a type added to those tables does.'
+            openapi:
+              type:
+              - string
+              - 'null'
+              description: The OpenAPI description.
+          additionalProperties: true
+          required:
+          - api
+          - digest
+          - openapi
+          description: The version of the API's shape; its fields are described below.
+        calculation:
+          type: object
+          properties:
+            version:
+              type:
+              - string
+              - 'null'
+              description: 'The first 16 hexadecimal characters of the sha256 of the method ids and the versions under readers: it moves when any of them does, and on no other night.'
+            methods:
+              type:
+              - array
+              - 'null'
+              items:
+                type: object
+                properties:
+                  id:
+                    type:
+                    - string
+                    - 'null'
+                  since:
+                    type:
+                    - string
+                    - 'null'
+                additionalProperties: true
+              description: Each method of methods.json, as id and since, the first day figures were published under it.
+            readers:
+              type: object
+              additionalProperties:
+                type:
+                - integer
+                - 'null'
+              description: 'The version of each reader and computation named here, by name: it rises when what it makes of the same input changes, and for issuer_file_read, price_read, returns_and_risk and computed_answers with any change to their code. key_scheme is how securities are keyed (2: a line abroad carries its market). Code not named here moves no version: a figure it corrects is recorded in corrections.json.'
+          additionalProperties: true
+          required:
+          - version
+          - methods
+          - readers
+          description: The version of the calculations; its fields are described below.
+        sources:
+          type: array
+          items:
+            type: object
+            properties:
+              id:
+                type:
+                - string
+                - 'null'
+                description: 'The source: prices, a layer of fund files by its source_layer (issuer, sec_nport and the others), or directory, Nasdaq Trader''s symbol directory.'
+              name:
+                type:
+                - string
+                - 'null'
+                description: The source in words.
+              version:
+                type:
+                - string
+                - 'null'
+                description: 'The source''s own version where it has one: the SEC''s quarterly data set read (2026q2) for sec_nport, the file''s date for the directory; null otherwise.'
+              date:
+                type:
+                - string
+                - 'null'
+                description: 'The date of the data: the last close for prices, the newest holdings date of the layer''s fund files, the directory''s file date.'
+              age_days:
+                type:
+                - integer
+                - 'null'
+                description: Days from date to the day of the build.
+              oldest:
+                type:
+                - string
+                - 'null'
+                description: The oldest holdings date of the layer's fund files; null for prices and the directory.
+              oldest_age_days:
+                type:
+                - integer
+                - 'null'
+                description: Days from oldest to the day of the build.
+              median_age_days:
+                type:
+                - integer
+                - 'null'
+                description: The median, over the layer's fund files, of the days from their holdings date to the day of the build.
+              funds:
+                type:
+                - integer
+                - 'null'
+                description: How many fund files of the layer; null for prices and the directory.
+            additionalProperties: true
+            required:
+            - id
+            - name
+            - version
+            - date
+            - age_days
+            - oldest
+            - oldest_age_days
+            - median_age_days
+            - funds
+          description: Each source of the data with its version, date and age in days on the day of the build; their fields are described below.
+        files:
+          type: object
+          properties:
+            count:
+              type:
+              - number
+              - 'null'
+              description: 'How many files are listed: every file under /api/v1/ but this one and the list.'
+            bytes:
+              type:
+              - number
+              - 'null'
+              description: Their size, added up.
+            list:
+              type:
+              - string
+              - 'null'
+              description: 'The list, gzipped: /api/v1/sha256sums.txt.gz.'
+            list_sha256:
+              type:
+              - string
+              - 'null'
+              description: The sha256 of the list once unzipped.
+            format:
+              type:
+              - string
+              - 'null'
+              description: How the list is written, and the command that checks a copy against it.
+          additionalProperties: true
+          required:
+          - count
+          - bytes
+          - list
+          - list_sha256
+          - format
+          description: The list of every file with its sha256; its fields are described below.
+        families:
+          type: object
+          additionalProperties:
+            type: object
+            additionalProperties: true
+            required:
+            - files
+            - bytes
+            - sha256
+            properties:
+              files:
+                type: integer
+              bytes:
+                type: integer
+              sha256:
+                type: string
+                pattern: ^[0-9a-f]{64}$
+          description: 'One entry per family of files, keyed by a directory followed by a slash (fund/) or by the name of a file at the top (index.json): files, the number of files, bytes, their size, and sha256, the digest of the family''s lines of the list, in their order, each ending with a newline.'
+        methods_url:
+          type:
+          - string
+          - 'null'
+          description: The methods of the computed figures, /api/v1/methods.json.
+        contract:
+          type:
+          - string
+          - 'null'
+          description: 'The data contract this file belongs to: /contract/.'
+        docs:
+          type:
+          - string
+          - 'null'
+          description: Where this file is documented.
+        license:
+          type:
+          - string
+          - 'null'
+          description: The licence the file is published under.
+        attribution:
+          type:
+          - string
+          - 'null'
+          description: 'How to credit the data: a link to this file where the medium allows one, the name where it does not.'
+      additionalProperties: true
+      required:
+      - manifest_version
+      - built_at
+      - build_date
+      - schema
+      - calculation
+      - sources
+      - files
+      - families
+      - methods_url
+      - contract
+      - docs
+      - license
+      - attribution
+    Unavailable:
+      type: object
+      additionalProperties: true
+      required:
+      - error
+      - message
+      - status
+      - uptime
+      properties:
+        error:
+          type: string
+          const: unavailable
+        message:
+          type: string
+        status:
+          type: string
+          description: The nightly report.
+        uptime:
+          type: string
+          description: 'The live checks: whether the site fails its own checks.'
+externalDocs:
+  description: The reference, with examples and recipes
+  url: https://tickerinside.com/api/

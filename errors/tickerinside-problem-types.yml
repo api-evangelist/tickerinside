@@ -1,0 +1,44 @@
+generated: '2026-10-13'
+method: derived
+generator: derive-problem-types.py
+source:
+- openapi/tickerinside-openapi.json
+format: custom
+envelope:
+  media_type: application/json
+  schema: Unavailable
+coverage:
+  operations: 32
+  statuses_declared: 4
+problems:
+- status: 400
+  title: Bad Request
+  description: 'The query was refused: reason and parameter say what to fix, and limit and asked give the figures
+    of a call past the limits.'
+  operations: 5
+  media_types:
+  - application/json
+  schema: BadRequest
+- status: 404
+  title: Not Found
+  description: 'A fund the answer needs is not covered: not_covered lists the tickers, with the reason in message,
+    and reason has_security_file the stock fi'
+  operations: 11
+  media_types:
+  - application/json
+  schema: NotCovered
+- status: 405
+  title: Method Not Allowed
+  description: Another method than GET or HEAD.
+  operations: 5
+  media_types:
+  - application/json
+  schema: null
+- status: 503
+  title: Service Unavailable
+  description: 'The file could not be served just then: retry after a minute. uptime says whether the site fails
+    its own checks.'
+  operations: 31
+  media_types:
+  - application/json
+  schema: Unavailable

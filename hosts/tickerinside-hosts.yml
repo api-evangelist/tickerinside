@@ -1,15 +1,14 @@
-generated: '2026-10-06'
+generated: '2026-10-13'
 method: derived
 source: the pre-flight dossier, apis.yml pointers, spec servers, well-known, vendors -- nothing fetched here
 generator: derive-hosts.py
 summary:
-  hosts: 4
+  hosts: 2
   own: 2
   other_domain: 0
-  platform: 2
+  platform: 0
   roles:
   - api
-  - other
   - website
 hosts:
 - host: api.tickerinside.com
@@ -20,15 +19,6 @@ hosts:
   registrable_domain: tickerinside.com
   role: api
   relation: own
-- host: pypi.org
-  found_by:
-  - docs-index
-  types: []
-  serves:
-  - docs
-  registrable_domain: pypi.org
-  role: other
-  relation: platform
 - host: tickerinside.com
   found_by:
   - pointer
@@ -57,12 +47,3 @@ hosts:
   registrable_domain: tickerinside.com
   role: website
   relation: own
-- host: www.npmjs.com
-  found_by:
-  - docs-index
-  types: []
-  serves:
-  - docs
-  registrable_domain: npmjs.com
-  role: other
-  relation: platform

@@ -1,0 +1,235 @@
+generated: '2026-10-13'
+method: derived
+generator: derive-vocabulary.py
+source: openapi/tickerinside-openapi.json
+vocabulary:
+  name: TickerInside Domain Vocabulary
+  description: 'Terms declared by TickerInside''s own API contract: its resource groups, objects and enumerations, with the contract''s definitions.
+    Derived, not authored.'
+  version: '2026-10-13'
+  terms:
+  - term: Index
+    definition: 'Object declared by the contract with fields: as_of, coverage, endpoints, tickers, tickers_sec, tickers_derivative, tickers_trust,
+      tickers_bond, tickers_multi_asset, tickers_sponsor, tickers_prospectus, written_comparisons. (5 more)'
+    tags:
+    - Object
+    source: openapi/tickerinside-openapi.json#/components/schemas/Index
+  - term: Fund
+    definition: 'Object declared by the contract with fields: ticker, name, page_url, cite_as, cite_html, identifiers, source_layer, category,
+      as_of, holdings_as_of, expense_ratio, expense_ratio_gross. (40 more)'
+    tags:
+    - Object
+    source: openapi/tickerinside-openapi.json#/components/schemas/Fund
+  - term: LayerFund
+    definition: 'Object declared by the contract with fields: ticker, name, page_url, cite_as, cite_html, identifiers, source_layer, category,
+      as_of, holdings_as_of, report_date, filed. (67 more)'
+    tags:
+    - Object
+    source: openapi/tickerinside-openapi.json#/components/schemas/LayerFund
+  - term: Security
+    definition: 'Object declared by the contract with fields: ticker, name, page_url, cite_as, cite_html, sector, industry, identifiers, as_of,
+      page, cap_b, pe. (39 more)'
+    tags:
+    - Object
+    source: openapi/tickerinside-openapi.json#/components/schemas/Security
+  - term: Ownership
+    definition: 'Object declared by the contract with fields: as_of, method, method_url, count, note, stocks, refused, refused_reasons, top10_share,
+      most_widely_held, held_back, docs. (2 more)'
+    tags:
+    - Object
+    source: openapi/tickerinside-openapi.json#/components/schemas/Ownership
+  - term: Methods
+    definition: 'Object declared by the contract with fields: note, methods, docs, license, attribution.'
+    tags:
+    - Object
+    source: openapi/tickerinside-openapi.json#/components/schemas/Methods
+  - term: Compare
+    definition: 'Object declared by the contract with fields: pair, as_of, holdings_as_of, overlap, correlation, funds, page_url, cite_as, cite_html,
+      source, license, attribution.'
+    tags:
+    - Object
+    source: openapi/tickerinside-openapi.json#/components/schemas/Compare
+  - term: Funds
+    definition: 'Object declared by the contract with fields: as_of, count, with_a_page, note, funds, sec_count, sec_note, sec_funds, sponsor_funds,
+      prospectus_funds, bond_funds, multi_asset_funds. (4 more)'
+    tags:
+    - Object
+    source: openapi/tickerinside-openapi.json#/components/schemas/Funds
+  - term: Universe
+    definition: 'Object declared by the contract with fields: as_of, available, source, file_date, sentence, coverage, layers, reasons, funds,
+      license, attribution.'
+    tags:
+    - Object
+    source: openapi/tickerinside-openapi.json#/components/schemas/Universe
+  - term: Holders
+    definition: 'Object declared by the contract with fields: as_of, holdings_as_of, funds, securities, names, note, holders, aliases, license,
+      attribution, source.'
+    tags:
+    - Object
+    source: openapi/tickerinside-openapi.json#/components/schemas/Holders
+  - term: HoldersShard
+    definition: 'Object declared by the contract with fields: as_of, holdings_as_of, funds, facts, holders, holders_sec_nport, sec_nport_as_of,
+      aliases, license, attribution.'
+    tags:
+    - Object
+    source: openapi/tickerinside-openapi.json#/components/schemas/HoldersShard
+  - term: Securities
+    definition: 'Object declared by the contract with fields: as_of, count, note, securities, license, attribution.'
+    tags:
+    - Object
+    source: openapi/tickerinside-openapi.json#/components/schemas/Securities
+  - term: Identifiers
+    definition: 'Object declared by the contract with fields: read_on, count, note, fields, counts, sources, securities, license, attribution.'
+    tags:
+    - Object
+    source: openapi/tickerinside-openapi.json#/components/schemas/Identifiers
+  - term: DiversifyList
+    definition: 'Object declared by the contract with fields: name, list_date, about, left_out_on_purpose, weeks_end, rule, top, min_weeks, groups,
+      unit, left_out_tonight, funds. (2 more)'
+    tags:
+    - Object
+    source: openapi/tickerinside-openapi.json#/components/schemas/DiversifyList
+  - term: DiversifyWeekly
+    definition: 'Object declared by the contract with fields: t, n, page, size, lines, l, h, bd, comp, w, end, solo.'
+    tags:
+    - Object
+    source: openapi/tickerinside-openapi.json#/components/schemas/DiversifyWeekly
+  - term: Status
+    definition: 'Object declared by the contract with fields: schema, built_at, run, data, pages, versions, live, docs, license, attribution.'
+    tags:
+    - Object
+    source: openapi/tickerinside-openapi.json#/components/schemas/Status
+  - term: Uptime
+    definition: 'Object declared by the contract with fields: schema, generated_at, method, deployed, components, today, days, incidents, status,
+      docs, license.'
+    tags:
+    - Object
+    source: openapi/tickerinside-openapi.json#/components/schemas/Uptime
+  - term: NotCovered
+    definition: 'Object declared by the contract with fields: error, reason, ticker, message, docs, security, reads_as, fund, etf, holders, pair,
+      written_comparisons. (10 more)'
+    tags:
+    - Object
+    source: openapi/tickerinside-openapi.json#/components/schemas/NotCovered
+  - term: Unavailable
+    definition: 'Object declared by the contract with fields: error, message, status, uptime.'
+    tags:
+    - Object
+    source: openapi/tickerinside-openapi.json#/components/schemas/Unavailable
+  - term: HistoryIndex
+    definition: 'Object declared by the contract with fields: as_of, since, count, funds, holdings_at, note, docs, license, terms, attribution.'
+    tags:
+    - Object
+    source: openapi/tickerinside-openapi.json#/components/schemas/HistoryIndex
+  - term: FundHistory
+    definition: 'Object declared by the contract with fields: ticker, name, source_layer, key_scheme, first, last, file_dates, cadence, snapshots,
+      moved_threshold_pp, traded_min_pairs, traded_pairs. (13 more)'
+    tags:
+    - Object
+    source: openapi/tickerinside-openapi.json#/components/schemas/FundHistory
+  - term: HistoryChange
+    definition: 'Object declared by the contract with fields: date, previous, entered, exited, moved, moved_below_threshold, names_turnover_pp,
+      weights_moved_pp, traded_pp, splits_seen, reverted, restated. (4 more)'
+    tags:
+    - Object
+    source: openapi/tickerinside-openapi.json#/components/schemas/HistoryChange
+  - term: OverlapPair
+    definition: 'Object declared by the contract with fields: kind, page_url, share_url, pair, prices_as_of, holdings_as_of, holdings_source,
+      overlap, overlap_kind, issuer_overlap, correlation_3y, covariance_annualised_pct2. (12 more)'
+    tags:
+    - Object
+    source: openapi/tickerinside-openapi.json#/components/schemas/OverlapPair
+  - term: OverlapMatrix
+    definition: 'Object declared by the contract with fields: kind, page_url, share_url, covered, computed, reason, overlap_kind, prices_as_of,
+      holdings_as_of, holdings_source, skipped, not_comparable. (11 more)'
+    tags:
+    - Object
+    source: openapi/tickerinside-openapi.json#/components/schemas/OverlapMatrix
+  - term: Lookthrough
+    definition: 'Object declared by the contract with fields: page_url, share_url, priced, portfolio_value, currency, prices_as_of, funds, distinct_companies,
+      top_10_weight_pct, looked_through_pct, holdings_as_of, holdings_source. (13 more)'
+    tags:
+    - Object
+    source: openapi/tickerinside-openapi.json#/components/schemas/Lookthrough
+  - term: Batch
+    definition: 'Object declared by the contract with fields: asked, found, not_covered, not_included, not_included_note, renamed, funds, license,
+      attribution, docs.'
+    tags:
+    - Object
+    source: openapi/tickerinside-openapi.json#/components/schemas/Batch
+  - term: Screen
+    definition: 'Object declared by the contract with fields: as_of, filters, sort, total, offset, limit, count, funds, next, source, license,
+      attribution. (1 more)'
+    tags:
+    - Object
+    source: openapi/tickerinside-openapi.json#/components/schemas/Screen
+  - term: Diversify
+    definition: 'Object declared by the contract with fields: kind, mode, question, answer, answers, have, candidates, ranking, prices_as_of,
+      definitions, skipped, renamed. (7 more)'
+    tags:
+    - Object
+    source: openapi/tickerinside-openapi.json#/components/schemas/Diversify
+  - term: DiversifyFind
+    definition: 'Object declared by the contract with fields: kind, mode, question, answer, answers, have, list, rule, lowest, lowest_by_group,
+      ranked, overlap. (11 more)'
+    tags:
+    - Object
+    source: openapi/tickerinside-openapi.json#/components/schemas/DiversifyFind
+  - term: BadRequest
+    definition: 'Object declared by the contract with fields: error, reason, message, parameter, min, max, limit, asked, files, holdings_by_fund,
+      answered_by, docs.'
+    tags:
+    - Object
+    source: openapi/tickerinside-openapi.json#/components/schemas/BadRequest
+  - term: FlowsSummary
+    definition: 'Object declared by the contract with fields: date, newest_file, first_date, method, coverage, added_by_value, reduced_by_value,
+      added_by_shares_pct, reduced_by_shares_pct, added_beyond_growth_by_value, reduced_beyond_growth_by_value, index_events. (18 more)'
+    tags:
+    - Object
+    source: openapi/tickerinside-openapi.json#/components/schemas/FlowsSummary
+  - term: SecurityFlows
+    definition: 'Object declared by the contract with fields: ticker, name, date, newest_file, funds_holding, funds_counted, latest, series, index_events,
+      corporate_actions, method, note. (8 more)'
+    tags:
+    - Object
+    source: openapi/tickerinside-openapi.json#/components/schemas/SecurityFlows
+  - term: OwnershipIndex
+    definition: 'Object declared by the contract with fields: name, as_of, method, ledger_method, method_url, methodology, holdings_dates, shares_outstanding_dates,
+      caps_as_of, count, columns, stocks. (15 more)'
+    tags:
+    - Object
+    source: openapi/tickerinside-openapi.json#/components/schemas/OwnershipIndex
+  - term: OwnershipIndexHistory
+    definition: 'Object declared by the contract with fields: name, method, flows_method, methodology, first_close, last_close, windows, series_columns,
+      market, sectors, stocks_columns, stocks. (11 more)'
+    tags:
+    - Object
+    source: openapi/tickerinside-openapi.json#/components/schemas/OwnershipIndexHistory
+  - term: Manifest
+    definition: 'Object declared by the contract with fields: manifest_version, built_at, build_date, schema, calculation, sources, files, families,
+      methods_url, contract, docs, license. (1 more)'
+    tags:
+    - Object
+    source: openapi/tickerinside-openapi.json#/components/schemas/Manifest
+  - term: Changelog
+    definition: 'Object declared by the contract with fields: count, newest, entries, contract, docs, license, attribution.'
+    tags:
+    - Object
+    source: openapi/tickerinside-openapi.json#/components/schemas/Changelog
+  - term: Deprecations
+    definition: 'Object declared by the contract with fields: count, rule, aliases, entries, contract, docs, license, attribution.'
+    tags:
+    - Object
+    source: openapi/tickerinside-openapi.json#/components/schemas/Deprecations
+  - term: Corrections
+    definition: 'Object declared by the contract with fields: count, newest, kinds, entries, contract, report, docs, license, attribution.'
+    tags:
+    - Object
+    source: openapi/tickerinside-openapi.json#/components/schemas/Corrections
+  - term: SecurityHoldersOnly
+    definition: 'The answer for a security covered funds hold that has no stock file: a stock the price data does not list or has too few weekly
+      returns for, or a line listed abroad (7203.JP). It is composed from the holders shard of its first character: its holders in both layers,
+      each dated by its issuer file or SEC filing, the price and return fields null, and none of the fields the shard cannot give (synthetic'
+    tags:
+    - Object
+    source: openapi/tickerinside-openapi.json#/components/schemas/SecurityHoldersOnly

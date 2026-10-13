@@ -1,0 +1,359 @@
+openapi: 3.2.0
+info:
+  title: TickerInside Ownership Index API
+  version: '1'
+  summary: Holdings of 5,433 US ETFs, which ETFs hold a stock, and overlap, as static JSON.
+  description: TickerInside is an open, machine-readable database of US ETF holdings, with the source and date of each holding.
+  termsOfService: https://tickerinside.com/terms/
+  contact:
+    name: TickerInside
+    email: contact@tickerinside.com
+    url: https://tickerinside.com/api/
+  license:
+    name: CC BY 4.0
+    identifier: CC-BY-4.0
+servers:
+- url: https://tickerinside.com/api/v1
+  description: Static JSON files, and five answers computed from them when asked. No key.
+security: []
+tags:
+- name: Ownership Index
+paths:
+  /ownership-index/history.json:
+    get:
+      operationId: getOwnershipIndexHistory
+      summary: ETF Ownership Index, daily history
+      description: 'One row per market close of the market line and of each sector line: the levels of the night the close was first published, and the change of ETF ownership ending on the close over 1, 5 and 20 market days, weighted by market cap. Then each stock''s changes ending on the latest close, in percentage points of its shares outstanding, from the net shares the funds read daily bought and sold, as the ETF flows publish them. Its CSV twin, /api/v1/ownership-index/history.csv, has the rows of every line. A row is written the first night its close is published and never rewritten. The rows before the first night are rebuilt from the flows of that night: their changes only. Not under CC BY 4.0: the history terms apply.'
+      externalDocs:
+        url: https://tickerinside.com/api/#ownership-index-history
+      responses:
+        '200':
+          description: 'The file. The example is a real answer, shortened: long lists and maps keep their first entries.'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/OwnershipIndexHistory'
+              example:
+                name: TickerInside ETF Ownership Index, daily history
+                method: ti-ownership-index/1
+                flows_method: ti-flows/1
+                methodology: https://tickerinside.com/etf-ownership/methodology/
+                first_close: '2026-09-29'
+                last_close: '2026-10-08'
+                windows:
+                  1d:
+                    from: '2026-10-07'
+                    to: '2026-10-08'
+                    covered: true
+                  5d:
+                    from: '2026-10-01'
+                    to: '2026-10-08'
+                    covered: true
+                  20d:
+                    from: '2026-09-10'
+                    to: '2026-10-08'
+                    covered: false
+                series_columns:
+                - date
+                - as_of
+                - companies
+                market:
+                - - '2026-09-29'
+                  - null
+                  - null
+                - - '2026-09-30'
+                  - null
+                  - null
+                - - '2026-10-01'
+                  - null
+                  - null
+                sectors:
+                  Communication Services:
+                  - - '2026-09-29'
+                    - null
+                    - null
+                  - - '2026-09-30'
+                    - null
+                    - null
+                  - - '2026-10-01'
+                    - null
+                    - null
+                  Consumer Discretionary:
+                  - - '2026-09-29'
+                    - null
+                    - null
+                  - - '2026-09-30'
+                    - null
+                    - null
+                  - - '2026-10-01'
+                    - null
+                    - null
+                  Consumer Staples:
+                  - - '2026-09-29'
+                    - null
+                    - null
+                  - - '2026-09-30'
+                    - null
+                    - null
+                  - - '2026-10-01'
+                    - null
+                    - null
+                stocks_columns:
+                - ticker
+                - change_1d_pp
+                - change_5d_pp
+                - change_20d_pp
+                - null_1d
+                - null_5d
+                - null_20d
+                stocks:
+                - - A
+                  - 0.01
+                  - -0.0013
+                  - null
+                  - null
+                  - null
+                  - null
+                - - AA
+                  - 0.0006
+                  - 0.0512
+                  - null
+                  - null
+                  - null
+                  - null
+                - - AADX
+                  - -0.0018
+                  - null
+                  - null
+                  - null
+                  - withheld
+                  - null
+                not_measured:
+                  1d:
+                    corporate_action: 2
+                    not_in_flows: 204
+                    withheld: 517
+                  5d:
+                    corporate_action: 2
+                    not_in_flows: 204
+                    withheld: 1775
+                  20d:
+                    window_not_covered: 3592
+                null_reasons:
+                  window_not_covered: A close of the window is not a complete close of the flows, or the window starts before the first close they publish.
+                  withheld: A daily sum of the window is withheld by the flows' rules, so the change would give it back.
+                  corporate_action: The flows name a corporate action of the stock within the window or just before it.
+                  not_in_flows: No fund read daily from its issuer's files held or moved the stock in the flows' window.
+                index: https://tickerinside.com/api/v1/ownership-index.json
+                csv: https://tickerinside.com/api/v1/ownership-index/history.csv
+                note: 'One row per market close, oldest first, with the columns named in series_columns: date, the close; as_of, the date of the ownership ledger whose levels the row carries, null for a rebuilt row; the levels of that night (as in /api/v1/ownership-index.json); then for 1, 5 and 20 market days the change of ETF ownership ending on the close, in percentage points of the shares outstanding, weighted by market cap over the companies with a change, and the share of the line''s market cap they make up. A row is written the first night its close is published and never rewritten; a rebuilt row is a close before that night, its changes read from the flows of that night and its levels null. The changes count the funds read daily from their issuers'' files, from the ETF flows (ti-flows/1): each daily sum over three funds or more, the lines a corporate action moved left out. stocks gives each stock''s changes ending on last_close, with the reason a change is null. Not under CC BY 4.0: the history terms apply. A measurement, not investment advice.'
+                cite_as: TickerInside, ETF Ownership Index, daily history of the closes of 2026-09-29 to 2026-10-08, https://tickerinside.com/api/v1/ownership-index/history.json
+                cite_html: <a href="https://tickerinside.com/api/v1/ownership-index/history.json">TickerInside</a> (https://tickerinside.com/api/v1/ownership-index/history.json)
+                docs: https://tickerinside.com/api/#ownership-index-history
+                license: TickerInside history terms
+                terms: https://tickerinside.com/legal/#history
+                attribution: Credit TickerInside with a link to this file, or to the page that shows the figure, wherever the medium allows a link, and by name where it does not. How you mark the link is up to you. Free per request, commercial use included; republishing the archive as a whole or a substantial part of it, and extracting it systematically, are not allowed.
+        '304':
+          description: 'Not modified: the ETag of your copy, sent in If-None-Match, is still current. Files are cached five minutes.'
+        '503':
+          description: 'The file could not be served just then: retry after a minute. uptime says whether the site fails its own checks.'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Unavailable'
+      tags:
+      - Ownership Index
+components:
+  schemas:
+    OwnershipIndexHistory:
+      type: object
+      additionalProperties: true
+      properties:
+        name:
+          type:
+          - string
+          description: The history's name.
+        method:
+          type:
+          - string
+          description: The method of the index, ti-ownership-index/1.
+        flows_method:
+          type:
+          - string
+          description: The method of the flows the changes are read from, ti-flows/1.
+        methodology:
+          type:
+          - string
+          description: The methodology page.
+        first_close:
+          type:
+          - string
+          - 'null'
+          description: The first close of the history.
+        last_close:
+          type:
+          - string
+          - 'null'
+          description: 'The close of the changes in stocks: the flows'' latest close.'
+        windows:
+          type: object
+          additionalProperties:
+            type: object
+            additionalProperties: true
+            properties:
+              from:
+                type:
+                - string
+                - 'null'
+              to:
+                type:
+                - string
+                - 'null'
+              covered:
+                type:
+                - boolean
+          description: 'For 1d, 5d and 20d: from, the close the change starts after, to, the close it ends on, and covered, whether every close between is a complete close of the flows.'
+        series_columns:
+          type: array
+          items:
+            type: string
+          description: The names of the places of each row of market and sectors.
+        market:
+          type: array
+          items:
+            type: array
+            items:
+              type:
+              - string
+              - number
+              - integer
+              - boolean
+              - 'null'
+          description: The market line, one row per close, oldest first.
+        sectors:
+          type: object
+          additionalProperties:
+            type: array
+            items:
+              type: array
+              items:
+                type:
+                - string
+                - number
+                - integer
+                - boolean
+                - 'null'
+          description: Each sector's line, one row per close, by sector.
+        stocks_columns:
+          type: array
+          items:
+            type: string
+          description: The names of the places of each row of stocks.
+        stocks:
+          type: array
+          items:
+            type: array
+            items:
+              type:
+              - string
+              - number
+              - integer
+              - boolean
+              - 'null'
+          description: Each stock's changes over 1, 5 and 20 market days ending on last_close, in percentage points of its shares outstanding, and the reason each null one is null; a null reason with a null change means the window is not covered.
+        not_measured:
+          type: object
+          additionalProperties:
+            type: object
+            additionalProperties:
+              type: integer
+          description: For each window, how many stocks have no change, by reason.
+        null_reasons:
+          type: object
+          additionalProperties:
+            type: string
+          description: Each reason a change is null, in words.
+        index:
+          type:
+          - string
+          description: The index file.
+        csv:
+          type:
+          - string
+          description: market and sectors as CSV rows, with the line's name in line.
+        note:
+          type:
+          - string
+          description: How to read the file.
+        cite_as:
+          type:
+          - string
+          - 'null'
+          description: 'A citation line: the closes and this file''s address.'
+        cite_html:
+          type:
+          - string
+          description: 'The credit as HTML: a link to this file, then its address.'
+        docs:
+          type:
+          - string
+          description: Where the file is documented.
+        license:
+          type:
+          - string
+          description: The history terms, not CC BY 4.0.
+        terms:
+          type:
+          - string
+          description: The terms in full, on the legal notice.
+        attribution:
+          type:
+          - string
+          description: How to credit it, then what the history terms allow.
+      required:
+      - name
+      - method
+      - flows_method
+      - methodology
+      - first_close
+      - last_close
+      - windows
+      - series_columns
+      - market
+      - sectors
+      - stocks_columns
+      - stocks
+      - not_measured
+      - null_reasons
+      - index
+      - csv
+      - note
+      - cite_as
+      - cite_html
+      - docs
+      - license
+      - terms
+      - attribution
+    Unavailable:
+      type: object
+      additionalProperties: true
+      required:
+      - error
+      - message
+      - status
+      - uptime
+      properties:
+        error:
+          type: string
+          const: unavailable
+        message:
+          type: string
+        status:
+          type: string
+          description: The nightly report.
+        uptime:
+          type: string
+          description: 'The live checks: whether the site fails its own checks.'
+externalDocs:
+  description: The reference, with examples and recipes
+  url: https://tickerinside.com/api/

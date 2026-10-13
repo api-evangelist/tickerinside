@@ -1,0 +1,596 @@
+openapi: 3.2.0
+info:
+  title: TickerInside Flows API
+  version: '1'
+  summary: Holdings of 5,433 US ETFs, which ETFs hold a stock, and overlap, as static JSON.
+  description: TickerInside is an open, machine-readable database of US ETF holdings, with the source and date of each holding.
+  termsOfService: https://tickerinside.com/terms/
+  contact:
+    name: TickerInside
+    email: contact@tickerinside.com
+    url: https://tickerinside.com/api/
+  license:
+    name: CC BY 4.0
+    identifier: CC-BY-4.0
+servers:
+- url: https://tickerinside.com/api/v1
+  description: Static JSON files, and five answers computed from them when asked. No key.
+security: []
+tags:
+- name: Flows
+paths:
+  /flows/{ticker}.json:
+    get:
+      operationId: getSecurityFlows
+      summary: ETF flows, one security
+      description: 'One security''s flows: on date, how many funds added and trimmed it, the net change in shares, in dollars at the files'' own prices and beyond the funds'' own growth, the funds with the largest changes, with their weights only, and the lines left out as no trade; then one row per close of the last 20, its index entries and exits and its corporate actions. Composed when asked from the shard of the key''s first character, /api/v1/flows/shards/{c}.json. A key no fund read daily held or moved in the last 20 trading days answers 404, reason not_held_by_daily_funds. Not under CC BY 4.0: the history terms apply.'
+      externalDocs:
+        url: https://tickerinside.com/api/#stock-flows
+      responses:
+        '200':
+          description: 'The file. The example is a real answer, shortened: long lists and maps keep their first entries.'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SecurityFlows'
+              example:
+                ticker: NVDA
+                name: Nvidia
+                date: '2026-10-08'
+                newest_file: '2026-10-09'
+                funds_holding: 163
+                funds_counted: 625
+                latest:
+                  date: '2026-10-08'
+                  funds_adding: 56
+                  funds_trimming: 18
+                  funds_entered: 0
+                  funds_exited: 0
+                  single_fund: false
+                  net_shares: 251511
+                  net_shares_beyond_growth: 52447
+                  net_shares_pct: 0.0175
+                  net_value_usd: 55992215
+                  net_value_beyond_growth_usd: 12087052
+                  valued_pct: 100.0
+                  withheld: null
+                  funds:
+                    columns:
+                    - fund
+                    - change
+                    - weight_before
+                    - weight_after
+                    - previous
+                    - date
+                    rows:
+                    - - SPYM
+                      - increased
+                      - 8.5408
+                      - 8.3284
+                      - '2026-10-07'
+                      - '2026-10-08'
+                    - - IYW
+                      - decreased
+                      - 17.2846
+                      - 17.0283
+                      - '2026-10-07'
+                      - '2026-10-08'
+                    - - QQQ
+                      - increased
+                      - 8.4593
+                      - 8.3343
+                      - '2026-10-07'
+                      - '2026-10-08'
+                  not_trusted: []
+                series:
+                  columns:
+                  - date
+                  - funds_adding
+                  - funds_trimming
+                  rows:
+                  - - '2026-09-28'
+                    - 5
+                    - 4
+                  - - '2026-09-29'
+                    - 27
+                    - 18
+                  - - '2026-09-30'
+                    - 31
+                    - 18
+                index_events: []
+                corporate_actions: []
+                method: ti-flows/1
+                note: 'Changes in shares held by the covered ETFs, read from consecutive issuer files of each fund read daily, each file placed at the market close it reflects. A change mixes the creations and redemptions of a fund''s own shares with its rebalancing; beyond_growth leaves out the part in proportion to the fund''s own growth. Corporate actions are no trades: the lines a merger converted, a spin-off distributed or a split, bonus issue or stock dividend multiplied are left out of the sums, and the security is named in corporate_actions and not ranked. Values are at the files'' own prices per share, never an outside price. Share counts are published as sums over funds, never fund by fund: a sum is published only when three or more funds make it and no one fund more than 80% of it, else it is null with its reason in withheld.'
+                summary: https://tickerinside.com/api/v1/flows.json
+                feed: https://tickerinside.com/feeds/stock/nvda.xml
+                cite_as: TickerInside, Nvidia (NVDA), ETF flows of the closes of 2026-09-28 to 2026-10-08 from the issuers' files, https://tickerinside.com/api/v1/flows/nvda.json
+                cite_html: <a href="https://tickerinside.com/api/v1/flows/nvda.json">TickerInside</a> (https://tickerinside.com/api/v1/flows/nvda.json)
+                docs: https://tickerinside.com/api/#stock-flows
+                license: TickerInside history terms
+                terms: https://tickerinside.com/legal/#history
+                attribution: Credit TickerInside with a link to the page the figure comes from (cite_as gives it) wherever the medium allows a link, and by name where it does not. How you mark the link is up to you. Free per request, commercial use included; republishing the archive as a whole or a substantial part of it, and extracting it systematically, are not allowed.
+        '301':
+          description: 'The address was not written the way the file is: an upper case ticker, a share class written BRK-B or BRK/B, a missing .json, or punctuation at the end. Follow the Location header (curl -L).'
+        '304':
+          description: 'Not modified: the ETag of your copy, sent in If-None-Match, is still current. Files are cached five minutes.'
+        '404':
+          description: 'reason not_held_by_daily_funds: no fund read daily from its issuer''s files held the key or moved it in the last 20 trading days; summary names the night''s summary.'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/NotCovered'
+        '503':
+          description: 'The file could not be served just then: retry after a minute. uptime says whether the site fails its own checks.'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Unavailable'
+      parameters:
+      - name: ticker
+        in: path
+        required: true
+        description: The security's key in lower case, for example nvda or 7203.jp.
+        schema:
+          type: string
+        example: nvda
+      tags:
+      - Flows
+components:
+  schemas:
+    NotCovered:
+      type: object
+      additionalProperties: true
+      required:
+      - error
+      - ticker
+      - message
+      - docs
+      properties:
+        error:
+          type: string
+          const: not_covered
+          description: 'Always not_covered, whatever the reason: read reason and the next address.'
+        reason:
+          type: string
+          enum:
+          - has_security_file
+          - in_another_layer
+          - is_a_fund
+          - no_written_comparison
+          - not_a_shard
+          - not_held_by_daily_funds
+          - not_held
+          - earlier_key
+          - no_such_endpoint
+          - not_in_directory
+          - no_file
+          - funds_not_covered
+          - etn
+          - other_product
+          - no_filing_yet
+          - not_in_sec_list
+          - other_fund
+          - stale_filing
+          - no_prospectus_found
+          - not_in_archive
+          - holdings_at_date_not_enabled
+          - invalid_date
+          - before_history
+          description: 'Every code is explained on /contract/#reasons. not_in_directory: a fund address with no file, for a ticker not in the directory of US-listed funds; a ticker of the directory with no file gets the code universe.json gives it (etn, no_filing_yet and the others), and no_file when the directory was not read. not_held: under /sec/, no covered fund holds the key; earlier_key: an old key, with reads_as. no_such_endpoint: no endpoint at the address. funds_not_covered: several funds of /overlap or /lookthrough, with reasons. in_another_layer: sent only to the TickerInside clients released before /fund/ answered for a fund of the other layers too (see holdings_kind); etf gives the fund''s file. has_security_file: a ticker asked for as a fund has a stock file (see security). is_a_fund: a ticker asked for as a stock is a covered fund (see fund, and holders for the funds that hold it). no_written_comparison: no comparison file for this pair in either order (see fund_files and written_comparisons). not_a_shard: an address under /api/v1/holders/ that is not a shard (see holders). Under /api/v1/history/: not_in_archive: the fund has no history file (see history). holdings_at_date_not_enabled: holdings at a date are not served yet, and every valid date answers this (see changes). invalid_date: the date is not a calendar date, or is after today. before_history: the date is before the fund''s first file (see first), answered only once holdings at a date are served. Under /api/v1/flows/: reason not_held_by_daily_funds: no fund read daily from its issuer''s files held the key or moved it in the last 20 trading days; summary names the night''s summary.'
+        ticker:
+          type:
+          - string
+          - 'null'
+          description: What was asked for, upper case; null when the address names no single ticker, such as a pair under /compare/.
+        message:
+          type: string
+          description: What happened and where to look next, in words.
+        docs:
+          type: string
+          description: The reference.
+        security:
+          type: string
+          description: 'With has_security_file: the stock file of the ticker, or its holders-only answer.'
+        reads_as:
+          type: array
+          items:
+            type: string
+          description: 'Under /sec/, for an old key written before lines listed abroad carried their market (7203): the keys it reads as now, from the aliases of holders. Absent otherwise.'
+        fund:
+          type: string
+          description: 'With is_a_fund: the fund file of the ticker.'
+        etf:
+          type: string
+          description: 'With in_another_layer: the file of the fund, /api/v1/etf/{ticker}.json.'
+        holders:
+          type: string
+          description: 'The shard of the key''s first character: /api/v1/holders/{c}.json, c a to z, or 0 for any other character (7203.JP is in 0.json). It lists the covered funds that hold the key, from issuer files and from SEC filings, with or without a stock file.'
+        pair:
+          type:
+          - array
+          - 'null'
+          items:
+            type: string
+          description: 'With no_written_comparison: the two tickers asked for, upper case, or null when the address names no pair.'
+        written_comparisons:
+          type: array
+          items:
+            type: object
+            additionalProperties: true
+            properties:
+              pair:
+                type: array
+                items:
+                  type: string
+              url:
+                type: string
+          description: 'With no_written_comparison: the pairs that have a comparison file, as index.json lists them.'
+        fund_files:
+          type: array
+          items:
+            type: string
+          description: 'With no_written_comparison: the fund files of the tickers asked for that are covered funds, to compute the overlap from.'
+        covered:
+          type: string
+          description: 'What is covered: /api/v1/securities.json after a /sec/ address with no reason, /api/v1/index.json otherwise.'
+        not_covered:
+          type: array
+          items:
+            type: string
+          description: 'Under /overlap, /lookthrough and /diversify: the tickers asked for that are not covered.'
+        reasons:
+          type: object
+          additionalProperties:
+            type: string
+          description: 'Under /overlap, /lookthrough and /diversify: the reason code of each ticker of not_covered.'
+        covered_issuers:
+          type: array
+          items:
+            type: string
+          description: 'Under /overlap and /lookthrough: the issuers whose own files are read; the other covered funds are read from SEC filings.'
+        history:
+          type: string
+          description: 'With not_in_archive: the list of the funds that have a history.'
+        changes:
+          type: string
+          description: 'With holdings_at_date_not_enabled: the fund''s changes file, served today.'
+        first:
+          type:
+          - string
+          - 'null'
+          description: 'With before_history: the date of the fund''s oldest file. before_history is answered only once holdings at a date are served.'
+        date:
+          type: string
+          description: 'With invalid_date, holdings_at_date_not_enabled or before_history: the date asked for.'
+        summary:
+          type: string
+          description: 'With not_held_by_daily_funds: the night''s flows, /api/v1/flows.json.'
+    SecurityFlows:
+      type: object
+      additionalProperties: true
+      properties:
+        ticker:
+          type:
+          - string
+          description: The security's key, as the holdings key it.
+        name:
+          type:
+          - string
+          - 'null'
+          description: Its name, where known.
+        date:
+          type:
+          - string
+          - 'null'
+          description: The close of latest, as in /api/v1/flows.json.
+        newest_file:
+          type:
+          - string
+          - 'null'
+          description: The newest close a file read reflects.
+        funds_holding:
+          type:
+          - integer
+          description: How many of the funds counted hold it in their newest file.
+        funds_counted:
+          type:
+          - integer
+          description: How many funds are counted on date.
+        latest:
+          type:
+          - object
+          - 'null'
+          additionalProperties: true
+          properties:
+            date:
+              type:
+              - string
+              description: The close.
+            funds_adding:
+              type:
+              - integer
+              description: How many funds hold more shares of it than in their previous file.
+            funds_trimming:
+              type:
+              - integer
+              description: How many hold fewer.
+            funds_entered:
+              type:
+              - integer
+              description: How many of those adding did not hold it before.
+            funds_exited:
+              type:
+              - integer
+              description: How many of those trimming hold none now.
+            single_fund:
+              type:
+              - boolean
+              description: 'true when one fund alone moved it: every sum is then null.'
+            net_shares:
+              type:
+              - integer
+              - 'null'
+              description: 'The change in shares held, summed over the funds. Null when fewer than three funds moved it or one fund makes more than 80% of it, as withheld says: a fund''s share count is never published.'
+            net_shares_beyond_growth:
+              type:
+              - integer
+              - 'null'
+              description: The same change less the part in proportion to each fund's own growth across its step (b minus k times a, k the fund's median ratio of share counts).
+            net_shares_pct:
+              type:
+              - number
+              - 'null'
+              description: net_shares in percent of the shares the funds held before; null when fewer than three funds held it before or after, or one fund held more than 80% of it.
+            net_value_usd:
+              type:
+              - integer
+              - 'null'
+              description: 'net_shares valued at each file''s own price per share: market value over shares, or weight times the fund''s stated net assets over shares. Never an outside price.'
+            net_value_beyond_growth_usd:
+              type:
+              - integer
+              - 'null'
+              description: net_shares_beyond_growth valued the same way.
+            valued_pct:
+              type:
+              - number
+              - 'null'
+              description: The share of the change in shares that a file valued.
+            withheld:
+              type:
+              - object
+              - 'null'
+              additionalProperties:
+                type: string
+                enum:
+                - fewer_than_3_funds
+                - one_fund_dominant
+                - gives_back_a_fund_count
+                - not_all_valued
+              description: 'Why each null sum is null, as {field: reason}, or null: fewer_than_3_funds, one_fund_dominant (one fund makes more than 80% of the sum, or of the difference two published sums give, such as net_shares less net_shares_beyond_growth), gives_back_a_fund_count (the sums as printed, taken as one or two funds'' own or compared with the figures published before for the same close, would give back a fund''s share count) or not_all_valued.'
+            funds:
+              type: object
+              additionalProperties: true
+              required:
+              - columns
+              - rows
+              properties:
+                columns:
+                  type: array
+                  items:
+                    type: string
+                rows:
+                  type: array
+                  items:
+                    type: array
+              description: 'The funds with the largest changes, largest by value first, at most eight, with the columns named in columns: fund, change (entered, exited, increased or decreased), weight_before and weight_after (percent of the fund, as its holdings files print them), previous and date (its two files, as its issuer dates them). No fund''s share count is published, nor any figure of its own a count could be worked out from.'
+            not_trusted:
+              type: array
+              items:
+                type: array
+                items:
+                  type: string
+              description: 'The funds whose line is left out of every sum, as [fund, reason]: price_per_share_jump (a split or a count in other units, by the file''s own values), count_weight_mismatch (a count that moved against the weight), split_seen_in_other_files, price_unlike_other_funds (a price per share half again or more away from the other funds'' line of the same key: another instrument under it), file_gap, rekeyed (a change of ticker), converted (a merger paid in shares), distribution (a spin-off) or split (a split, a bonus issue or a stock dividend found across the funds).'
+          required:
+          - date
+          - funds_adding
+          - funds_trimming
+          - funds_entered
+          - funds_exited
+          - single_fund
+          - net_shares
+          - net_shares_beyond_growth
+          - net_shares_pct
+          - net_value_usd
+          - net_value_beyond_growth_usd
+          - valued_pct
+          - withheld
+          - funds
+          - not_trusted
+          description: Its flows on date; null when no fund moved it then. Described below.
+        series:
+          type: object
+          additionalProperties: true
+          required:
+          - columns
+          - rows
+          properties:
+            columns:
+              type: array
+              items:
+                type: string
+            rows:
+              type: array
+              items:
+                type: array
+          description: 'One row per close of the last 20 it moved on, oldest first, with the columns named in columns: date, funds_adding, funds_trimming, funds_entered, funds_exited, net_shares, net_shares_beyond_growth, net_value_usd, and withheld, why the first null of the three sums is null (as in latest). No close newer than date is published.'
+        index_events:
+          type: array
+          items:
+            type: object
+            additionalProperties: true
+            properties:
+              date:
+                type:
+                - string
+                description: The close.
+              change:
+                type: string
+                enum:
+                - entered
+                - exited
+                description: entered or exited.
+              funds:
+                type: array
+                items:
+                  type: string
+                description: The funds of the group it entered or exited on that close.
+              same_index_as:
+                type:
+                - string
+                description: The group's largest fund. Two funds track the same index when they overlap by 98% or more by weight on their latest files.
+              group_funds:
+                type:
+                - integer
+                description: How many funds the group has.
+              text:
+                type:
+                - string
+                description: The event in words, to quote.
+            required:
+            - date
+            - change
+            - funds
+            - same_index_as
+            - group_funds
+            - text
+          description: Its entries and exits in funds tracking the same index, in the last 20 trading days, as in /api/v1/flows.json.
+        corporate_actions:
+          type: array
+          items:
+            type: object
+            additionalProperties: true
+            properties:
+              date:
+                type:
+                - string
+                description: The first close the funds show it on; funds that book it later show it a close or two after.
+              kind:
+                type: string
+                enum:
+                - converted
+                - distribution
+                - acquired_or_delisted
+                - split
+                - uniform_change
+                description: 'converted (a merger paid in shares: from exited while to rose, or entered, by the same ratio in funds of three or more indexes), distribution (a spin-off: to entered at the same ratio of from in funds of three or more indexes), acquired_or_delisted (from left the funds of two or more issuers with nothing replacing it, and half its holders left it or its price per share stood still), split (three quarters or more of the funds holding from changed their counts by one ratio within three closes, while its price per share in the files moved by the inverse ratio: a split, a reverse split, a bonus issue or a stock dividend) or uniform_change (the same ratio with no price move to match: named and not ranked, its lines kept in the sums).'
+              from:
+                type:
+                - string
+                description: The security converted, the parent of a distribution, the security taken over or delisted, or the security split or changed.
+              to:
+                type:
+                - string
+                - 'null'
+                description: 'The security received: from itself for a split; null for acquired_or_delisted and uniform_change.'
+              ratio:
+                type:
+                - number
+                - 'null'
+                description: Shares of to per share of from, as the funds' counts show it (1.2 for a 6-for-5 bonus issue, 0.5 for a 1-for-2 reverse split); null for acquired_or_delisted.
+              text:
+                type:
+                - string
+                description: The action in words, to quote.
+            required:
+            - date
+            - kind
+            - from
+            - to
+            - ratio
+            - text
+          description: The mergers, spin-offs, takeovers, splits and uniform changes it is part of in the last 20 trading days, as in /api/v1/flows.json; the lines a merger, a spin-off or a split moved are left out of its sums.
+        method:
+          type:
+          - string
+          description: The method of the figures, ti-flows/1.
+        note:
+          type:
+          - string
+          description: How to read the figures.
+        summary:
+          type:
+          - string
+          description: The night's summary.
+        feed:
+          type:
+          - string
+          description: This security's flows as an RSS feed.
+        cite_as:
+          type:
+          - string
+          description: 'A citation line: the security, the closes of the window and this answer''s address.'
+        cite_html:
+          type:
+          - string
+          description: 'The credit as HTML: a link to this answer, then its address.'
+        docs:
+          type:
+          - string
+          description: Where the answer is documented.
+        license:
+          type:
+          - string
+          description: The history terms, not CC BY 4.0.
+        terms:
+          type:
+          - string
+          description: The terms in full, on the legal notice.
+        attribution:
+          type:
+          - string
+          description: How to credit it, then what the history terms allow.
+      required:
+      - ticker
+      - name
+      - date
+      - newest_file
+      - funds_holding
+      - funds_counted
+      - latest
+      - series
+      - index_events
+      - corporate_actions
+      - method
+      - note
+      - summary
+      - feed
+      - cite_as
+      - cite_html
+      - docs
+      - license
+      - terms
+      - attribution
+    Unavailable:
+      type: object
+      additionalProperties: true
+      required:
+      - error
+      - message
+      - status
+      - uptime
+      properties:
+        error:
+          type: string
+          const: unavailable
+        message:
+          type: string
+        status:
+          type: string
+          description: The nightly report.
+        uptime:
+          type: string
+          description: 'The live checks: whether the site fails its own checks.'
+externalDocs:
+  description: The reference, with examples and recipes
+  url: https://tickerinside.com/api/

@@ -1,15 +1,25 @@
-generated: '2026-10-06'
+generated: '2026-10-12'
 method: probed
 generator: harvest-packages.py
 source: registry metadata endpoints (registry.npmjs.org, pypi.org, rubygems.org, api.nuget.org, packagist.org, crates.io)
-ownership_rule: 'official: true only when the registry metadata (homepage, repository, author, URLs) names the provider''s domain (security/tickerinside-domain-security.yml,
-  security/tickerinside-vulnerability-disclosure.yml, tickerinside.com) or its accepted GitHub org.'
+ownership_rule: 'official: true only when the registry metadata (homepage, repository, author, URLs) names the provider''s domain (cli/tickerinside-cli.yml,
+  conformance/tickerinside-conformance.yml, hosts/tickerinside-hosts.yml, llms/tickerinside-llms.txt, packages/tickerinside-packages.yml, security/tickerinside-domain-security.yml,
+  security/tickerinside-vulnerability-disclosure.yml, tickerinside.com, vendors/tickerinside-vendors.yml, well-known/tickerinside-security.txt,
+  well-known/tickerinside-well-known.yml) or its accepted GitHub org.'
 packages:
 - name: tickerinside
   registry: pypi
   url: https://pypi.org/project/tickerinside/
   language: Python
   official: true
-  version: 0.3.0
-  published: '2026-09-30'
+  version: 0.4.0
+  published: '2026-10-11'
+  evidence: metadata names tickerinside.com
+- name: tickerinside-mcp
+  registry: npm
+  url: https://www.npmjs.com/package/tickerinside-mcp
+  language: JavaScript
+  official: true
+  version: 1.12.0
+  published: '2026-10-12'
   evidence: metadata names tickerinside.com

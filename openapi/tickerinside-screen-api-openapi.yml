@@ -1,0 +1,521 @@
+openapi: 3.2.0
+info:
+  title: TickerInside Screen API
+  version: '1'
+  summary: Holdings of 5,433 US ETFs, which ETFs hold a stock, and overlap, as static JSON.
+  description: TickerInside is an open, machine-readable database of US ETF holdings, with the source and date of each holding.
+  termsOfService: https://tickerinside.com/terms/
+  contact:
+    name: TickerInside
+    email: contact@tickerinside.com
+    url: https://tickerinside.com/api/
+  license:
+    name: CC BY 4.0
+    identifier: CC-BY-4.0
+servers:
+- url: https://tickerinside.com/api/v1
+  description: Static JSON files, and five answers computed from them when asked. No key.
+security: []
+tags:
+- name: Screen
+paths:
+  /screen:
+    get:
+      operationId: getScreen
+      summary: A screen of funds, computed
+      description: The funds of funds.json that pass every filter given, paged. limit 1 to 100, 50 by default; a CSV page holds 1 to 50, 50 by default; holds takes a security with a stock file.
+      externalDocs:
+        url: https://tickerinside.com/api/#screen
+      parameters:
+      - name: issuer
+        in: query
+        required: false
+        description: The issuer, as funds.json names it, whatever the case.
+        schema:
+          type: string
+        example: Vanguard
+      - name: category
+        in: query
+        required: false
+        description: The category, by its id or its label, whatever the case (https://tickerinside.com/etf/category/).
+        schema:
+          type: string
+        example: us-large-blend
+      - name: layer
+        in: query
+        required: false
+        description: The layer.
+        schema:
+          type: string
+          enum:
+          - issuer_files
+          - sec_nport
+          - sec_nport_bonds
+          - sec_nport_multi_asset
+          - sec_nport_derivatives
+          - trust_filings
+          - sponsor_files
+          - prospectus
+        example: issuer_files
+      - name: expense_ratio_max
+        in: query
+        required: false
+        description: The highest expense ratio, in percent a year.
+        schema:
+          type: number
+          minimum: 0
+          maximum: 100
+        example: 0.1
+      - name: aum_min
+        in: query
+        required: false
+        description: The smallest size, in billions of US dollars.
+        schema:
+          type: number
+          minimum: 0
+          maximum: 100000
+        example: 1
+      - name: holds
+        in: query
+        required: false
+        description: 'A security with a stock file: only the funds that hold it. BRK-B reads as BRK.B.'
+        schema:
+          type: string
+        example: NVDA
+      - name: min_weight
+        in: query
+        required: false
+        description: 'With holds: the least weight of the security in the fund, in percent.'
+        schema:
+          type: number
+          minimum: 0
+          maximum: 100
+        example: 5
+      - name: sort
+        in: query
+        required: false
+        description: 'The order: weight with holds, aum by default.'
+        schema:
+          type: string
+          enum:
+          - weight
+          - aum
+          - expense_ratio
+          - positions
+          - ticker
+        example: aum
+      - name: limit
+        in: query
+        required: false
+        description: How many funds a page holds, 1 to 100, 50 by default; for CSV 1 to 50, 50 by default.
+        schema:
+          type: integer
+          minimum: 1
+          maximum: 100
+        example: 50
+      - name: offset
+        in: query
+        required: false
+        description: Where the page starts.
+        schema:
+          type: integer
+          minimum: 0
+          maximum: 100000
+        example: 0
+      - name: format
+        in: query
+        required: false
+        description: json, the default, or csv for the CSV twin, which the path with .csv also gives.
+        schema:
+          type: string
+          enum:
+          - json
+          - csv
+      responses:
+        '200':
+          description: The answer, computed when asked and kept in the edge cache for up to a day. The example is a real answer, shortened.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Screen'
+              example:
+                as_of: '2026-10-09'
+                filters:
+                  holds: NVDA
+                  min_weight: 15
+                sort: weight
+                total: 29
+                offset: 0
+                limit: 3
+                count: 3
+                funds:
+                - ticker: GXPT
+                  name: Global X PureCap℠ MSCI Information Technology ETF
+                  layer: issuer_files
+                  issuer: Global X
+                  category: Technology
+                  category_id: technology
+                  expense_ratio: 0.15
+                  aum_b: 0.1
+                  net_assets: null
+                  positions: 85
+                  report_date: null
+                  weight_pct: 19.89
+                  holdings_as_of: '2026-10-09'
+                  holdings_source: issuer file
+                  fund_file: https://tickerinside.com/api/v1/fund/gxpt.json
+                  page_url: null
+                - ticker: SMHX
+                  name: VanEck Fabless Semiconductor ETF
+                  layer: sec_nport
+                  issuer: VanEck
+                  category: Technology
+                  category_id: technology
+                  expense_ratio: 0.35
+                  aum_b: null
+                  net_assets: 297043576
+                  positions: 22
+                  report_date: '2026-06-30'
+                  weight_pct: 18.5624
+                  holdings_as_of: '2026-06-30'
+                  holdings_source: SEC Form N-PORT
+                  fund_file: https://tickerinside.com/api/v1/fund/smhx.json
+                  page_url: null
+                - ticker: VGT
+                  name: Vanguard Information Technology ETF
+                  layer: issuer_files
+                  issuer: Vanguard
+                  category: Technology
+                  category_id: technology
+                  expense_ratio: 0.09
+                  aum_b: 177.9
+                  net_assets: null
+                  positions: 318
+                  report_date: null
+                  weight_pct: 17.7869
+                  holdings_as_of: '2026-08-31'
+                  holdings_source: issuer file
+                  fund_file: https://tickerinside.com/api/v1/fund/vgt.json
+                  page_url: https://tickerinside.com/etf/vgt/
+                next: https://tickerinside.com/api/v1/screen?holds=NVDA&min_weight=15&sort=weight&limit=3&offset=3
+                source:
+                  provider: TickerInside
+                  api_urls:
+                  - https://tickerinside.com/api/v1/funds.json
+                  - https://tickerinside.com/api/v1/sec/nvda.json
+                  cite_as: TickerInside (tickerinside.com), from its list of funds and the funds holding NVDA, dated as shown.
+                license: CC BY 4.0
+                attribution: Credit TickerInside with a link to the page of a fund the figure comes from (source names them), or to this address, wherever the medium allows a link, and by name where it does not. How you mark the link is up to you.
+                docs: https://tickerinside.com/api/#screen
+            text/csv:
+              schema:
+                type: string
+              example: 'ticker,name,layer,issuer,category,expense_ratio,aum_b,net_assets,positions,report_date,weight_pct,holdings_as_of,holdings_source,fund_file,note,category_id
+
+                GXPT,Global X PureCap℠ MSCI Information Technology ETF,issuer_files,Global X,Technology,0.15,0.1,,85,,19.89,2026-10-09,issuer file,https://tickerinside.com/api/v1/fund/gxpt.json,,technology
+
+                SMHX,VanEck Fabless Semiconductor ETF,sec_nport,VanEck,Technology,0.35,,297043576,22,2026-06-30,18.5624,2026-06-30,SEC Form N-PORT,https://tickerinside.com/api/v1/fund/smhx.json,,technology
+
+                VGT,Vanguard Information Technology ETF,issuer_files,Vanguard,Technology,0.09,177.9,,318,,17.7869,2026-08-31,issuer file,https://tickerinside.com/api/v1/fund/vgt.json,,technology
+
+                ,,,,,,,,,,,,,,Rows 1 to 3 of 29 funds. The next rows: https://tickerinside.com/api/v1/screen.csv?holds=NVDA&min_weight=15&sort=weight&limit=3&offset=3,
+
+                '
+        '304':
+          description: 'Not modified: the ETag of your copy, sent in If-None-Match, is still current.'
+        '400':
+          description: 'The query was refused: reason and parameter say what to fix, and limit and asked give the figures of a call past the limits.'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/BadRequest'
+              example:
+                error: bad_request
+                reason: too_few_funds
+                message: funds must name at least 2 different funds.
+                parameter: funds
+                min: 2
+                docs: https://tickerinside.com/api/#overlap
+        '405':
+          description: Another method than GET or HEAD.
+          content:
+            application/json:
+              schema:
+                type: object
+                additionalProperties: true
+                required:
+                - error
+                - message
+                properties:
+                  error:
+                    type: string
+                    const: method_not_allowed
+                  message:
+                    type: string
+                  docs:
+                    type: string
+        '503':
+          description: 'The answer could not be computed just then: retry after a minute.'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Unavailable'
+      tags:
+      - Screen
+components:
+  schemas:
+    Screen:
+      type: object
+      additionalProperties: true
+      properties:
+        as_of:
+          type:
+          - string
+          - 'null'
+          description: The date of funds.json, the price date.
+        filters:
+          type: object
+          additionalProperties: true
+          description: 'The filters applied, as read: issuer as the data spells it; category as the category''s id, whether it was asked by id or by label, and category_asked beside it when it was asked by a category name the site printed before 9 October 2026, which the screener reads for as long as v1 is served (funds-columns.json category_aliases); and holds_reads_as when the holders are read under another key: BRK.B for BRK-B, or the key an old one reads as now.'
+        sort:
+          type: string
+          enum:
+          - weight
+          - aum
+          - expense_ratio
+          - positions
+          - ticker
+          description: 'The order of funds: weight (with holds) or aum, largest first by default; expense_ratio and ticker smallest first; positions largest first. A fund without the figure comes last.'
+        total:
+          type: integer
+          description: How many funds pass the filters.
+        offset:
+          type: integer
+          description: Where this page starts in them.
+        limit:
+          type: integer
+          description: How many funds a page holds at most.
+        count:
+          type: integer
+          description: How many funds this page holds.
+        funds:
+          type: array
+          items:
+            type: object
+            additionalProperties: true
+            properties:
+              ticker:
+                type: string
+                description: The fund's ticker.
+              name:
+                type:
+                - string
+                - 'null'
+                description: Its name.
+              layer:
+                type: string
+                enum:
+                - issuer_files
+                - sec_nport
+                - sec_nport_bonds
+                - sec_nport_multi_asset
+                - sec_nport_derivatives
+                - trust_filings
+                - sponsor_files
+                - prospectus
+                description: 'Its layer: issuer_files, sec_nport, sec_nport_bonds, sec_nport_multi_asset, sec_nport_derivatives, trust_filings, sponsor_files, prospectus.'
+              issuer:
+                type:
+                - string
+                - 'null'
+                description: Its issuer, as funds.json names it. Null when unknown.
+              category:
+                type:
+                - string
+                - 'null'
+                description: Its category, TickerInside's own, set every night from the fund's file (its name in funds.json c; https://tickerinside.com/etf/category/). Null for a fund the build has not classified.
+              category_id:
+                type:
+                - string
+                - 'null'
+                description: The id of that category, which never changes meaning. Null with category.
+              expense_ratio:
+                type:
+                - number
+                - 'null'
+                description: Its expense ratio, in percent a year. Null when unknown.
+              aum_b:
+                type:
+                - number
+                - 'null'
+                description: Its assets in billions of US dollars, from market data. Null when unknown.
+              net_assets:
+                type:
+                - number
+                - 'null'
+                description: Its net assets in US dollars on report_date, from its filing. Null for a fund read from its issuer's file.
+              positions:
+                type:
+                - integer
+                - 'null'
+                description: How many positions its file lists.
+              report_date:
+                type:
+                - string
+                - 'null'
+                description: The quarter end its filing describes, or the day its prospectus was filed. Null for a fund read from its issuer's file.
+              weight_pct:
+                type:
+                - number
+                - 'null'
+                description: 'With holds: the security''s weight in the fund, in percent.'
+              holdings_as_of:
+                type:
+                - string
+                - 'null'
+                description: 'With holds: the date of the fund''s file the weight is read from.'
+              holdings_source:
+                type: string
+                description: 'With holds: issuer file or SEC Form N-PORT.'
+              fund_file:
+                type: string
+                description: The address of its file.
+              page_url:
+                type:
+                - string
+                - 'null'
+                description: Its page. Null without one.
+            required:
+            - ticker
+            - name
+            - layer
+            - fund_file
+          description: The funds of this page.
+        next:
+          type:
+          - string
+          - 'null'
+          description: The address of the next page. Null on the last one.
+        source:
+          type: object
+          additionalProperties: true
+          properties:
+            provider:
+              type: string
+            api_urls:
+              type: array
+              items:
+                type: string
+            cite_as:
+              type: string
+          description: 'The files read, under api_urls: funds.json and, for holds, the stock file; and cite_as.'
+        license:
+          type: string
+          description: The licence the data is published under.
+        attribution:
+          type: string
+          description: 'How to credit the data: a link to the page of a fund the figure comes from, or to this address, where the medium allows one, the name where it does not.'
+        docs:
+          type: string
+          description: The reference of this endpoint.
+      required:
+      - as_of
+      - filters
+      - sort
+      - total
+      - offset
+      - limit
+      - count
+      - funds
+      - next
+      - source
+      - license
+      - attribution
+      - docs
+    BadRequest:
+      type: object
+      additionalProperties: true
+      properties:
+        error:
+          type: string
+          const: bad_request
+          description: Always bad_request.
+        reason:
+          type: string
+          enum:
+          - missing_parameter
+          - unknown_parameter
+          - repeated_parameter
+          - invalid_value
+          - too_few_funds
+          - too_many_funds
+          - too_large
+          - no_price_history
+          description: missing_parameter, unknown_parameter, repeated_parameter, invalid_value, too_few_funds, too_many_funds, too_large, a call past the limits of its endpoint (see limit and asked), or no_price_history, Find with no fund held that has weekly returns here.
+        message:
+          type: string
+          description: What to fix, in words.
+        parameter:
+          type: string
+          description: The parameter to fix. Absent with too_large.
+        min:
+          type: integer
+          description: 'With too_few_funds: the fewest funds the parameter takes.'
+        max:
+          type: integer
+          description: 'With too_many_funds: the most funds the parameter takes.'
+        limit:
+          type: object
+          additionalProperties:
+            type: integer
+          description: 'With too_large: the limit the call passed, as chars (the size of the files read, in bytes, a file of the other layers for a third of it), pairs (the holdings overlap compares), holdings (those a look-through or diversify reads), comparisons (those of diversify''s overlaps) or subrequests (the reads of files and of the edge cache one call makes).'
+        asked:
+          type: object
+          additionalProperties:
+            type: integer
+          description: 'With too_large: the call''s own figure for that limit.'
+        files:
+          type: object
+          additionalProperties:
+            type: integer
+          description: 'With too_large past limit.chars: what each fund''s file weighed, by ticker, in the units of chars (diversify''s asked.chars adds the reference file''s), so that a client can drop the largest.'
+        holdings_by_fund:
+          type: object
+          additionalProperties:
+            type: integer
+          description: 'With too_large on diversify past limit.holdings or limit.comparisons: the lines of each fund counted, by ticker (before any fund is read, those with a compact file).'
+        answered_by:
+          type: object
+          additionalProperties: true
+          description: 'With too_large from overlap or lookthrough, what answers the same question, as the message names it: mcp, the MCP server''s tool (url, tool, arguments); for two funds diversify answers, diversify and page; for a portfolio whose x-ray the site writes, page.'
+        docs:
+          type: string
+          description: The reference of this endpoint.
+      required:
+      - error
+      - reason
+      - message
+      - docs
+    Unavailable:
+      type: object
+      additionalProperties: true
+      required:
+      - error
+      - message
+      - status
+      - uptime
+      properties:
+        error:
+          type: string
+          const: unavailable
+        message:
+          type: string
+        status:
+          type: string
+          description: The nightly report.
+        uptime:
+          type: string
+          description: 'The live checks: whether the site fails its own checks.'
+externalDocs:
+  description: The reference, with examples and recipes
+  url: https://tickerinside.com/api/

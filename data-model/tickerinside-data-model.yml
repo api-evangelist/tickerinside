@@ -1,0 +1,96 @@
+generated: '2026-10-13'
+method: derived
+generator: derive-data-model.py
+source:
+- openapi/tickerinside-openapi.json
+notation: has_one = property $ref; has_many = array of $ref; belongs_to = <entity>_id field
+summary:
+  entities: 39
+  entities_in_spec: 39
+  relationships: 1
+entities:
+- name: BadRequest
+  fields: 12
+- name: Batch
+  fields: 10
+- name: Changelog
+  fields: 7
+- name: Compare
+  fields: 12
+- name: Corrections
+  fields: 9
+- name: Deprecations
+  fields: 8
+- name: Diversify
+  fields: 19
+- name: DiversifyFind
+  fields: 23
+- name: DiversifyList
+  fields: 14
+- name: DiversifyWeekly
+  fields: 12
+- name: FlowsSummary
+  fields: 30
+- name: Fund
+  fields: 52
+- name: FundHistory
+  fields: 25
+- name: Funds
+  fields: 16
+- name: HistoryChange
+  fields: 16
+- name: HistoryIndex
+  fields: 10
+- name: Holders
+  fields: 11
+- name: HoldersShard
+  fields: 10
+- name: Identifiers
+  fields: 9
+- name: Index
+  fields: 17
+- name: LayerFund
+  fields: 79
+- name: Lookthrough
+  fields: 25
+- name: Manifest
+  fields: 13
+- name: Methods
+  fields: 5
+- name: NotCovered
+  fields: 22
+- name: OverlapMatrix
+  fields: 23
+- name: OverlapPair
+  fields: 24
+- name: Ownership
+  fields: 14
+- name: OwnershipIndex
+  fields: 27
+- name: OwnershipIndexHistory
+  fields: 23
+- name: Screen
+  fields: 13
+- name: Securities
+  fields: 6
+- name: Security
+  fields: 51
+- name: SecurityFlows
+  fields: 20
+- name: SecurityHoldersOnly
+  fields: 42
+  description: 'The answer for a security covered funds hold that has no stock file: a stock the price data does
+    not list or has too few weekly returns for, or a line listed abroad (7203.JP). It is composed from the '
+- name: Status
+  fields: 10
+- name: Unavailable
+  fields: 4
+- name: Universe
+  fields: 11
+- name: Uptime
+  fields: 11
+relationships:
+- from: FundHistory
+  to: HistoryChange
+  type: has_many
+  via: changes

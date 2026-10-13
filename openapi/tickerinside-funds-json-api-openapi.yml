@@ -1,0 +1,823 @@
+openapi: 3.2.0
+info:
+  title: TickerInside Funds.json API
+  version: '1'
+  summary: Holdings of 5,433 US ETFs, which ETFs hold a stock, and overlap, as static JSON.
+  description: TickerInside is an open, machine-readable database of US ETF holdings, with the source and date of each holding.
+  termsOfService: https://tickerinside.com/terms/
+  contact:
+    name: TickerInside
+    email: contact@tickerinside.com
+    url: https://tickerinside.com/api/
+  license:
+    name: CC BY 4.0
+    identifier: CC-BY-4.0
+servers:
+- url: https://tickerinside.com/api/v1
+  description: Static JSON files, and five answers computed from them when asked. No key.
+security: []
+tags:
+- name: Funds.json
+paths:
+  /funds.json:
+    get:
+      operationId: getFunds
+      summary: Every fund, one line each
+      description: 'Ticker, name, category, cost, position count, and whether the fund has a written page: the funds read from issuer files under funds, and those from SEC filings under sec_funds. The list to iterate before pulling fund files.'
+      externalDocs:
+        url: https://tickerinside.com/api/#funds
+      responses:
+        '200':
+          description: 'The file. The example is a real answer, shortened: long lists and maps keep their first entries.'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Funds'
+              example:
+                as_of: '2026-10-09'
+                count: 690
+                with_a_page: 526
+                note: page is true when the fund has a written page on the site. Every fund here has a /api/v1/fund/{ticker}.json file and can be compared, whether or not it has a page. c is the fund's category, TickerInside's own, set every night from the fund's latest file, and cat_id the category's id, which never changes meaning (https://tickerinside.com/etf/category/). issuer is the fund's issuer, named as in index.json coverage.issuers, or null. aum_b is the fund's assets in billions of US dollars from market data, as in its fund file, or null.
+                funds:
+                - t: AAXJ
+                  n: iShares MSCI All Country Asia ex Japan ETF
+                  c: Asia Pacific ex Japan
+                  cat_id: asia-pacific-ex-japan
+                  er: 0.72
+                  p: 949
+                  issuer: iShares
+                  aum_b: 4.0
+                  page: true
+                  url: https://tickerinside.com/etf/aaxj/
+                  api: https://tickerinside.com/api/v1/fund/aaxj.json
+                - t: ACWI
+                  n: iShares MSCI ACWI ETF
+                  c: Global Large Blend
+                  cat_id: global-large-blend
+                  er: 0.32
+                  p: 2197
+                  issuer: iShares
+                  aum_b: 32.8
+                  page: true
+                  url: https://tickerinside.com/etf/acwi/
+                  api: https://tickerinside.com/api/v1/fund/acwi.json
+                - t: ACWV
+                  n: iShares MSCI Global Min Vol Factor ETF
+                  c: Global Large Blend
+                  cat_id: global-large-blend
+                  er: 0.2
+                  p: 378
+                  issuer: iShares
+                  aum_b: 3.3
+                  page: true
+                  url: https://tickerinside.com/etf/acwv/
+                  api: https://tickerinside.com/api/v1/fund/acwv.json
+                sec_count: 1982
+                sec_note: 'sec_funds are the other US stock ETFs, served from their latest public SEC Form N-PORT filing rather than an issuer''s daily file. Their holdings describe the portfolio on report_date, usually two to four months back. page and url are as in funds: a fund of a published cohort has a page built from its filing. er is null where the cost is not in the data. issuer is the fund family its name or its filer gives, or null. net_assets is the fund''s net assets in US dollars on report_date, from the filing; aum_b is null unless market data gives the fund''s size.'
+                sec_funds:
+                - t: AAAA
+                  n: Amplius Aggressive Asset Allocation ETF
+                  c: Aggressive Allocation
+                  cat_id: allocation-aggressive
+                  er: 0.49
+                  p: 43
+                  api: https://tickerinside.com/api/v1/fund/aaaa.json
+                  report_date: '2026-07-31'
+                  issuer: null
+                  aum_b: null
+                  net_assets: 278318309
+                  page: false
+                  url: null
+                - t: AADR
+                  n: AdvisorShares Dorsey Wright ADR ETF
+                  c: International Large Blend
+                  cat_id: international-large-blend
+                  er: 1.09
+                  p: 36
+                  api: https://tickerinside.com/api/v1/fund/aadr.json
+                  report_date: '2026-06-30'
+                  issuer: AdvisorShares
+                  aum_b: null
+                  net_assets: 41715126
+                  page: false
+                  url: null
+                - t: AAEQ
+                  n: Alpha Architect US Equity 2 ETF
+                  c: Large Blend
+                  cat_id: us-large-blend
+                  er: 0.09
+                  p: 340
+                  api: https://tickerinside.com/api/v1/fund/aaeq.json
+                  report_date: '2026-06-30'
+                  issuer: Alpha Architect
+                  aum_b: null
+                  net_assets: 497032856
+                  page: false
+                  url: null
+                sponsor_funds:
+                - t: AAUB
+                  n: Alpha Architect US Equity 4 ETF
+                  c: Large Blend
+                  cat_id: us-large-blend
+                  er: 0.1
+                  p: 406
+                  api: https://tickerinside.com/api/v1/etf/aaub.json
+                  report_date: '2026-09-30'
+                  issuer: ETF Architect sponsor site
+                  aum_b: null
+                  net_assets: 851630000
+                - t: ACQQ
+                  n: ProShares Nasdaq-100 Autocallable Income ETF
+                  c: Option Income
+                  cat_id: option-income
+                  er: 0.72
+                  p: 3
+                  api: https://tickerinside.com/api/v1/etf/acqq.json
+                  report_date: '2026-10-09'
+                  issuer: ProShares
+                  aum_b: null
+                  net_assets: null
+                - t: ACRT
+                  n: ProShares Russell 2000 Autocallable Income ETF
+                  c: Option Income
+                  cat_id: option-income
+                  er: 0.72
+                  p: 3
+                  api: https://tickerinside.com/api/v1/etf/acrt.json
+                  report_date: '2026-10-09'
+                  issuer: ProShares
+                  aum_b: null
+                  net_assets: null
+                prospectus_funds:
+                - t: AAAD
+                  n: PGIM AAA CLO Aggregate Duration ETF
+                  c: CLO Bonds
+                  cat_id: clo
+                  er: 0.19
+                  p: 0
+                  api: https://tickerinside.com/api/v1/etf/aaad.json
+                  filed: '2026-05-27'
+                  form: 497K
+                  issuer: null
+                  aum_b: null
+                - t: AAOZ
+                  n: Tradr 2X Short AAOI Daily ETF
+                  c: Inverse Single Stock
+                  cat_id: inverse-single-stock
+                  er: 1.49
+                  p: 0
+                  api: https://tickerinside.com/api/v1/etf/aaoz.json
+                  filed: '2026-07-15'
+                  form: 497K
+                  issuer: AXS Investments LLC
+                  aum_b: 0.0
+                - t: ACBE
+                  n: Pacer Metaurus Enhanced Core Income Autocallable ETF
+                  c: Option Income
+                  cat_id: option-income
+                  er: 0.6
+                  p: 0
+                  api: https://tickerinside.com/api/v1/etf/acbe.json
+                  filed: '2026-08-25'
+                  form: 497K
+                  issuer: Pacer Advisors, Inc.
+                  aum_b: null
+                bond_funds:
+                - t: AAA
+                  n: Alternative Access First Priority CLO Bond ETF
+                  c: CLO Bonds
+                  cat_id: clo
+                  er: 0.19
+                  p: 31
+                  api: https://tickerinside.com/api/v1/etf/aaa.json
+                  report_date: '2026-06-30'
+                  issuer: null
+                  aum_b: null
+                  net_assets: 44906491
+                - t: AAAC
+                  n: Columbia AAA CLO ETF
+                  c: CLO Bonds
+                  cat_id: clo
+                  er: 0.2
+                  p: 37
+                  api: https://tickerinside.com/api/v1/etf/aaac.json
+                  report_date: '2026-06-30'
+                  issuer: Columbia
+                  aum_b: null
+                  net_assets: 10035240
+                - t: AAAP
+                  n: Pacer Barings CLO Market Flex ETF
+                  c: CLO Bonds
+                  cat_id: clo
+                  er: 0.39
+                  p: 79
+                  api: https://tickerinside.com/api/v1/etf/aaap.json
+                  report_date: '2026-07-31'
+                  issuer: Pacer
+                  aum_b: 0.1
+                  net_assets: 86334734
+                multi_asset_funds:
+                - t: AAPR
+                  n: Innovator Equity Defined Protection ETF - 2 Yr to April 2028
+                  c: Defined Outcome
+                  cat_id: defined-outcome
+                  er: 0.79
+                  p: 1
+                  api: https://tickerinside.com/api/v1/etf/aapr.json
+                  report_date: '2026-07-31'
+                  issuer: Innovator
+                  aum_b: null
+                  net_assets: 72633790
+                - t: ABUF
+                  n: Aptus Laddered Buffer ETF
+                  c: Defined Outcome
+                  cat_id: defined-outcome
+                  er: 0.3
+                  p: 4
+                  api: https://tickerinside.com/api/v1/etf/abuf.json
+                  report_date: '2026-07-31'
+                  issuer: Aptus
+                  aum_b: null
+                  net_assets: 7358410
+                - t: ABXB
+                  n: Abacus Flexible Bond Leaders ETF
+                  c: Multisector Bonds
+                  cat_id: multisector-bond
+                  er: 0.62
+                  p: 9
+                  api: https://tickerinside.com/api/v1/etf/abxb.json
+                  report_date: '2026-07-31'
+                  issuer: null
+                  aum_b: null
+                  net_assets: 1905866
+                derivative_funds:
+                - t: AALG
+                  n: Leverage Shares 2X Long AAL Daily ETF
+                  c: Leveraged Single Stock
+                  cat_id: leveraged-single-stock
+                  er: 0.78
+                  p: 0
+                  api: https://tickerinside.com/api/v1/etf/aalg.json
+                  report_date: '2026-07-31'
+                  issuer: null
+                  aum_b: null
+                  net_assets: 2827625
+                - t: AAOG
+                  n: Leverage Shares 2X Long AAOI Daily ETF
+                  c: Leveraged Single Stock
+                  cat_id: leveraged-single-stock
+                  er: 0.75
+                  p: 0
+                  api: https://tickerinside.com/api/v1/etf/aaog.json
+                  report_date: '2026-07-31'
+                  issuer: null
+                  aum_b: 0.0
+                  net_assets: 16017480
+                - t: AAOX
+                  n: Tradr 2X Long AAOI Daily ETF
+                  c: Leveraged Equity
+                  cat_id: leveraged-equity
+                  er: 1.49
+                  p: 0
+                  api: https://tickerinside.com/api/v1/etf/aaox.json
+                  report_date: '2026-07-31'
+                  issuer: null
+                  aum_b: null
+                  net_assets: 142959476
+                trust_funds:
+                - t: AAAU
+                  n: Goldman Sachs Physical Gold ETF
+                  c: Gold and Precious Metals
+                  cat_id: precious-metals
+                  er: 0.18
+                  p: 0
+                  api: https://tickerinside.com/api/v1/etf/aaau.json
+                  report_date: '2026-06-30'
+                  issuer: Goldman Sachs
+                  aum_b: 2.9
+                  net_assets: null
+                - t: AGQ
+                  n: ProShares Ultra Silver
+                  c: Leveraged Commodities
+                  cat_id: leveraged-commodity
+                  er: 1.29
+                  p: 0
+                  api: https://tickerinside.com/api/v1/etf/agq.json
+                  report_date: '2026-06-30'
+                  issuer: ProShares
+                  aum_b: 1.5
+                  net_assets: null
+                - t: ARKB
+                  n: ARK 21Shares Bitcoin ETF
+                  c: Bitcoin
+                  cat_id: bitcoin
+                  er: 0.21
+                  p: 0
+                  api: https://tickerinside.com/api/v1/etf/arkb.json
+                  report_date: '2026-06-30'
+                  issuer: ARK
+                  aum_b: 2.7
+                  net_assets: null
+                license: CC BY 4.0
+                attribution: Credit TickerInside with a link to this file, or to the page that shows the figure, wherever the medium allows a link, and by name where it does not. How you mark the link is up to you.
+        '304':
+          description: 'Not modified: the ETag of your copy, sent in If-None-Match, is still current. Files are cached five minutes.'
+        '503':
+          description: 'The file could not be served just then: retry after a minute. uptime says whether the site fails its own checks.'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Unavailable'
+      tags:
+      - Funds.json
+components:
+  schemas:
+    Funds:
+      type: object
+      properties:
+        as_of:
+          type:
+          - string
+          - 'null'
+          description: The price date.
+        count:
+          type:
+          - integer
+          - 'null'
+          description: How many issuer-layer funds there are, the length of funds. Each has a /fund/ file.
+        with_a_page:
+          type:
+          - integer
+          - 'null'
+          description: How many funds have a page, in every list of this file.
+        note:
+          type:
+          - string
+          - 'null'
+          description: How to read the entries.
+        funds:
+          type:
+          - array
+          - 'null'
+          items:
+            type: object
+            properties:
+              t:
+                type:
+                - string
+                - 'null'
+              n:
+                type:
+                - string
+                - 'null'
+              c:
+                type:
+                - string
+                - 'null'
+              cat_id:
+                type:
+                - string
+                - 'null'
+              er:
+                type:
+                - number
+                - 'null'
+              p:
+                type:
+                - integer
+                - 'null'
+              issuer:
+                type:
+                - string
+                - 'null'
+              aum_b:
+                type:
+                - number
+                - 'null'
+              page:
+                type:
+                - boolean
+                - 'null'
+              url:
+                type:
+                - string
+                - 'null'
+              api:
+                type:
+                - string
+                - 'null'
+            additionalProperties: true
+          description: 'One entry per issuer-layer fund: t the ticker, n the name, c the category''s name (Large Blend for US Large Blend, as before 9 October 2026), cat_id its id, er the expense ratio, p the number of positions. issuer is the fund''s issuer, named as in index.json coverage.issuers, and aum_b its assets in billions of US dollars, as in its fund file; either can be null. page says whether it has a page, url is that page or null, and api is its file.'
+        sec_count:
+          type:
+          - integer
+          - 'null'
+          description: How many SEC-layer funds there are, the length of sec_funds.
+        sec_note:
+          type:
+          - string
+          - 'null'
+          description: How to read sec_funds.
+        sec_funds:
+          type:
+          - array
+          - 'null'
+          items:
+            type: object
+            properties:
+              t:
+                type:
+                - string
+                - 'null'
+              n:
+                type:
+                - string
+                - 'null'
+              c:
+                type:
+                - string
+                - 'null'
+              cat_id:
+                type:
+                - string
+                - 'null'
+              er:
+                type:
+                - number
+                - 'null'
+              p:
+                type:
+                - integer
+                - 'null'
+              api:
+                type:
+                - string
+                - 'null'
+              report_date:
+                type:
+                - string
+                - 'null'
+              issuer:
+                type:
+                - string
+                - 'null'
+              aum_b:
+                type:
+                - number
+                - 'null'
+              net_assets:
+                type:
+                - number
+                - 'null'
+              page:
+                type:
+                - boolean
+                - 'null'
+              url:
+                type:
+                - string
+                - 'null'
+            additionalProperties: true
+          description: 'One entry per SEC-layer fund: t, n, c, cat_id, er, p, issuer, aum_b and api as above, then report_date, the quarter end the filing describes, and net_assets, in US dollars on that date. er is null where the cost is not in the data, never zero, and aum_b is null unless the market data gives the fund''s size; the filing''s figure is net_assets. issuer is read from the fund''s name and checked against the trust that filed it, or null when neither says. page and url as in funds.'
+        sponsor_funds:
+          type:
+          - array
+          - 'null'
+          items:
+            type: object
+            properties:
+              t:
+                type:
+                - string
+                - 'null'
+              n:
+                type:
+                - string
+                - 'null'
+              c:
+                type:
+                - string
+                - 'null'
+              cat_id:
+                type:
+                - string
+                - 'null'
+              er:
+                type:
+                - number
+                - 'null'
+              p:
+                type:
+                - number
+                - 'null'
+              api:
+                type:
+                - string
+                - 'null'
+              report_date:
+                type:
+                - string
+                - 'null'
+              issuer:
+                type:
+                - string
+                - 'null'
+              aum_b: {}
+              net_assets:
+                type:
+                - number
+                - 'null'
+            additionalProperties: true
+          description: One entry per sponsor-file fund, as sec_funds.
+        prospectus_funds:
+          type:
+          - array
+          - 'null'
+          items:
+            type: object
+            properties:
+              t:
+                type:
+                - string
+                - 'null'
+              n:
+                type:
+                - string
+                - 'null'
+              c:
+                type:
+                - string
+                - 'null'
+              cat_id:
+                type:
+                - string
+                - 'null'
+              er:
+                type:
+                - number
+                - 'null'
+              p:
+                type:
+                - number
+                - 'null'
+              api:
+                type:
+                - string
+                - 'null'
+              filed:
+                type:
+                - string
+                - 'null'
+              form:
+                type:
+                - string
+                - 'null'
+              issuer: {}
+              aum_b: {}
+            additionalProperties: true
+          description: One entry per prospectus-file fund, as sec_funds, with filed and form.
+        bond_funds:
+          type:
+          - array
+          - 'null'
+          items:
+            type: object
+            properties:
+              t:
+                type:
+                - string
+                - 'null'
+              n:
+                type:
+                - string
+                - 'null'
+              c:
+                type:
+                - string
+                - 'null'
+              cat_id:
+                type:
+                - string
+                - 'null'
+              er:
+                type:
+                - number
+                - 'null'
+              p:
+                type:
+                - number
+                - 'null'
+              api:
+                type:
+                - string
+                - 'null'
+              report_date:
+                type:
+                - string
+                - 'null'
+              issuer: {}
+              aum_b: {}
+              net_assets:
+                type:
+                - number
+                - 'null'
+            additionalProperties: true
+          description: One entry per fixed income fund, as sec_funds; p counts its filing's lines.
+        multi_asset_funds:
+          type:
+          - array
+          - 'null'
+          items:
+            type: object
+            properties:
+              t:
+                type:
+                - string
+                - 'null'
+              n:
+                type:
+                - string
+                - 'null'
+              c:
+                type:
+                - string
+                - 'null'
+              cat_id:
+                type:
+                - string
+                - 'null'
+              er:
+                type:
+                - number
+                - 'null'
+              p:
+                type:
+                - number
+                - 'null'
+              api:
+                type:
+                - string
+                - 'null'
+              report_date:
+                type:
+                - string
+                - 'null'
+              issuer:
+                type:
+                - string
+                - 'null'
+              aum_b: {}
+              net_assets:
+                type:
+                - number
+                - 'null'
+            additionalProperties: true
+          description: One entry per multi-asset fund, as sec_funds.
+        derivative_funds:
+          type:
+          - array
+          - 'null'
+          items:
+            type: object
+            properties:
+              t:
+                type:
+                - string
+                - 'null'
+              n:
+                type:
+                - string
+                - 'null'
+              c:
+                type:
+                - string
+                - 'null'
+              cat_id:
+                type:
+                - string
+                - 'null'
+              er:
+                type:
+                - number
+                - 'null'
+              p:
+                type:
+                - number
+                - 'null'
+              api:
+                type:
+                - string
+                - 'null'
+              report_date:
+                type:
+                - string
+                - 'null'
+              issuer: {}
+              aum_b: {}
+              net_assets:
+                type:
+                - number
+                - 'null'
+            additionalProperties: true
+          description: One entry per derivative-based fund, as sec_funds; report_date is the quarter end its filing describes. The files of this and the next three lists are under /etf/, at each entry's api. In them, page and url are given only for a fund that has a page.
+        trust_funds:
+          type:
+          - array
+          - 'null'
+          items:
+            type: object
+            properties:
+              t:
+                type:
+                - string
+                - 'null'
+              n:
+                type:
+                - string
+                - 'null'
+              c:
+                type:
+                - string
+                - 'null'
+              cat_id:
+                type:
+                - string
+                - 'null'
+              er:
+                type:
+                - number
+                - 'null'
+              p:
+                type:
+                - number
+                - 'null'
+              api:
+                type:
+                - string
+                - 'null'
+              report_date:
+                type:
+                - string
+                - 'null'
+              issuer:
+                type:
+                - string
+                - 'null'
+              aum_b:
+                type:
+                - number
+                - 'null'
+              net_assets: {}
+            additionalProperties: true
+          description: One entry per trust or commodity pool, as sec_funds; report_date is the period its filing describes, null for a fund too new to have filed a report.
+        license:
+          type:
+          - string
+          - 'null'
+          description: The licence the data is published under.
+        attribution:
+          type:
+          - string
+          - 'null'
+          description: 'How to credit the data: a link to this file where the medium allows one, the name where it does not.'
+      additionalProperties: true
+      required:
+      - as_of
+      - count
+      - with_a_page
+      - note
+      - funds
+      - sec_count
+      - sec_note
+      - sec_funds
+      - sponsor_funds
+      - prospectus_funds
+      - bond_funds
+      - multi_asset_funds
+      - derivative_funds
+      - trust_funds
+      - license
+      - attribution
+    Unavailable:
+      type: object
+      additionalProperties: true
+      required:
+      - error
+      - message
+      - status
+      - uptime
+      properties:
+        error:
+          type: string
+          const: unavailable
+        message:
+          type: string
+        status:
+          type: string
+          description: The nightly report.
+        uptime:
+          type: string
+          description: 'The live checks: whether the site fails its own checks.'
+externalDocs:
+  description: The reference, with examples and recipes
+  url: https://tickerinside.com/api/

@@ -1,0 +1,430 @@
+openapi: 3.2.0
+info:
+  title: TickerInside Ownership Index.json API
+  version: '1'
+  summary: Holdings of 5,433 US ETFs, which ETFs hold a stock, and overlap, as static JSON.
+  description: TickerInside is an open, machine-readable database of US ETF holdings, with the source and date of each holding.
+  termsOfService: https://tickerinside.com/terms/
+  contact:
+    name: TickerInside
+    email: contact@tickerinside.com
+    url: https://tickerinside.com/api/
+  license:
+    name: CC BY 4.0
+    identifier: CC-BY-4.0
+servers:
+- url: https://tickerinside.com/api/v1
+  description: Static JSON files, and five answers computed from them when asked. No key.
+security: []
+tags:
+- name: Ownership Index.json
+paths:
+  /ownership-index.json:
+    get:
+      operationId: getOwnershipIndex
+      summary: ETF Ownership Index
+      description: 'The ETF Ownership Index (ti-ownership-index/1). For each stock with a figure in the ownership ledger: the share of its shares outstanding held by the covered US ETFs, at least, the funds counted, and top3_share_pct, the share of those funds'' holdings held by the three funds holding the most. Then the market line, over one line per company, with the cap-weighted share of the companies'' market value the ETFs hold, the mean, the median and the quartiles, and the same line by sector. Its CSV twin, /api/v1/ownership-index.csv, has the same rows. The methodology, with a worked example, is at /etf-ownership/methodology/. A lower bound, like the ledger it reads: funds outside the coverage, and covered funds whose count could not be used, are not in it. Market caps weight the lines and enter no stock''s figure. Under CC BY 4.0.'
+      externalDocs:
+        url: https://tickerinside.com/api/#ownership-index
+      responses:
+        '200':
+          description: 'The file. The example is a real answer, shortened: long lists and maps keep their first entries.'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/OwnershipIndex'
+              example:
+                name: TickerInside ETF Ownership Index
+                as_of: '2026-10-12'
+                method: ti-ownership-index/1
+                ledger_method: ti-ownership/1
+                method_url: https://tickerinside.com/api/v1/methods.json
+                methodology: https://tickerinside.com/etf-ownership/methodology/
+                holdings_dates:
+                  oldest: '2026-01-31'
+                  newest: '2026-10-12'
+                shares_outstanding_dates:
+                  oldest: '2025-10-21'
+                  newest: '2026-09-25'
+                caps_as_of: '2026-10-09'
+                count: 3592
+                columns:
+                - ticker
+                - company
+                - sector
+                stocks:
+                - - EU
+                  - enCore Energy Corp.
+                  - null
+                - - ATEN
+                  - A10 Networks, Inc.
+                  - null
+                - - URG
+                  - Ur Energy Inc
+                  - null
+                market:
+                  companies: 3481
+                  cap_weighted_pct: 11.41
+                  mean_pct: 10.69
+                  median_pct: 9.96
+                  p25_pct: 3.72
+                  p75_pct: 16.53
+                  companies_without_cap: 246
+                  cap_b: 85003.6
+                sectors:
+                - sector: Communication Services
+                  companies: 18
+                  cap_weighted_pct: 9.92
+                  mean_pct: 12.76
+                  median_pct: 12.53
+                  p25_pct: 9.96
+                  p75_pct: 14.46
+                  companies_without_cap: 0
+                  cap_b: 7590.1
+                - sector: Consumer Discretionary
+                  companies: 47
+                  cap_weighted_pct: 10.29
+                  mean_pct: 13.89
+                  median_pct: 13.62
+                  p25_pct: 11.8
+                  p75_pct: 16.03
+                  companies_without_cap: 0
+                  cap_b: 6706.1
+                - sector: Consumer Staples
+                  companies: 31
+                  cap_weighted_pct: 11.97
+                  mean_pct: 15.16
+                  median_pct: 14.79
+                  p25_pct: 13.21
+                  p75_pct: 17.13
+                  companies_without_cap: 0
+                  cap_b: 3408.5
+                class_basis_left_out: 90
+                concentration_min_funds: 6
+                concentration_not_published:
+                  fewer_than_6_funds: 431
+                  one_fund_dominant: 5
+                  split_under_3_funds: 1188
+                held_back: null
+                failed: false
+                history: https://tickerinside.com/api/v1/ownership-index/history.json
+                csv: https://tickerinside.com/api/v1/ownership-index.csv
+                note: 'Each row of stocks is described by columns: ticker; company; sector, where the price data gives one (the companies of its S&P 500 list); basis, company when the percent is of the company''s shares outstanding, every class counted, class when it is of the ticker''s class alone; pct_lower_bound, at least this percent held by the covered US ETFs (the ledger''s figure); funds_counted; top3_share_pct, the share of those funds'' holdings held by the three funds holding the most, null under 6 funds or where a published sum would give back one fund''s count (concentration_not_published); holdings_newest, the newest holdings date counted; shares_outstanding_as_of, the date of the SEC''s count. market and sectors are over one line per company on a company basis, weighted by market cap for cap_weighted_pct. The changes over 5 and 20 market days are in the history file, under the history terms. A measurement, not investment advice.'
+                cite_as: 'TickerInside, ETF Ownership Index (ti-ownership-index/1) of 2026-10-12: at least 11.41% of the combined market value of 3,481 US-listed companies held by the covered US ETFs, https://tickerinside.com/api/v1/ownership-index.json, CC BY 4.0'
+                cite_html: <a href="https://tickerinside.com/api/v1/ownership-index.json">TickerInside</a> (https://tickerinside.com/api/v1/ownership-index.json)
+                docs: https://tickerinside.com/api/#ownership-index
+                license: CC BY 4.0
+                attribution: Credit TickerInside with a link to this file, or to the page that shows the figure, wherever the medium allows a link, and by name where it does not. How you mark the link is up to you.
+        '304':
+          description: 'Not modified: the ETag of your copy, sent in If-None-Match, is still current. Files are cached five minutes.'
+        '503':
+          description: 'The file could not be served just then: retry after a minute. uptime says whether the site fails its own checks.'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Unavailable'
+      tags:
+      - Ownership Index.json
+components:
+  schemas:
+    OwnershipIndex:
+      type: object
+      additionalProperties: true
+      properties:
+        name:
+          type:
+          - string
+          description: The index's name.
+        as_of:
+          type:
+          - string
+          - 'null'
+          description: 'The date of the ownership ledger the index reads: its newest holdings date.'
+        method:
+          type:
+          - string
+          description: The method of the index, ti-ownership-index/1, in /api/v1/methods.json.
+        ledger_method:
+          type:
+          - string
+          description: The method of the figures it reads, ti-ownership/1.
+        method_url:
+          type:
+          - string
+          description: Where both methods are written down, with their test vectors.
+        methodology:
+          type:
+          - string
+          description: 'The methodology page: formulas, sources, dates, limits and a worked example.'
+        holdings_dates:
+          type:
+          - object
+          - 'null'
+          additionalProperties: true
+          properties:
+            oldest:
+              type:
+              - string
+            newest:
+              type:
+              - string
+          description: The oldest and newest holdings dates counted across the stocks.
+        shares_outstanding_dates:
+          type:
+          - object
+          - 'null'
+          additionalProperties: true
+          properties:
+            oldest:
+              type:
+              - string
+            newest:
+              type:
+              - string
+          description: The oldest and newest dates of the SEC's counts of shares outstanding used.
+        caps_as_of:
+          type:
+          - string
+          - 'null'
+          description: The price date of the market caps that weight the lines; they enter no stock's figure.
+        count:
+          type:
+          - integer
+          description: How many stocks have a figure, the rows of stocks.
+        columns:
+          type: array
+          items:
+            type: string
+          description: The names of the places of each row of stocks.
+        stocks:
+          type: array
+          items:
+            type: array
+            items:
+              type:
+              - string
+              - number
+              - integer
+              - boolean
+              - 'null'
+          description: One row per stock with a figure, most held first, as columns names them.
+        market:
+          type:
+          - object
+          - 'null'
+          additionalProperties: true
+          properties:
+            companies:
+              type:
+              - integer
+              description: Companies in the line, one per company on a company basis.
+            cap_weighted_pct:
+              type:
+              - number
+              - 'null'
+              description: 'Sum of each company''s figure times its market cap over the sum of their caps, rounded down: the share of their combined market value held by the covered US ETFs, at least.'
+            mean_pct:
+              type:
+              - number
+              - 'null'
+              description: The mean of the companies' figures, rounded down.
+            median_pct:
+              type:
+              - number
+              - 'null'
+              description: The median company's figure.
+            p25_pct:
+              type:
+              - number
+              - 'null'
+              description: The first quartile, by nearest rank.
+            p75_pct:
+              type:
+              - number
+              - 'null'
+              description: The third quartile, by nearest rank.
+            companies_without_cap:
+              type:
+              - integer
+              description: Companies without a market cap, in the mean and quartiles and left out of cap_weighted_pct.
+            cap_b:
+              type:
+              - number
+              - 'null'
+              description: The companies' combined market cap, in billions of dollars.
+          required:
+          - companies
+          - cap_weighted_pct
+          - mean_pct
+          - median_pct
+          - p25_pct
+          - p75_pct
+          - companies_without_cap
+          - cap_b
+          description: 'The line over every company: described below.'
+        sectors:
+          type: array
+          items:
+            type: object
+            additionalProperties: true
+            properties:
+              sector:
+                type:
+                - string
+                description: The sector, as the price data names it.
+              companies:
+                type:
+                - integer
+                description: Companies in the line, one per company on a company basis.
+              cap_weighted_pct:
+                type:
+                - number
+                - 'null'
+                description: 'Sum of each company''s figure times its market cap over the sum of their caps, rounded down: the share of their combined market value held by the covered US ETFs, at least.'
+              mean_pct:
+                type:
+                - number
+                - 'null'
+                description: The mean of the companies' figures, rounded down.
+              median_pct:
+                type:
+                - number
+                - 'null'
+                description: The median company's figure.
+              p25_pct:
+                type:
+                - number
+                - 'null'
+                description: The first quartile, by nearest rank.
+              p75_pct:
+                type:
+                - number
+                - 'null'
+                description: The third quartile, by nearest rank.
+              companies_without_cap:
+                type:
+                - integer
+                description: Companies without a market cap, in the mean and quartiles and left out of cap_weighted_pct.
+              cap_b:
+                type:
+                - number
+                - 'null'
+                description: The companies' combined market cap, in billions of dollars.
+            required:
+            - sector
+            - companies
+            - cap_weighted_pct
+            - mean_pct
+            - median_pct
+            - p25_pct
+            - p75_pct
+            - companies_without_cap
+            - cap_b
+          description: 'The line of each sector with at least 5 companies, by name: the same fields and sector.'
+        class_basis_left_out:
+          type:
+          - integer
+          description: How many figures of one class alone are in stocks and left out of the lines.
+        concentration_min_funds:
+          type:
+          - integer
+          description: The fewest funds counted for a top3_share_pct.
+        concentration_not_published:
+          type: object
+          additionalProperties:
+            type: integer
+          description: How many stocks have a null top3_share_pct, by reason (refusals of ti-ownership-index/1 in methods.json).
+        held_back:
+          type:
+          - object
+          - 'null'
+          additionalProperties: true
+          description: 'Set when tonight''s ledger was held back by its checks: the index then reads the last ledger that passed.'
+        failed:
+          type:
+          - boolean
+          description: 'True when the index could not be computed tonight: no rows and no lines, the history as it was.'
+        history:
+          type:
+          - string
+          description: The daily history, with the changes over 5 and 20 market days (history terms).
+        csv:
+          type:
+          - string
+          description: The rows of stocks as CSV, the same columns.
+        note:
+          type:
+          - string
+          description: How to read the file.
+        cite_as:
+          type:
+          - string
+          - 'null'
+          description: 'A citation line: the index, its date, the market line and this file''s address.'
+        cite_html:
+          type:
+          - string
+          description: 'The credit as HTML: a link to this file, then its address.'
+        docs:
+          type:
+          - string
+          description: Where the file is documented.
+        license:
+          type:
+          - string
+          description: CC BY 4.0.
+        attribution:
+          type:
+          - string
+          description: Credit TickerInside with a link to this file, or to the page that shows the figure, wherever the medium allows a link, and by name where it does not. How you mark the link is up to you.
+      required:
+      - name
+      - as_of
+      - method
+      - ledger_method
+      - method_url
+      - methodology
+      - holdings_dates
+      - shares_outstanding_dates
+      - caps_as_of
+      - count
+      - columns
+      - stocks
+      - market
+      - sectors
+      - class_basis_left_out
+      - concentration_min_funds
+      - concentration_not_published
+      - held_back
+      - failed
+      - history
+      - csv
+      - note
+      - cite_as
+      - cite_html
+      - docs
+      - license
+      - attribution
+    Unavailable:
+      type: object
+      additionalProperties: true
+      required:
+      - error
+      - message
+      - status
+      - uptime
+      properties:
+        error:
+          type: string
+          const: unavailable
+        message:
+          type: string
+        status:
+          type: string
+          description: The nightly report.
+        uptime:
+          type: string
+          description: 'The live checks: whether the site fails its own checks.'
+externalDocs:
+  description: The reference, with examples and recipes
+  url: https://tickerinside.com/api/

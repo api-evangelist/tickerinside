@@ -1,0 +1,227 @@
+openapi: 3.2.0
+info:
+  title: TickerInside Deprecations.json API
+  version: '1'
+  summary: Holdings of 5,433 US ETFs, which ETFs hold a stock, and overlap, as static JSON.
+  description: TickerInside is an open, machine-readable database of US ETF holdings, with the source and date of each holding.
+  termsOfService: https://tickerinside.com/terms/
+  contact:
+    name: TickerInside
+    email: contact@tickerinside.com
+    url: https://tickerinside.com/api/
+  license:
+    name: CC BY 4.0
+    identifier: CC-BY-4.0
+servers:
+- url: https://tickerinside.com/api/v1
+  description: Static JSON files, and five answers computed from them when asked. No key.
+security: []
+tags:
+- name: Deprecations.json
+paths:
+  /deprecations.json:
+    get:
+      operationId: getDeprecations
+      summary: What is kept for compatibility
+      description: Each field, key, answer, address and MCP tool name kept answering for compatibility, with what replaces it. The fund addresses and the tool names are read from the code that answers them. Nothing listed here is removed inside v1.
+      externalDocs:
+        url: https://tickerinside.com/api/#deprecations
+      responses:
+        '200':
+          description: 'The file. The example is a real answer, shortened: long lists and maps keep their first entries.'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Deprecations'
+              example:
+                count: 21
+                rule: 'Nothing listed here is removed inside v1: each entry keeps answering as answers says, and removal is null. A removal would come with a new version path, announced here and in changelog.json.'
+                aliases:
+                  glov: gswo
+                  rpsa: rspa
+                  netz: pwrd
+                  fluk: flgb
+                  iscb: msml
+                entries:
+                - id: field-sec-left-out
+                  kind: field
+                  since: '2026-09-28'
+                  what: left_out
+                  where: /api/v1/sec/{ticker}.json
+                  replaced_by:
+                  - same_code_abroad
+                  - earlier_key_reads_as
+                  answers: An empty list for a stock with a page, and null without one.
+                  note: It named the issuer-layer funds whose row under the ticker was most likely a company listed abroad under the same code. Since lines abroad carry their market (7203.JP), such a row has a key of its own.
+                  removal: null
+                - id: key-without-market
+                  kind: key
+                  since: '2026-09-28'
+                  what: A key of a line listed abroad without its market, such as 7203
+                  where: /api/v1/sec/{ticker}.json and the holders files
+                  replaced_by:
+                  - 'The keys it reads as now: reads_as in the 404 under /sec/, and the aliases of /api/v1/holders/{c}.json'
+                  answers: A 404 under /sec/ with reason earlier_key and reads_as.
+                  note: 'Each line abroad is keyed by its local code and its market: 7203.JP, Toyota in Tokyo, and 7203.SA, Elm in Riyadh.'
+                  removal: null
+                - id: answer-fund-in-another-layer
+                  kind: answer
+                  since: '2026-10-04'
+                  what: 404 with reason in_another_layer under /api/v1/fund/{ticker}.json
+                  where: /api/v1/fund/{ticker}.json
+                  replaced_by:
+                  - The answer /fund/ composes from the fund's file under /etf/, with holdings_kind and listed_pct
+                  answers: Only to the Python client before 0.3.0 and the MCP package up to 1.7.1, by the version in their User-Agent.
+                  note: Every other client gets the composed answer.
+                  removal: null
+                contract: https://tickerinside.com/contract/
+                docs: https://tickerinside.com/api/#versions
+                license: CC BY 4.0
+                attribution: Credit TickerInside with a link to this file, or to the page that shows the figure, wherever the medium allows a link, and by name where it does not. How you mark the link is up to you.
+        '304':
+          description: 'Not modified: the ETag of your copy, sent in If-None-Match, is still current. Files are cached five minutes.'
+        '503':
+          description: 'The file could not be served just then: retry after a minute. uptime says whether the site fails its own checks.'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Unavailable'
+      tags:
+      - Deprecations.json
+components:
+  schemas:
+    Unavailable:
+      type: object
+      additionalProperties: true
+      required:
+      - error
+      - message
+      - status
+      - uptime
+      properties:
+        error:
+          type: string
+          const: unavailable
+        message:
+          type: string
+        status:
+          type: string
+          description: The nightly report.
+        uptime:
+          type: string
+          description: 'The live checks: whether the site fails its own checks.'
+    Deprecations:
+      type: object
+      properties:
+        count:
+          type:
+          - number
+          - 'null'
+          description: How many entries.
+        rule:
+          type:
+          - string
+          - 'null'
+          description: What deprecated means here, in one sentence.
+        aliases:
+          type: object
+          additionalProperties:
+            type: string
+          description: 'Each fund address the Worker answers with a 301 to the fund''s file under its new ticker: {old ticker: new ticker}, lower case, as src/index.js lists them.'
+        entries:
+          type: array
+          items:
+            type: object
+            properties:
+              id:
+                type:
+                - string
+                - 'null'
+                description: The entry's id. It does not change.
+              kind:
+                type:
+                - string
+                - 'null'
+                description: field, a field of a file; key, a way of keying a security; answer, an answer of an address; address, an address that leads to another; mcp_tool, a tool name of the MCP server.
+              since:
+                type:
+                - string
+                - 'null'
+                description: The day it was replaced.
+              what:
+                type:
+                - string
+                - 'null'
+                description: What is deprecated.
+              where:
+                type:
+                - string
+                - 'null'
+                description: The file, address or server where it answers.
+              replaced_by:
+                type:
+                - array
+                - 'null'
+                items:
+                  type:
+                  - 'null'
+                  - string
+                description: What to read or call instead.
+              answers:
+                type:
+                - string
+                - 'null'
+                description: How it answers today.
+              note:
+                type:
+                - string
+                - 'null'
+                description: Why, in words.
+              removal:
+                type: 'null'
+                description: 'Always null: nothing is removed inside v1.'
+            additionalProperties: true
+            required:
+            - id
+            - kind
+            - since
+            - what
+            - where
+            - replaced_by
+            - answers
+            - note
+            - removal
+          description: What still answers but has a replacement; their fields are described below.
+        contract:
+          type:
+          - string
+          - 'null'
+          description: 'The data contract this file belongs to: /contract/.'
+        docs:
+          type:
+          - string
+          - 'null'
+          description: Where this file is documented.
+        license:
+          type:
+          - string
+          - 'null'
+          description: The licence the file is published under.
+        attribution:
+          type:
+          - string
+          - 'null'
+          description: 'How to credit the data: a link to this file where the medium allows one, the name where it does not.'
+      additionalProperties: true
+      required:
+      - count
+      - rule
+      - aliases
+      - entries
+      - contract
+      - docs
+      - license
+      - attribution
+externalDocs:
+  description: The reference, with examples and recipes
+  url: https://tickerinside.com/api/

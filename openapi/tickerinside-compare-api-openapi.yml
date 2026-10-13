@@ -1,0 +1,721 @@
+openapi: 3.2.0
+info:
+  title: TickerInside Compare API
+  version: '1'
+  summary: Holdings of 5,433 US ETFs, which ETFs hold a stock, and overlap, as static JSON.
+  description: TickerInside is an open, machine-readable database of US ETF holdings, with the source and date of each holding.
+  termsOfService: https://tickerinside.com/terms/
+  contact:
+    name: TickerInside
+    email: contact@tickerinside.com
+    url: https://tickerinside.com/api/
+  license:
+    name: CC BY 4.0
+    identifier: CC-BY-4.0
+servers:
+- url: https://tickerinside.com/api/v1
+  description: Static JSON files, and five answers computed from them when asked. No key.
+security: []
+tags:
+- name: Compare
+paths:
+  /compare/{a}-vs-{b}.json:
+    get:
+      operationId: getComparison
+      summary: A written comparison
+      description: 'One of the 15 written comparisons, the pairs listed in index.json written_comparisons: overlap measured three ways, correlation over one, three and five years, and a summary of each fund. The file is written in the order listed there (voo-vs-vti); the other order answers 301 to it. Any other pair answers 404, reason no_written_comparison, with the two fund files. From them, compute the overlap by weight: the sum, over the tickers both hold, of the smaller of the two weights, as the overlap example does.'
+      externalDocs:
+        url: https://tickerinside.com/api/#compare
+      responses:
+        '200':
+          description: 'The file. The example is a real answer, shortened: long lists and maps keep their first entries.'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Compare'
+              example:
+                pair:
+                - VOO
+                - VTI
+                as_of: '2026-10-09'
+                holdings_as_of:
+                  VOO: '2026-08-31'
+                  VTI: '2026-08-31'
+                overlap:
+                  by_weight: 88.9
+                  share_of_a: 99.9
+                  share_of_b: 88.9
+                  n_shared: 501
+                  n_a: 503
+                  n_b: 3458
+                  top:
+                  - ticker: NVDA
+                    wa: 8.09
+                    wb: 6.89
+                    min: 6.89
+                    pa: 100.0
+                    pb: 85.2
+                    name: NVIDIA Corp.
+                  - ticker: AAPL
+                    wa: 7.04
+                    wb: 6.32
+                    min: 6.32
+                    pa: 87.0
+                    pb: 78.1
+                    name: Apple Inc.
+                  - ticker: MSFT
+                    wa: 5.7
+                    wb: 5.12
+                    min: 5.12
+                    pa: 70.5
+                    pb: 63.3
+                    name: Microsoft Corp.
+                  only_a:
+                  - ticker: NXPI
+                    w: 0.09
+                    name: NXP Semiconductors NV
+                  - ticker: AMCR
+                    w: 0.03
+                    name: Amcor plc
+                  only_b:
+                  - ticker: SNOW
+                    w: 0.15
+                    name: Snowflake Inc.
+                  - ticker: NET
+                    w: 0.13
+                    name: Cloudflare Inc. Class A
+                  - ticker: SPCX
+                    w: 0.12
+                    name: Space Exploration Technologies Corp. Class A
+                  method: ti-overlap/1
+                  method_url: https://tickerinside.com/api/v1/methods.json
+                correlation:
+                  c1y: 0.99
+                  c3y: 1.0
+                  c5y: 1.0
+                  cov: 205.3
+                  weeks:
+                  - '2025-10-17'
+                  - '2025-10-24'
+                  - '2025-10-31'
+                funds:
+                  VOO:
+                    ticker: VOO
+                    name: Vanguard S&P 500 ETF
+                    kind: etf
+                    group: US Large Cap
+                    vol: 14.2
+                    beta: 0.99
+                    r1: 20.5
+                    r3: 87.5
+                    r5: 87.2
+                    mdd3: -16.7
+                    cal:
+                      '2022': -18.2
+                      '2023': 26.3
+                      '2024': 25.0
+                    er: 0.03
+                    yield: 1.06
+                    aum_b: 1729.3
+                    family: Vanguard
+                    cat: US Large Blend
+                    nh: 503
+                    spark:
+                    - 100.0
+                    - 101.9
+                    - 102.7
+                    px:
+                      last: 715.59
+                      date: '2026-10-09'
+                      d1: 0.61
+                      hi52: 716.2
+                      lo52: 580.93
+                      ccy: USD
+                  VTI:
+                    ticker: VTI
+                    name: Vanguard Total Stock Market ETF
+                    kind: etf
+                    group: US Large Cap
+                    vol: 14.5
+                    beta: 1.01
+                    r1: 20.0
+                    r3: 85.8
+                    r5: 77.4
+                    mdd3: -17.4
+                    cal:
+                      '2022': -19.5
+                      '2023': 26.0
+                      '2024': 23.8
+                    er: 0.03
+                    yield: 1.06
+                    aum_b: 2322.1
+                    family: Vanguard
+                    cat: US Large Blend
+                    nh: 3133
+                    spark:
+                    - 100.0
+                    - 102.0
+                    - 102.5
+                    px:
+                      last: 381.94
+                      date: '2026-10-09'
+                      d1: 0.63
+                      hi52: 384.3
+                      lo52: 311.68
+                      ccy: USD
+                page_url: https://tickerinside.com/compare/voo-vs-vti/
+                cite_as: TickerInside, VOO vs VTI, holdings files of 2026-08-31 and 2026-08-31, https://tickerinside.com/compare/voo-vs-vti/, CC BY 4.0
+                cite_html: <a href="https://tickerinside.com/compare/voo-vs-vti/">TickerInside</a> (https://tickerinside.com/compare/voo-vs-vti/)
+                source: https://tickerinside.com/compare/voo-vs-vti/
+                license: CC BY 4.0
+                attribution: Credit TickerInside with a link to the page the figure comes from (cite_as gives it) wherever the medium allows a link, and by name where it does not. How you mark the link is up to you.
+        '301':
+          description: 'The address was not written the way the file is: an upper case ticker, a share class written BRK-B or BRK/B, a missing .json, or punctuation at the end. Follow the Location header (curl -L). A written comparison asked for in the other order answers 301 to its file.'
+        '304':
+          description: 'Not modified: the ETag of your copy, sent in If-None-Match, is still current. Files are cached five minutes.'
+        '404':
+          description: 'reason no_written_comparison: no comparison file for this pair in either order. fund_files gives the two fund files to compute the overlap from; the other order of a written pair answers 301 to its file.'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/NotCovered'
+        '503':
+          description: 'The file could not be served just then: retry after a minute. uptime says whether the site fails its own checks.'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Unavailable'
+      parameters:
+      - name: a
+        in: path
+        required: true
+        description: The first fund of a written comparison, lower case, in the order of index.json written_comparisons.
+        schema:
+          type: string
+        example: voo
+      - name: b
+        in: path
+        required: true
+        description: The second fund, lower case.
+        schema:
+          type: string
+        example: qqq
+      tags:
+      - Compare
+components:
+  schemas:
+    NotCovered:
+      type: object
+      additionalProperties: true
+      required:
+      - error
+      - ticker
+      - message
+      - docs
+      properties:
+        error:
+          type: string
+          const: not_covered
+          description: 'Always not_covered, whatever the reason: read reason and the next address.'
+        reason:
+          type: string
+          enum:
+          - has_security_file
+          - in_another_layer
+          - is_a_fund
+          - no_written_comparison
+          - not_a_shard
+          - not_held_by_daily_funds
+          - not_held
+          - earlier_key
+          - no_such_endpoint
+          - not_in_directory
+          - no_file
+          - funds_not_covered
+          - etn
+          - other_product
+          - no_filing_yet
+          - not_in_sec_list
+          - other_fund
+          - stale_filing
+          - no_prospectus_found
+          - not_in_archive
+          - holdings_at_date_not_enabled
+          - invalid_date
+          - before_history
+          description: 'Every code is explained on /contract/#reasons. not_in_directory: a fund address with no file, for a ticker not in the directory of US-listed funds; a ticker of the directory with no file gets the code universe.json gives it (etn, no_filing_yet and the others), and no_file when the directory was not read. not_held: under /sec/, no covered fund holds the key; earlier_key: an old key, with reads_as. no_such_endpoint: no endpoint at the address. funds_not_covered: several funds of /overlap or /lookthrough, with reasons. in_another_layer: sent only to the TickerInside clients released before /fund/ answered for a fund of the other layers too (see holdings_kind); etf gives the fund''s file. has_security_file: a ticker asked for as a fund has a stock file (see security). is_a_fund: a ticker asked for as a stock is a covered fund (see fund, and holders for the funds that hold it). no_written_comparison: no comparison file for this pair in either order (see fund_files and written_comparisons). not_a_shard: an address under /api/v1/holders/ that is not a shard (see holders). Under /api/v1/history/: not_in_archive: the fund has no history file (see history). holdings_at_date_not_enabled: holdings at a date are not served yet, and every valid date answers this (see changes). invalid_date: the date is not a calendar date, or is after today. before_history: the date is before the fund''s first file (see first), answered only once holdings at a date are served. Under /api/v1/flows/: reason not_held_by_daily_funds: no fund read daily from its issuer''s files held the key or moved it in the last 20 trading days; summary names the night''s summary.'
+        ticker:
+          type:
+          - string
+          - 'null'
+          description: What was asked for, upper case; null when the address names no single ticker, such as a pair under /compare/.
+        message:
+          type: string
+          description: What happened and where to look next, in words.
+        docs:
+          type: string
+          description: The reference.
+        security:
+          type: string
+          description: 'With has_security_file: the stock file of the ticker, or its holders-only answer.'
+        reads_as:
+          type: array
+          items:
+            type: string
+          description: 'Under /sec/, for an old key written before lines listed abroad carried their market (7203): the keys it reads as now, from the aliases of holders. Absent otherwise.'
+        fund:
+          type: string
+          description: 'With is_a_fund: the fund file of the ticker.'
+        etf:
+          type: string
+          description: 'With in_another_layer: the file of the fund, /api/v1/etf/{ticker}.json.'
+        holders:
+          type: string
+          description: 'The shard of the key''s first character: /api/v1/holders/{c}.json, c a to z, or 0 for any other character (7203.JP is in 0.json). It lists the covered funds that hold the key, from issuer files and from SEC filings, with or without a stock file.'
+        pair:
+          type:
+          - array
+          - 'null'
+          items:
+            type: string
+          description: 'With no_written_comparison: the two tickers asked for, upper case, or null when the address names no pair.'
+        written_comparisons:
+          type: array
+          items:
+            type: object
+            additionalProperties: true
+            properties:
+              pair:
+                type: array
+                items:
+                  type: string
+              url:
+                type: string
+          description: 'With no_written_comparison: the pairs that have a comparison file, as index.json lists them.'
+        fund_files:
+          type: array
+          items:
+            type: string
+          description: 'With no_written_comparison: the fund files of the tickers asked for that are covered funds, to compute the overlap from.'
+        covered:
+          type: string
+          description: 'What is covered: /api/v1/securities.json after a /sec/ address with no reason, /api/v1/index.json otherwise.'
+        not_covered:
+          type: array
+          items:
+            type: string
+          description: 'Under /overlap, /lookthrough and /diversify: the tickers asked for that are not covered.'
+        reasons:
+          type: object
+          additionalProperties:
+            type: string
+          description: 'Under /overlap, /lookthrough and /diversify: the reason code of each ticker of not_covered.'
+        covered_issuers:
+          type: array
+          items:
+            type: string
+          description: 'Under /overlap and /lookthrough: the issuers whose own files are read; the other covered funds are read from SEC filings.'
+        history:
+          type: string
+          description: 'With not_in_archive: the list of the funds that have a history.'
+        changes:
+          type: string
+          description: 'With holdings_at_date_not_enabled: the fund''s changes file, served today.'
+        first:
+          type:
+          - string
+          - 'null'
+          description: 'With before_history: the date of the fund''s oldest file. before_history is answered only once holdings at a date are served.'
+        date:
+          type: string
+          description: 'With invalid_date, holdings_at_date_not_enabled or before_history: the date asked for.'
+        summary:
+          type: string
+          description: 'With not_held_by_daily_funds: the night''s flows, /api/v1/flows.json.'
+    Compare:
+      type: object
+      properties:
+        pair:
+          type:
+          - array
+          - 'null'
+          items:
+            type:
+            - 'null'
+            - string
+          description: 'The two tickers, in the order of the file''s address and of index.json written_comparisons: this file is /compare/{a}-vs-{b}.json with a first. The other order answers 301 to this file.'
+        as_of:
+          type:
+          - string
+          - 'null'
+          description: The price date.
+        holdings_as_of:
+          type:
+          - object
+          - 'null'
+          additionalProperties:
+            type:
+            - string
+            - 'null'
+          description: The date of each fund's holdings file, keyed by ticker. The two are often weeks apart.
+        overlap:
+          type: object
+          properties:
+            by_weight:
+              type:
+              - number
+              - 'null'
+              description: 'The sum, over every ticker both funds hold, of the smaller of its two weights. Symmetric: the headline figure. Tickers are compared as keys, so GOOG and GOOGL count as two.'
+            share_of_a:
+              type:
+              - number
+              - 'null'
+              description: The part of the first fund's weight that sits in tickers the second also holds, in percent of the first fund's listed total weight, which can differ a little from 100. Not symmetric.
+            share_of_b:
+              type:
+              - number
+              - 'null'
+              description: The same measure from the second fund's side. When share_of_a is far above share_of_b, the first fund is mostly contained in the second.
+            n_shared:
+              type:
+              - integer
+              - 'null'
+              description: How many tickers appear in both funds. The Python client calls it companies_in_both.
+            n_a:
+              type:
+              - integer
+              - 'null'
+              description: How many positions the first fund holds, as positions in its fund file.
+            n_b:
+              type:
+              - integer
+              - 'null'
+              description: How many positions the second fund holds.
+            top:
+              type:
+              - array
+              - 'null'
+              items:
+                type: object
+                properties:
+                  ticker:
+                    type:
+                    - string
+                    - 'null'
+                  wa:
+                    type:
+                    - number
+                    - 'null'
+                  wb:
+                    type:
+                    - number
+                    - 'null'
+                  min:
+                    type:
+                    - number
+                    - 'null'
+                  pa:
+                    type:
+                    - number
+                    - 'null'
+                  pb:
+                    type:
+                    - number
+                    - 'null'
+                  name:
+                    type:
+                    - string
+                    - 'null'
+                additionalProperties: true
+              description: 'The largest shared positions: ticker, name, wa and wb, the weight in each fund rounded to two decimals, and min, the smaller of the two. pa and pb are the same weights scaled so that the largest in the list is 100, for drawing bars.'
+            only_a:
+              type:
+              - array
+              - 'null'
+              items:
+                type: object
+                properties:
+                  ticker:
+                    type:
+                    - string
+                    - 'null'
+                  w:
+                    type:
+                    - number
+                    - 'null'
+                  name:
+                    type:
+                    - string
+                    - 'null'
+                additionalProperties: true
+              description: 'The largest positions of the first fund that the second does not hold: ticker, name and w, the weight.'
+            only_b:
+              type:
+              - array
+              - 'null'
+              items:
+                type: object
+                properties:
+                  ticker:
+                    type:
+                    - string
+                    - 'null'
+                  w:
+                    type:
+                    - number
+                    - 'null'
+                  name:
+                    type:
+                    - string
+                    - 'null'
+                additionalProperties: true
+              description: The largest positions of the second fund that the first does not hold, in the same shape.
+            method:
+              type:
+              - string
+              - 'null'
+              description: ti-overlap/1, in methods.json.
+            method_url:
+              type:
+              - string
+              - 'null'
+              description: Its address.
+          additionalProperties: true
+          description: Holdings overlap, measured three ways; its fields are described below.
+        correlation:
+          type:
+          - object
+          - 'null'
+          properties:
+            c1y:
+              type:
+              - number
+              - 'null'
+              description: Correlation of weekly total returns over one year, 52 weeks.
+            c3y:
+              type:
+              - number
+              - 'null'
+              description: 'Correlation over three years, 156 weeks: the figure the comparison pages quote.'
+            c5y:
+              type:
+              - number
+              - 'null'
+              description: Correlation over five years, 260 weeks.
+            cov:
+              type:
+              - number
+              - 'null'
+              description: Annualised covariance of the weekly returns over three years, in percent squared. Divided by the two funds' vol, it gives c3y back, which is how a reader can check it.
+            weeks:
+              type:
+              - array
+              - 'null'
+              items:
+                type:
+                - 'null'
+                - string
+              description: The 52 weekly dates of the one-year spark series in funds. They are not the weeks of c3y or c5y.
+          additionalProperties: true
+          description: Correlation of weekly total returns, and the annualised covariance; its fields are described below.
+        funds:
+          type: object
+          additionalProperties:
+            type: object
+            properties:
+              ticker:
+                type:
+                - string
+                - 'null'
+                description: The fund's ticker.
+              name:
+                type:
+                - string
+                - 'null'
+                description: The fund's name.
+              kind:
+                type:
+                - string
+                - 'null'
+                description: etf.
+              group:
+                type:
+                - string
+                - 'null'
+                description: The fund's sector or category in the market data, or null.
+              vol:
+                type:
+                - number
+                - 'null'
+                description: Annualised standard deviation of weekly total returns over three years, as a percentage.
+              beta:
+                type:
+                - number
+                - 'null'
+                description: Sensitivity to the S&P 500, from three years of weekly returns.
+              r1:
+                type:
+                - number
+                - 'null'
+                description: Cumulative total return over one year, as a percentage.
+              r3:
+                type:
+                - number
+                - 'null'
+                description: Cumulative total return over three years, as a percentage.
+              r5:
+                type:
+                - number
+                - 'null'
+                description: Cumulative total return over five years, as a percentage.
+              mdd3:
+                type:
+                - number
+                - 'null'
+                description: Largest peak to trough decline over three years, on weekly closes, as a percentage. Negative.
+              cal:
+                type:
+                - object
+                - 'null'
+                additionalProperties:
+                  type:
+                  - number
+                  - 'null'
+                description: Total return by calendar year, as a percentage, keyed by year; the current year to date.
+              er:
+                type:
+                - number
+                - 'null'
+                description: The expense ratio, in percent of assets a year, or null.
+              yield:
+                type:
+                - number
+                - 'null'
+                description: Trailing twelve month distribution yield, as a percentage, or null.
+              aum_b:
+                type:
+                - number
+                - 'null'
+                description: Assets under management, in billions of US dollars, or null.
+              family:
+                type:
+                - string
+                - 'null'
+                description: The fund family in the market data, or null.
+              cat:
+                type:
+                - string
+                - 'null'
+                description: The fund's category, TickerInside's own, or null.
+              nh:
+                type:
+                - integer
+                - 'null'
+                description: How many positions have a weight above zero. It can be lower than positions in the fund file and n_a or n_b, which count every line.
+              spark:
+                type:
+                - array
+                - 'null'
+                items:
+                  type:
+                  - 'null'
+                  - number
+                description: 'The last 52 weekly closes, indexed to 100 at the first: the one-year line the page draws.'
+              px:
+                type: object
+                properties:
+                  last:
+                    type:
+                    - number
+                    - 'null'
+                  date:
+                    type:
+                    - string
+                    - 'null'
+                  d1:
+                    type:
+                    - number
+                    - 'null'
+                  hi52:
+                    type:
+                    - number
+                    - 'null'
+                  lo52:
+                    type:
+                    - number
+                    - 'null'
+                  ccy:
+                    type:
+                    - string
+                    - 'null'
+                additionalProperties: true
+                description: 'The latest raw close: last, the price; date, its date; d1, the move from the previous close in percent; hi52 and lo52, the highest and lowest close over 252 trading days; ccy, the trading currency.'
+            additionalProperties: true
+          description: A summary of each fund, keyed by ticker, as the comparison page shows it; its fields are described below. The full file of each fund, with its holdings, is /api/v1/fund/{ticker}.json.
+        page_url:
+          type:
+          - string
+          - 'null'
+          description: The written comparison's page, to link when you quote a figure.
+        cite_as:
+          type:
+          - string
+          - 'null'
+          description: 'A citation line for a quoted figure: the pair, both holdings file dates, the page, and the licence.'
+        cite_html:
+          type:
+          - string
+          - 'null'
+          description: 'The credit as HTML: a link to the page cite_as names, then its address.'
+        source:
+          type:
+          - string
+          - 'null'
+          description: The written comparison's page, which this data belongs to.
+        license:
+          type:
+          - string
+          - 'null'
+          description: The licence the data is published under.
+        attribution:
+          type:
+          - string
+          - 'null'
+          description: 'How to credit the data: a link to the page cite_as names where the medium allows one, the name where it does not.'
+      additionalProperties: true
+      required:
+      - pair
+      - as_of
+      - holdings_as_of
+      - overlap
+      - correlation
+      - funds
+      - page_url
+      - cite_as
+      - cite_html
+      - source
+      - license
+      - attribution
+    Unavailable:
+      type: object
+      additionalProperties: true
+      required:
+      - error
+      - message
+      - status
+      - uptime
+      properties:
+        error:
+          type: string
+          const: unavailable
+        message:
+          type: string
+        status:
+          type: string
+          description: The nightly report.
+        uptime:
+          type: string
+          description: 'The live checks: whether the site fails its own checks.'
+externalDocs:
+  description: The reference, with examples and recipes
+  url: https://tickerinside.com/api/

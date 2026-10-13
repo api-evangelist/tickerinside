@@ -1,0 +1,1400 @@
+openapi: 3.2.0
+info:
+  title: TickerInside Flows.json API
+  version: '1'
+  summary: Holdings of 5,433 US ETFs, which ETFs hold a stock, and overlap, as static JSON.
+  description: TickerInside is an open, machine-readable database of US ETF holdings, with the source and date of each holding.
+  termsOfService: https://tickerinside.com/terms/
+  contact:
+    name: TickerInside
+    email: contact@tickerinside.com
+    url: https://tickerinside.com/api/
+  license:
+    name: CC BY 4.0
+    identifier: CC-BY-4.0
+servers:
+- url: https://tickerinside.com/api/v1
+  description: Static JSON files, and five answers computed from them when asked. No key.
+security: []
+tags:
+- name: Flows.json
+paths:
+  /flows.json:
+    get:
+      operationId: getFlows
+      summary: ETF flows, the day's summary
+      description: 'What the US ETFs read daily from their issuers'' files bought and sold, security by security, from the change in shares held between each fund''s previous file and its file of date, each file placed at the market close it reflects: the largest net additions and reductions by value, in percent and beyond the funds'' own growth, the securities that entered or exited funds tracking the same index, the corporate actions, and each of the last 20 closes. Its CSV twin, /api/v1/flows.csv, lists every security moved on date. A change in shares held mixes the creations and redemptions of a fund''s own shares with its rebalancing: read beyond_growth for the second. Only the funds read daily from their issuers are counted, never the funds known from SEC filings, and only common shares: futures, options and short positions are left out. A split, a bonus issue or a stock dividend, a count in other units, a line a file dropped for a day, a change of ticker and the lines a merger or a spin-off moved are left out as no trade. A sum is published only when three or more funds make it and no one fund more than 80% of it; withheld says why one is null. Feeds: /feeds/flows.xml, /feeds/fund/{ticker}.xml, /feeds/stock/{ticker}.xml (RSS 2.0). Not under CC BY 4.0: the history terms apply. A feed reader may poll the feeds; fetching the shards or many securities'' answers on a schedule to keep them is systematic extraction.'
+      externalDocs:
+        url: https://tickerinside.com/api/#flows
+      responses:
+        '200':
+          description: 'The file. The example is a real answer, shortened: long lists and maps keep their first entries.'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/FlowsSummary'
+              example:
+                date: '2026-10-08'
+                newest_file: '2026-10-09'
+                first_date: '2026-09-28'
+                method: ti-flows/1
+                coverage:
+                  funds_read_daily: 637
+                  funds_counted: 625
+                  issuers:
+                  - Global X
+                  - Invesco
+                  - SPDR
+                  - Vanguard
+                  - iShares
+                  net_assets_usd: 6356901050225
+                  share_of_stock_etf_assets_pct: 48.0
+                  not_counted:
+                    fund_of_funds: 10
+                    no_file_for_date: 2
+                    no_longer_read: 7
+                    not_daily: 53
+                added_by_value:
+                - ticker: XOM
+                  name: ExxonMobil
+                  funds_adding: 35
+                  funds_trimming: 12
+                  funds_entered: 0
+                  funds_exited: 0
+                  net_shares: 940564
+                  net_shares_pct: 0.3407
+                  net_shares_beyond_growth: 54295
+                  net_value_usd: 156824509
+                  net_value_beyond_growth_usd: 9148767
+                  withheld: null
+                - ticker: BRK.B
+                  name: Berkshire Hathaway
+                  funds_adding: 33
+                  funds_trimming: 11
+                  funds_entered: 0
+                  funds_exited: 0
+                  net_shares: 254385
+                  net_shares_pct: 0.2784
+                  net_shares_beyond_growth: 24647
+                  net_value_usd: 128173963
+                  net_value_beyond_growth_usd: 12594898
+                  withheld: null
+                - ticker: JPM
+                  name: JPMorgan Chase
+                  funds_adding: 35
+                  funds_trimming: 14
+                  funds_entered: 0
+                  funds_exited: 0
+                  net_shares: 356504
+                  net_shares_pct: 0.2489
+                  net_shares_beyond_growth: 31101
+                  net_value_usd: 116450527
+                  net_value_beyond_growth_usd: 10308069
+                  withheld: null
+                reduced_by_value:
+                - ticker: TSM
+                  name: Taiwan Semiconductor Manufacturing Company Ltd.
+                  funds_adding: 6
+                  funds_trimming: 3
+                  funds_entered: 0
+                  funds_exited: 0
+                  net_shares: -27121
+                  net_shares_pct: -0.4479
+                  net_shares_beyond_growth: -4
+                  net_value_usd: -12478731
+                  net_value_beyond_growth_usd: -1942
+                  withheld: null
+                - ticker: GE
+                  name: GE Aerospace
+                  funds_adding: 28
+                  funds_trimming: 16
+                  funds_entered: 0
+                  funds_exited: 0
+                  net_shares: -37422
+                  net_shares_pct: -0.0578
+                  net_shares_beyond_growth: 3550
+                  net_value_usd: -11614453
+                  net_value_beyond_growth_usd: 1084465
+                  withheld: null
+                - ticker: MPWR
+                  name: Monolithic Power Systems
+                  funds_adding: 35
+                  funds_trimming: 15
+                  funds_entered: 0
+                  funds_exited: 0
+                  net_shares: -8297
+                  net_shares_pct: -0.1501
+                  net_shares_beyond_growth: -42
+                  net_value_usd: -11392440
+                  net_value_beyond_growth_usd: -54521
+                  withheld: null
+                added_by_shares_pct:
+                - ticker: 600031.CN
+                  name: Sany Heavy Industry Co. Ltd. Class A
+                  funds_adding: 3
+                  funds_trimming: 4
+                  funds_entered: 0
+                  funds_exited: 0
+                  net_shares: 790486
+                  net_shares_pct: 6.9551
+                  net_shares_beyond_growth: 801335
+                  net_value_usd: 2007709
+                  net_value_beyond_growth_usd: 2035443
+                  withheld: null
+                - ticker: CBC
+                  name: Central BanCo Inc
+                  funds_adding: 7
+                  funds_trimming: 5
+                  funds_entered: 0
+                  funds_exited: 0
+                  net_shares: 119443
+                  net_shares_pct: 6.6275
+                  net_shares_beyond_growth: null
+                  net_value_usd: 3601515
+                  net_value_beyond_growth_usd: null
+                  withheld:
+                    net_shares_beyond_growth: one_fund_dominant
+                    net_value_beyond_growth_usd: one_fund_dominant
+                - ticker: 002128.CN
+                  name: Inner Mongolia Dian Tou Energy Corp. Ltd. Class A
+                  funds_adding: 2
+                  funds_trimming: 3
+                  funds_entered: 0
+                  funds_exited: 0
+                  net_shares: 166700
+                  net_shares_pct: 6.5113
+                  net_shares_beyond_growth: null
+                  net_value_usd: 699683
+                  net_value_beyond_growth_usd: null
+                  withheld:
+                    net_shares_beyond_growth: fewer_than_3_funds
+                    net_value_beyond_growth_usd: fewer_than_3_funds
+                reduced_by_shares_pct:
+                - ticker: NTCPHR.IN
+                  name: null
+                  funds_adding: 0
+                  funds_trimming: 4
+                  funds_entered: 0
+                  funds_exited: 4
+                  net_shares: -125962
+                  net_shares_pct: -100.0
+                  net_shares_beyond_growth: -125962
+                  net_value_usd: -78226
+                  net_value_beyond_growth_usd: -78226
+                  withheld: null
+                - ticker: TIT.IT
+                  name: Telecom Italia SpA/Milano
+                  funds_adding: 0
+                  funds_trimming: 19
+                  funds_entered: 0
+                  funds_exited: 0
+                  net_shares: -1140072
+                  net_shares_pct: -12.0738
+                  net_shares_beyond_growth: -1145136
+                  net_value_usd: -7187584
+                  net_value_beyond_growth_usd: -7219509
+                  withheld: null
+                - ticker: 0126Z0.KR
+                  name: Samsung Episholdings Co Ltd
+                  funds_adding: 0
+                  funds_trimming: 9
+                  funds_entered: 0
+                  funds_exited: 0
+                  net_shares: -2102
+                  net_shares_pct: -7.664
+                  net_shares_beyond_growth: null
+                  net_value_usd: -534866
+                  net_value_beyond_growth_usd: null
+                  withheld:
+                    net_shares_beyond_growth: fewer_than_3_funds
+                    net_value_beyond_growth_usd: fewer_than_3_funds
+                added_beyond_growth_by_value:
+                - ticker: AAPL
+                  name: Apple Inc.
+                  funds_adding: 59
+                  funds_trimming: 16
+                  funds_entered: 0
+                  funds_exited: 0
+                  net_shares: 334016
+                  net_shares_pct: 0.0391
+                  net_shares_beyond_growth: 101614
+                  net_value_usd: 111943843
+                  net_value_beyond_growth_usd: 34590205
+                  withheld: null
+                - ticker: AMZN
+                  name: Amazon
+                  funds_adding: 50
+                  funds_trimming: 15
+                  funds_entered: 0
+                  funds_exited: 0
+                  net_shares: 458725
+                  net_shares_pct: 0.0853
+                  net_shares_beyond_growth: 95938
+                  net_value_usd: 115623197
+                  net_value_beyond_growth_usd: 24374116
+                  withheld: null
+                - ticker: MSFT
+                  name: Microsoft
+                  funds_adding: 59
+                  funds_trimming: 20
+                  funds_entered: 0
+                  funds_exited: 0
+                  net_shares: 168877
+                  net_shares_pct: 0.038
+                  net_shares_beyond_growth: 42787
+                  net_value_usd: 86876606
+                  net_value_beyond_growth_usd: 22359563
+                  withheld: null
+                reduced_beyond_growth_by_value:
+                - ticker: TIT.IT
+                  name: Telecom Italia SpA/Milano
+                  funds_adding: 0
+                  funds_trimming: 19
+                  funds_entered: 0
+                  funds_exited: 0
+                  net_shares: -1140072
+                  net_shares_pct: -12.0738
+                  net_shares_beyond_growth: -1145136
+                  net_value_usd: -7187584
+                  net_value_beyond_growth_usd: -7219509
+                  withheld: null
+                - ticker: PCRX
+                  name: Pacira BioSciences, Inc.
+                  funds_adding: 7
+                  funds_trimming: 10
+                  funds_entered: 0
+                  funds_exited: 3
+                  net_shares: -109348
+                  net_shares_pct: -1.8713
+                  net_shares_beyond_growth: -107294
+                  net_value_usd: -2819256
+                  net_value_beyond_growth_usd: -2743353
+                  withheld: null
+                - ticker: AZO
+                  name: AutoZone
+                  funds_adding: 18
+                  funds_trimming: 14
+                  funds_entered: 0
+                  funds_exited: 2
+                  net_shares: -640
+                  net_shares_pct: -0.0711
+                  net_shares_beyond_growth: -729
+                  net_value_usd: -1840002
+                  net_value_beyond_growth_usd: -2059164
+                  withheld: null
+                index_events:
+                - date: '2026-10-08'
+                  ticker: MRNA
+                  change: entered
+                  funds:
+                  - QYLD
+                  - IQQ
+                  - QNDX
+                  - QYLG
+                  - QRMI
+                  - QTR
+                  same_index_as: QQQ
+                  group_funds: 9
+                  text: entered 6 of the 9 funds tracking the same index as QQQ on 2026-10-08
+                - date: '2026-10-07'
+                  ticker: WBD
+                  change: exited
+                  funds:
+                  - IWB
+                  - IYY
+                  same_index_as: IWB
+                  group_funds: 2
+                  text: exited the 2 funds tracking the same index as IWB on 2026-10-07
+                - date: '2026-10-07'
+                  ticker: WBD
+                  change: exited
+                  funds:
+                  - ITOT
+                  - IWV
+                  same_index_as: ITOT
+                  group_funds: 2
+                  text: exited the 2 funds tracking the same index as ITOT on 2026-10-07
+                corporate_actions:
+                - date: '2026-10-08'
+                  kind: acquired_or_delisted
+                  from: SNR.GB
+                  to: null
+                  ratio: null
+                  text: SNR.GB left the funds of two or more issuers on 2026-10-08, taken over or delisted
+                - date: '2026-10-07'
+                  kind: distribution
+                  from: 2890.TW
+                  to: 2684290D.TW
+                  ratio: 1.0
+                  text: 2684290D.TW distributed to holders of 2890.TW at 1 share each on 2026-10-07
+                - date: '2026-10-07'
+                  kind: distribution
+                  from: UWMC
+                  to: UWMC-R-W
+                  ratio: 0.9996
+                  text: UWMC-R-W distributed to holders of UWMC at 0.9996 shares each on 2026-10-07
+                not_ranked:
+                - ticker: BANK.ID
+                  reason: uniform_change
+                - ticker: INDA
+                  reason: fund_shares
+                - ticker: IWF
+                  reason: fund_shares
+                funds_most_changed:
+                - fund: INRO
+                  name: iShares U.S. Industry Rotation Active ETF
+                  previous: '2026-10-07'
+                  date: '2026-10-08'
+                  entered: 42
+                  exited: 2
+                  increased: 167
+                  decreased: 128
+                  growth_pct: 0.3025
+                  not_trusted: 0
+                - fund: BDVL
+                  name: iShares Disciplined Volatility Equity Active ETF
+                  previous: '2026-10-07'
+                  date: '2026-10-08'
+                  entered: 14
+                  exited: 6
+                  increased: 23
+                  decreased: 16
+                  growth_pct: 0.0
+                  not_trusted: 0
+                - fund: ENHE
+                  name: iShares Enhanced Emerging Markets Active ETF
+                  previous: '2026-10-07'
+                  date: '2026-10-08'
+                  entered: 6
+                  exited: 3
+                  increased: 37
+                  decreased: 16
+                  growth_pct: 0.0
+                  not_trusted: 0
+                days:
+                - date: '2026-10-08'
+                  funds: 625
+                  complete: true
+                  securities_changed: 9146
+                  added_by_value:
+                  - - XOM
+                    - 156824509
+                    - 940564
+                  - - BRK.B
+                    - 128173963
+                    - 254385
+                  - - JPM
+                    - 116450527
+                    - 356504
+                  reduced_by_value:
+                  - - TSM
+                    - -12478731
+                    - -27121
+                  - - GE
+                    - -11614453
+                    - -37422
+                  - - MPWR
+                    - -11392440
+                    - -8297
+                - date: '2026-10-07'
+                  funds: 625
+                  complete: true
+                  securities_changed: 6937
+                  added_by_value:
+                  - - FRSH
+                    - 254410070
+                    - 18707100
+                  - - NEE
+                    - 31247790
+                    - 409908
+                  - - META
+                    - 29526803
+                    - 42025
+                  reduced_by_value:
+                  - - NVDA
+                    - -137078945
+                    - -576391
+                  - - AAPL
+                    - -117592208
+                    - -348598
+                  - - MSFT
+                    - -99131131
+                    - -186560
+                - date: '2026-10-06'
+                  funds: 625
+                  complete: true
+                  securities_changed: 7705
+                  added_by_value:
+                  - - NVDA
+                    - 348649396
+                    - 1468463
+                  - - AAPL
+                    - 230796110
+                    - 698434
+                  - - META
+                    - 217541179
+                    - 300891
+                  reduced_by_value:
+                  - - FORM
+                    - -49171281
+                    - -302950
+                  - - TWLO
+                    - -38908890
+                    - -54084
+                  - - JPM
+                    - -30501491
+                    - -87843
+                not_counted:
+                - fund: CORO
+                  reason: fund_of_funds
+                  last_file: '2026-10-09'
+                - fund: HAWX
+                  reason: fund_of_funds
+                  last_file: '2026-10-09'
+                - fund: HEEM
+                  reason: fund_of_funds
+                  last_file: '2026-10-09'
+                file_gaps: 18
+                security: https://tickerinside.com/api/v1/flows/{ticker}.json
+                csv: https://tickerinside.com/api/v1/flows.csv
+                feed: https://tickerinside.com/feeds/flows.xml
+                feed_fund: https://tickerinside.com/feeds/fund/{ticker}.xml
+                feed_stock: https://tickerinside.com/feeds/stock/{ticker}.xml
+                note: 'Changes in shares held by the covered ETFs, read from consecutive issuer files of each fund read daily, each file placed at the market close it reflects. A change mixes the creations and redemptions of a fund''s own shares with its rebalancing; beyond_growth leaves out the part in proportion to the fund''s own growth. Corporate actions are no trades: the lines a merger converted, a spin-off distributed or a split, bonus issue or stock dividend multiplied are left out of the sums, and the security is named in corporate_actions and not ranked. Values are at the files'' own prices per share, never an outside price. Share counts are published as sums over funds, never fund by fund: a sum is published only when three or more funds make it and no one fund more than 80% of it, else it is null with its reason in withheld.'
+                cite_as: TickerInside, ETF flows of the close of 2026-10-08 from the issuers' files, https://tickerinside.com/api/v1/flows.json
+                cite_html: <a href="https://tickerinside.com/api/v1/flows.json">TickerInside</a> (https://tickerinside.com/api/v1/flows.json)
+                docs: https://tickerinside.com/api/#flows
+                license: TickerInside history terms
+                terms: https://tickerinside.com/legal/#history
+                attribution: Credit TickerInside with a link to the page the figure comes from (cite_as gives it) wherever the medium allows a link, and by name where it does not. How you mark the link is up to you. Free per request, commercial use included; republishing the archive as a whole or a substantial part of it, and extracting it systematically, are not allowed.
+        '304':
+          description: 'Not modified: the ETag of your copy, sent in If-None-Match, is still current. Files are cached five minutes.'
+        '503':
+          description: 'The file could not be served just then: retry after a minute. uptime says whether the site fails its own checks.'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Unavailable'
+      tags:
+      - Flows.json
+components:
+  schemas:
+    FlowsSummary:
+      type: object
+      additionalProperties: true
+      properties:
+        date:
+          type:
+          - string
+          - 'null'
+          description: 'The market close of the figures: the newest close that nine in ten of the funds counted have a file of. Each file is placed at the close it reflects (Invesco dates a Friday''s file on the Saturday, Vanguard''s ETF files carry the next business day), and each fund''s change runs from its previous file to its file of this close.'
+        newest_file:
+          type:
+          - string
+          - 'null'
+          description: The newest close a file read reflects. A close is published once every fund still publishing has a file of it or of a later close, so date can be older.
+        first_date:
+          type:
+          - string
+          - 'null'
+          description: 'The first close with a counted change: the first files carrying share counts in today''s keys.'
+        method:
+          type:
+          - string
+          description: The method of the figures, ti-flows/1.
+        coverage:
+          type: object
+          additionalProperties: true
+          properties:
+            funds_read_daily:
+              type:
+              - integer
+              description: The funds read from their issuers' files every business day.
+            funds_counted:
+              type:
+              - integer
+              description: How many of them have a step to date that is counted.
+            issuers:
+              type: array
+              items:
+                type: string
+              description: The issuers of the funds counted.
+            net_assets_usd:
+              type:
+              - integer
+              - 'null'
+              description: The counted funds' net assets, as their issuers' files state them.
+            share_of_stock_etf_assets_pct:
+              type:
+              - number
+              - 'null'
+              description: The counted funds' share of the assets of the covered US stock ETFs, measured as the universe's share of assets is; null when not measured.
+            not_counted:
+              type: object
+              additionalProperties:
+                type: integer
+              description: How many funds of the archive are not counted, by reason, not_daily for a fund whose issuer publishes monthly.
+          required:
+          - funds_read_daily
+          - funds_counted
+          - issuers
+          - net_assets_usd
+          - share_of_stock_etf_assets_pct
+          - not_counted
+          description: Which funds are counted; its fields are described below.
+        added_by_value:
+          type: array
+          items:
+            type: object
+            additionalProperties: true
+            properties:
+              ticker:
+                type:
+                - string
+                description: 'The security''s key: a US ticker, or a local code and market for a line listed abroad (7203.JP).'
+              name:
+                type:
+                - string
+                - 'null'
+                description: Its name, where known.
+              funds_adding:
+                type:
+                - integer
+                description: How many funds hold more shares of it than in their previous file.
+              funds_trimming:
+                type:
+                - integer
+                description: How many hold fewer.
+              funds_entered:
+                type:
+                - integer
+                description: How many of those adding did not hold it before.
+              funds_exited:
+                type:
+                - integer
+                description: How many of those trimming hold none now.
+              net_shares:
+                type:
+                - integer
+                - 'null'
+                description: 'The change in shares held, summed over the funds. Null when fewer than three funds moved it or one fund makes more than 80% of it, as withheld says: a fund''s share count is never published.'
+              net_shares_pct:
+                type:
+                - number
+                - 'null'
+                description: net_shares in percent of the shares the funds held before; null when fewer than three funds held it before or after, or one fund held more than 80% of it.
+              net_shares_beyond_growth:
+                type:
+                - integer
+                - 'null'
+                description: The same change less the part in proportion to each fund's own growth across its step (b minus k times a, k the fund's median ratio of share counts).
+              net_value_usd:
+                type:
+                - integer
+                - 'null'
+                description: 'net_shares valued at each file''s own price per share: market value over shares, or weight times the fund''s stated net assets over shares. Never an outside price.'
+              net_value_beyond_growth_usd:
+                type:
+                - integer
+                - 'null'
+                description: net_shares_beyond_growth valued the same way.
+              withheld:
+                type:
+                - object
+                - 'null'
+                additionalProperties:
+                  type: string
+                  enum:
+                  - fewer_than_3_funds
+                  - one_fund_dominant
+                  - gives_back_a_fund_count
+                  - not_all_valued
+                description: 'Why each null sum is null, as {field: reason}, or null: fewer_than_3_funds, one_fund_dominant (one fund makes more than 80% of the sum, or of the difference two published sums give, such as net_shares less net_shares_beyond_growth), gives_back_a_fund_count (the sums as printed, taken as one or two funds'' own or compared with the figures published before for the same close, would give back a fund''s share count) or not_all_valued.'
+            required:
+            - ticker
+            - name
+            - funds_adding
+            - funds_trimming
+            - funds_entered
+            - funds_exited
+            - net_shares
+            - net_shares_pct
+            - net_shares_beyond_growth
+            - net_value_usd
+            - net_value_beyond_growth_usd
+            - withheld
+          description: The ten securities with the largest net additions in dollars on date, the securities in not_ranked left out; a row is described below.
+        reduced_by_value:
+          type: array
+          items:
+            type: object
+            additionalProperties: true
+            properties:
+              ticker:
+                type:
+                - string
+                description: 'The security''s key: a US ticker, or a local code and market for a line listed abroad (7203.JP).'
+              name:
+                type:
+                - string
+                - 'null'
+                description: Its name, where known.
+              funds_adding:
+                type:
+                - integer
+                description: How many funds hold more shares of it than in their previous file.
+              funds_trimming:
+                type:
+                - integer
+                description: How many hold fewer.
+              funds_entered:
+                type:
+                - integer
+                description: How many of those adding did not hold it before.
+              funds_exited:
+                type:
+                - integer
+                description: How many of those trimming hold none now.
+              net_shares:
+                type:
+                - integer
+                - 'null'
+                description: 'The change in shares held, summed over the funds. Null when fewer than three funds moved it or one fund makes more than 80% of it, as withheld says: a fund''s share count is never published.'
+              net_shares_pct:
+                type:
+                - number
+                - 'null'
+                description: net_shares in percent of the shares the funds held before; null when fewer than three funds held it before or after, or one fund held more than 80% of it.
+              net_shares_beyond_growth:
+                type:
+                - integer
+                - 'null'
+                description: The same change less the part in proportion to each fund's own growth across its step (b minus k times a, k the fund's median ratio of share counts).
+              net_value_usd:
+                type:
+                - integer
+                - 'null'
+                description: 'net_shares valued at each file''s own price per share: market value over shares, or weight times the fund''s stated net assets over shares. Never an outside price.'
+              net_value_beyond_growth_usd:
+                type:
+                - integer
+                - 'null'
+                description: net_shares_beyond_growth valued the same way.
+              withheld:
+                type:
+                - object
+                - 'null'
+                additionalProperties:
+                  type: string
+                  enum:
+                  - fewer_than_3_funds
+                  - one_fund_dominant
+                  - gives_back_a_fund_count
+                  - not_all_valued
+                description: 'Why each null sum is null, as {field: reason}, or null: fewer_than_3_funds, one_fund_dominant (one fund makes more than 80% of the sum, or of the difference two published sums give, such as net_shares less net_shares_beyond_growth), gives_back_a_fund_count (the sums as printed, taken as one or two funds'' own or compared with the figures published before for the same close, would give back a fund''s share count) or not_all_valued.'
+            required:
+            - ticker
+            - name
+            - funds_adding
+            - funds_trimming
+            - funds_entered
+            - funds_exited
+            - net_shares
+            - net_shares_pct
+            - net_shares_beyond_growth
+            - net_value_usd
+            - net_value_beyond_growth_usd
+            - withheld
+          description: The ten with the largest net reductions in dollars.
+        added_by_shares_pct:
+          type: array
+          items:
+            type: object
+            additionalProperties: true
+            properties:
+              ticker:
+                type:
+                - string
+                description: 'The security''s key: a US ticker, or a local code and market for a line listed abroad (7203.JP).'
+              name:
+                type:
+                - string
+                - 'null'
+                description: Its name, where known.
+              funds_adding:
+                type:
+                - integer
+                description: How many funds hold more shares of it than in their previous file.
+              funds_trimming:
+                type:
+                - integer
+                description: How many hold fewer.
+              funds_entered:
+                type:
+                - integer
+                description: How many of those adding did not hold it before.
+              funds_exited:
+                type:
+                - integer
+                description: How many of those trimming hold none now.
+              net_shares:
+                type:
+                - integer
+                - 'null'
+                description: 'The change in shares held, summed over the funds. Null when fewer than three funds moved it or one fund makes more than 80% of it, as withheld says: a fund''s share count is never published.'
+              net_shares_pct:
+                type:
+                - number
+                - 'null'
+                description: net_shares in percent of the shares the funds held before; null when fewer than three funds held it before or after, or one fund held more than 80% of it.
+              net_shares_beyond_growth:
+                type:
+                - integer
+                - 'null'
+                description: The same change less the part in proportion to each fund's own growth across its step (b minus k times a, k the fund's median ratio of share counts).
+              net_value_usd:
+                type:
+                - integer
+                - 'null'
+                description: 'net_shares valued at each file''s own price per share: market value over shares, or weight times the fund''s stated net assets over shares. Never an outside price.'
+              net_value_beyond_growth_usd:
+                type:
+                - integer
+                - 'null'
+                description: net_shares_beyond_growth valued the same way.
+              withheld:
+                type:
+                - object
+                - 'null'
+                additionalProperties:
+                  type: string
+                  enum:
+                  - fewer_than_3_funds
+                  - one_fund_dominant
+                  - gives_back_a_fund_count
+                  - not_all_valued
+                description: 'Why each null sum is null, as {field: reason}, or null: fewer_than_3_funds, one_fund_dominant (one fund makes more than 80% of the sum, or of the difference two published sums give, such as net_shares less net_shares_beyond_growth), gives_back_a_fund_count (the sums as printed, taken as one or two funds'' own or compared with the figures published before for the same close, would give back a fund''s share count) or not_all_valued.'
+            required:
+            - ticker
+            - name
+            - funds_adding
+            - funds_trimming
+            - funds_entered
+            - funds_exited
+            - net_shares
+            - net_shares_pct
+            - net_shares_beyond_growth
+            - net_value_usd
+            - net_value_beyond_growth_usd
+            - withheld
+          description: The ten largest net additions in percent of the shares the funds held before.
+        reduced_by_shares_pct:
+          type: array
+          items:
+            type: object
+            additionalProperties: true
+            properties:
+              ticker:
+                type:
+                - string
+                description: 'The security''s key: a US ticker, or a local code and market for a line listed abroad (7203.JP).'
+              name:
+                type:
+                - string
+                - 'null'
+                description: Its name, where known.
+              funds_adding:
+                type:
+                - integer
+                description: How many funds hold more shares of it than in their previous file.
+              funds_trimming:
+                type:
+                - integer
+                description: How many hold fewer.
+              funds_entered:
+                type:
+                - integer
+                description: How many of those adding did not hold it before.
+              funds_exited:
+                type:
+                - integer
+                description: How many of those trimming hold none now.
+              net_shares:
+                type:
+                - integer
+                - 'null'
+                description: 'The change in shares held, summed over the funds. Null when fewer than three funds moved it or one fund makes more than 80% of it, as withheld says: a fund''s share count is never published.'
+              net_shares_pct:
+                type:
+                - number
+                - 'null'
+                description: net_shares in percent of the shares the funds held before; null when fewer than three funds held it before or after, or one fund held more than 80% of it.
+              net_shares_beyond_growth:
+                type:
+                - integer
+                - 'null'
+                description: The same change less the part in proportion to each fund's own growth across its step (b minus k times a, k the fund's median ratio of share counts).
+              net_value_usd:
+                type:
+                - integer
+                - 'null'
+                description: 'net_shares valued at each file''s own price per share: market value over shares, or weight times the fund''s stated net assets over shares. Never an outside price.'
+              net_value_beyond_growth_usd:
+                type:
+                - integer
+                - 'null'
+                description: net_shares_beyond_growth valued the same way.
+              withheld:
+                type:
+                - object
+                - 'null'
+                additionalProperties:
+                  type: string
+                  enum:
+                  - fewer_than_3_funds
+                  - one_fund_dominant
+                  - gives_back_a_fund_count
+                  - not_all_valued
+                description: 'Why each null sum is null, as {field: reason}, or null: fewer_than_3_funds, one_fund_dominant (one fund makes more than 80% of the sum, or of the difference two published sums give, such as net_shares less net_shares_beyond_growth), gives_back_a_fund_count (the sums as printed, taken as one or two funds'' own or compared with the figures published before for the same close, would give back a fund''s share count) or not_all_valued.'
+            required:
+            - ticker
+            - name
+            - funds_adding
+            - funds_trimming
+            - funds_entered
+            - funds_exited
+            - net_shares
+            - net_shares_pct
+            - net_shares_beyond_growth
+            - net_value_usd
+            - net_value_beyond_growth_usd
+            - withheld
+          description: The ten largest net reductions in percent.
+        added_beyond_growth_by_value:
+          type: array
+          items:
+            type: object
+            additionalProperties: true
+            properties:
+              ticker:
+                type:
+                - string
+                description: 'The security''s key: a US ticker, or a local code and market for a line listed abroad (7203.JP).'
+              name:
+                type:
+                - string
+                - 'null'
+                description: Its name, where known.
+              funds_adding:
+                type:
+                - integer
+                description: How many funds hold more shares of it than in their previous file.
+              funds_trimming:
+                type:
+                - integer
+                description: How many hold fewer.
+              funds_entered:
+                type:
+                - integer
+                description: How many of those adding did not hold it before.
+              funds_exited:
+                type:
+                - integer
+                description: How many of those trimming hold none now.
+              net_shares:
+                type:
+                - integer
+                - 'null'
+                description: 'The change in shares held, summed over the funds. Null when fewer than three funds moved it or one fund makes more than 80% of it, as withheld says: a fund''s share count is never published.'
+              net_shares_pct:
+                type:
+                - number
+                - 'null'
+                description: net_shares in percent of the shares the funds held before; null when fewer than three funds held it before or after, or one fund held more than 80% of it.
+              net_shares_beyond_growth:
+                type:
+                - integer
+                - 'null'
+                description: The same change less the part in proportion to each fund's own growth across its step (b minus k times a, k the fund's median ratio of share counts).
+              net_value_usd:
+                type:
+                - integer
+                - 'null'
+                description: 'net_shares valued at each file''s own price per share: market value over shares, or weight times the fund''s stated net assets over shares. Never an outside price.'
+              net_value_beyond_growth_usd:
+                type:
+                - integer
+                - 'null'
+                description: net_shares_beyond_growth valued the same way.
+              withheld:
+                type:
+                - object
+                - 'null'
+                additionalProperties:
+                  type: string
+                  enum:
+                  - fewer_than_3_funds
+                  - one_fund_dominant
+                  - gives_back_a_fund_count
+                  - not_all_valued
+                description: 'Why each null sum is null, as {field: reason}, or null: fewer_than_3_funds, one_fund_dominant (one fund makes more than 80% of the sum, or of the difference two published sums give, such as net_shares less net_shares_beyond_growth), gives_back_a_fund_count (the sums as printed, taken as one or two funds'' own or compared with the figures published before for the same close, would give back a fund''s share count) or not_all_valued.'
+            required:
+            - ticker
+            - name
+            - funds_adding
+            - funds_trimming
+            - funds_entered
+            - funds_exited
+            - net_shares
+            - net_shares_pct
+            - net_shares_beyond_growth
+            - net_value_usd
+            - net_value_beyond_growth_usd
+            - withheld
+          description: 'The ten largest net additions beyond the funds'' own growth, in dollars: rebalancing and index changes rather than the creations of the funds'' shares.'
+        reduced_beyond_growth_by_value:
+          type: array
+          items:
+            type: object
+            additionalProperties: true
+            properties:
+              ticker:
+                type:
+                - string
+                description: 'The security''s key: a US ticker, or a local code and market for a line listed abroad (7203.JP).'
+              name:
+                type:
+                - string
+                - 'null'
+                description: Its name, where known.
+              funds_adding:
+                type:
+                - integer
+                description: How many funds hold more shares of it than in their previous file.
+              funds_trimming:
+                type:
+                - integer
+                description: How many hold fewer.
+              funds_entered:
+                type:
+                - integer
+                description: How many of those adding did not hold it before.
+              funds_exited:
+                type:
+                - integer
+                description: How many of those trimming hold none now.
+              net_shares:
+                type:
+                - integer
+                - 'null'
+                description: 'The change in shares held, summed over the funds. Null when fewer than three funds moved it or one fund makes more than 80% of it, as withheld says: a fund''s share count is never published.'
+              net_shares_pct:
+                type:
+                - number
+                - 'null'
+                description: net_shares in percent of the shares the funds held before; null when fewer than three funds held it before or after, or one fund held more than 80% of it.
+              net_shares_beyond_growth:
+                type:
+                - integer
+                - 'null'
+                description: The same change less the part in proportion to each fund's own growth across its step (b minus k times a, k the fund's median ratio of share counts).
+              net_value_usd:
+                type:
+                - integer
+                - 'null'
+                description: 'net_shares valued at each file''s own price per share: market value over shares, or weight times the fund''s stated net assets over shares. Never an outside price.'
+              net_value_beyond_growth_usd:
+                type:
+                - integer
+                - 'null'
+                description: net_shares_beyond_growth valued the same way.
+              withheld:
+                type:
+                - object
+                - 'null'
+                additionalProperties:
+                  type: string
+                  enum:
+                  - fewer_than_3_funds
+                  - one_fund_dominant
+                  - gives_back_a_fund_count
+                  - not_all_valued
+                description: 'Why each null sum is null, as {field: reason}, or null: fewer_than_3_funds, one_fund_dominant (one fund makes more than 80% of the sum, or of the difference two published sums give, such as net_shares less net_shares_beyond_growth), gives_back_a_fund_count (the sums as printed, taken as one or two funds'' own or compared with the figures published before for the same close, would give back a fund''s share count) or not_all_valued.'
+            required:
+            - ticker
+            - name
+            - funds_adding
+            - funds_trimming
+            - funds_entered
+            - funds_exited
+            - net_shares
+            - net_shares_pct
+            - net_shares_beyond_growth
+            - net_value_usd
+            - net_value_beyond_growth_usd
+            - withheld
+          description: The ten largest net reductions beyond the funds' own growth.
+        index_events:
+          type: array
+          items:
+            type: object
+            additionalProperties: true
+            properties:
+              date:
+                type:
+                - string
+                description: The close.
+              ticker:
+                type:
+                - string
+                description: The security.
+              change:
+                type: string
+                enum:
+                - entered
+                - exited
+                description: entered or exited.
+              funds:
+                type: array
+                items:
+                  type: string
+                description: The funds of the group it entered or exited on that close.
+              same_index_as:
+                type:
+                - string
+                description: The group's largest fund. Two funds track the same index when they overlap by 98% or more by weight on their latest files.
+              group_funds:
+                type:
+                - integer
+                description: How many funds the group has.
+              text:
+                type:
+                - string
+                description: The event in words, to quote.
+            required:
+            - date
+            - ticker
+            - change
+            - funds
+            - same_index_as
+            - group_funds
+            - text
+          description: Securities that entered or exited two or more funds tracking the same index on the same close, in the last 20 trading days, newest first; described below.
+        corporate_actions:
+          type: array
+          items:
+            type: object
+            additionalProperties: true
+            properties:
+              date:
+                type:
+                - string
+                description: The first close the funds show it on; funds that book it later show it a close or two after.
+              kind:
+                type: string
+                enum:
+                - converted
+                - distribution
+                - acquired_or_delisted
+                - split
+                - uniform_change
+                description: 'converted (a merger paid in shares: from exited while to rose, or entered, by the same ratio in funds of three or more indexes), distribution (a spin-off: to entered at the same ratio of from in funds of three or more indexes), acquired_or_delisted (from left the funds of two or more issuers with nothing replacing it, and half its holders left it or its price per share stood still), split (three quarters or more of the funds holding from changed their counts by one ratio within three closes, while its price per share in the files moved by the inverse ratio: a split, a reverse split, a bonus issue or a stock dividend) or uniform_change (the same ratio with no price move to match: named and not ranked, its lines kept in the sums).'
+              from:
+                type:
+                - string
+                description: The security converted, the parent of a distribution, the security taken over or delisted, or the security split or changed.
+              to:
+                type:
+                - string
+                - 'null'
+                description: 'The security received: from itself for a split; null for acquired_or_delisted and uniform_change.'
+              ratio:
+                type:
+                - number
+                - 'null'
+                description: Shares of to per share of from, as the funds' counts show it (1.2 for a 6-for-5 bonus issue, 0.5 for a 1-for-2 reverse split); null for acquired_or_delisted.
+              text:
+                type:
+                - string
+                description: The action in words, to quote.
+            required:
+            - date
+            - kind
+            - from
+            - to
+            - ratio
+            - text
+          description: 'Mergers, spin-offs, takeovers, splits and uniform changes the files show in the last 20 trading days, newest first: no trades, so the lines a merger, a spin-off or a split moved are left out of the sums. Described below.'
+        not_ranked:
+          type: array
+          items:
+            type: object
+            additionalProperties: true
+            properties:
+              ticker:
+                type:
+                - string
+                description: The security.
+              reason:
+                type: string
+                enum:
+                - fund_shares
+                - converted
+                - distribution
+                - acquired_or_delisted
+                - split
+                - uniform_change
+                description: converted, acquired_or_delisted, distribution, split, uniform_change or fund_shares.
+            required:
+            - ticker
+            - reason
+          description: 'The securities moved on date that the six lists leave out, each with its reason: converted (both securities of a merger paid in shares), acquired_or_delisted, distribution, split or uniform_change (within three closes of a corporate action, or on a close where a line of theirs is left out for one), or fund_shares (the shares of a fund the site covers, held by another fund).'
+        funds_most_changed:
+          type: array
+          items:
+            type: object
+            additionalProperties: true
+            properties:
+              fund:
+                type:
+                - string
+                description: The fund's ticker.
+              name:
+                type:
+                - string
+                - 'null'
+                description: Its name.
+              previous:
+                type:
+                - string
+                description: The date its issuer gives the file its step is compared with.
+              date:
+                type:
+                - string
+                description: The date its issuer gives its file, which can be a day after the close it reflects.
+              entered:
+                type:
+                - integer
+                description: Lines that entered.
+              exited:
+                type:
+                - integer
+                description: Lines that exited.
+              increased:
+                type:
+                - integer
+                description: Lines whose share count rose.
+              decreased:
+                type:
+                - integer
+                description: Lines whose share count fell.
+              growth_pct:
+                type:
+                - number
+                description: 'The fund''s own growth across the step, in percent: the median change of its share counts, mostly creations and redemptions of its shares.'
+              not_trusted:
+                type:
+                - integer
+                description: Lines left out of every sum, as no trade (see not_trusted in one security's flows).
+            required:
+            - fund
+            - name
+            - previous
+            - date
+            - entered
+            - exited
+            - increased
+            - decreased
+            - growth_pct
+            - not_trusted
+          description: The ten funds whose step to date entered or exited the most lines; described below.
+        days:
+          type: array
+          items:
+            type: object
+            additionalProperties: true
+            properties:
+              date:
+                type:
+                - string
+                description: The close.
+              funds:
+                type:
+                - integer
+                description: How many funds have a counted step to it.
+              complete:
+                type:
+                - boolean
+                description: true when nine in ten of the funds counted on date do.
+              securities_changed:
+                type:
+                - integer
+                description: How many securities a fund moved on it.
+              added_by_value:
+                type: array
+                items:
+                  type: array
+                  items:
+                    type:
+                    - string
+                    - integer
+                description: Its five largest net additions, as [ticker, dollars, shares].
+              reduced_by_value:
+                type: array
+                items:
+                  type: array
+                  items:
+                    type:
+                    - string
+                    - integer
+                description: Its five largest net reductions.
+            required:
+            - date
+            - funds
+            - complete
+            - securities_changed
+            - added_by_value
+            - reduced_by_value
+          description: 'Each close of the last 20, newest first: how many funds have a step to it, whether nine in ten do (complete), how many securities moved, and its five largest net additions and reductions as [ticker, dollars, shares], the securities not ranked left out.'
+        not_counted:
+          type: array
+          items:
+            type: object
+            additionalProperties: true
+            properties:
+              fund:
+                type:
+                - string
+                description: The fund's ticker.
+              reason:
+                type: string
+                enum:
+                - fund_of_funds
+                - whole_fund_counts
+                - not_daily
+                - no_share_counts
+                - no_longer_read
+                - no_file_for_date
+                - restated
+                - no_previous_file
+                - unreadable_file
+                description: Why it is not counted on date.
+              last_file:
+                type:
+                - string
+                description: The date of its newest file.
+              restated_reason:
+                type:
+                - string
+                description: 'With restated: engine''s reason for the step, such as key_scheme_2.'
+            required:
+            - fund
+            - reason
+            - last_file
+          description: 'The funds read daily that are not counted on date, each with its reason and its last file: fund_of_funds, whole_fund_counts (a file that counts every share class of a fund with mutual fund classes), no_share_counts, no_file_for_date, restated (a change of keys), no_previous_file or unreadable_file.'
+        file_gaps:
+          type:
+          - integer
+          description: How many lines the window leaves out because an issuer's file dropped them for a day and they came back with the same count.
+        security:
+          type:
+          - string
+          description: The address of one security's flows, with {ticker} to fill.
+        csv:
+          type:
+          - string
+          description: Every security moved on date, one row each, largest net value first.
+        feed:
+          type:
+          - string
+          description: This summary as an RSS feed, one item per complete close.
+        feed_fund:
+          type:
+          - string
+          description: One fund's holdings changes as an RSS feed, from its history, with {ticker} to fill.
+        feed_stock:
+          type:
+          - string
+          description: One security's flows as an RSS feed, with {ticker} to fill.
+        note:
+          type:
+          - string
+          description: How to read the figures.
+        cite_as:
+          type:
+          - string
+          description: 'A citation line: the close and this file''s address.'
+        cite_html:
+          type:
+          - string
+          description: 'The credit as HTML: a link to this file, then its address.'
+        docs:
+          type:
+          - string
+          description: Where the file is documented.
+        license:
+          type:
+          - string
+          description: 'The terms the flows are published under: TickerInside''s history terms, not CC BY 4.0, as they are computed from the archive.'
+        terms:
+          type:
+          - string
+          description: The terms in full, on the legal notice.
+        attribution:
+          type:
+          - string
+          description: How to credit it, then what the history terms allow.
+      required:
+      - date
+      - newest_file
+      - first_date
+      - method
+      - coverage
+      - added_by_value
+      - reduced_by_value
+      - added_by_shares_pct
+      - reduced_by_shares_pct
+      - added_beyond_growth_by_value
+      - reduced_beyond_growth_by_value
+      - index_events
+      - corporate_actions
+      - not_ranked
+      - funds_most_changed
+      - days
+      - not_counted
+      - file_gaps
+      - security
+      - csv
+      - feed
+      - feed_fund
+      - feed_stock
+      - note
+      - cite_as
+      - cite_html
+      - docs
+      - license
+      - terms
+      - attribution
+    Unavailable:
+      type: object
+      additionalProperties: true
+      required:
+      - error
+      - message
+      - status
+      - uptime
+      properties:
+        error:
+          type: string
+          const: unavailable
+        message:
+          type: string
+        status:
+          type: string
+          description: The nightly report.
+        uptime:
+          type: string
+          description: 'The live checks: whether the site fails its own checks.'
+externalDocs:
+  description: The reference, with examples and recipes
+  url: https://tickerinside.com/api/

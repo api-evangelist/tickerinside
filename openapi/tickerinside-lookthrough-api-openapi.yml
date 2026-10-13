@@ -1,0 +1,631 @@
+openapi: 3.2.0
+info:
+  title: TickerInside Lookthrough API
+  version: '1'
+  summary: Holdings of 5,433 US ETFs, which ETFs hold a stock, and overlap, as static JSON.
+  description: TickerInside is an open, machine-readable database of US ETF holdings, with the source and date of each holding.
+  termsOfService: https://tickerinside.com/terms/
+  contact:
+    name: TickerInside
+    email: contact@tickerinside.com
+    url: https://tickerinside.com/api/
+  license:
+    name: CC BY 4.0
+    identifier: CC-BY-4.0
+servers:
+- url: https://tickerinside.com/api/v1
+  description: Static JSON files, and five answers computed from them when asked. No key.
+security: []
+tags:
+- name: Lookthrough
+paths:
+  /lookthrough:
+    get:
+      operationId: getLookthrough
+      summary: Look-through of a portfolio, computed
+      description: The companies under a portfolio, as the MCP tool get_etf_portfolio_lookthrough gives them. 1 to 6 funds, whose files weigh at most 30 KB, a file of the other layers a third of its size, and hold at most 1,100 lines between them. The portfolios whose x-ray the site writes, listed under pages in /og/answers.json, answer past these limits, in any order of their funds, with the weights written as listed there, top up to 25 and currency as given.
+      externalDocs:
+        url: https://tickerinside.com/api/#lookthrough
+      parameters:
+      - name: portfolio
+        in: query
+        required: true
+        description: Funds separated by commas, each with its weight or amount after a colon, or none for equal weights; a weight for every fund or for none.
+        schema:
+          type: string
+        example: VOO:60,QQQ:40
+      - name: top
+        in: query
+        required: false
+        description: How many companies, 1 to 200; 25 by default.
+        schema:
+          type: integer
+          minimum: 1
+          maximum: 200
+        example: 25
+      - name: currency
+        in: query
+        required: false
+        description: The currency of the amounts, three letters, echoed and never converted.
+        schema:
+          type: string
+          pattern: ^[A-Za-z]{3}$
+        example: USD
+      - name: format
+        in: query
+        required: false
+        description: json, the default, or csv for the CSV twin, which the path with .csv also gives.
+        schema:
+          type: string
+          enum:
+          - json
+          - csv
+      responses:
+        '200':
+          description: The answer, computed when asked and kept in the edge cache for up to a day. The example is a real answer, shortened.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Lookthrough'
+              example:
+                page_url: https://tickerinside.com/xray/?p=VOO:60,QQQ:40
+                share_url: https://tickerinside.com/xray/?p=VOO:60,QQQ:40
+                priced: true
+                portfolio_value: 100
+                currency: unstated
+                prices_as_of: '2026-10-09'
+                funds: 2
+                distinct_companies: 518
+                top_10_weight_pct: 41.1
+                looked_through_pct: 100
+                holdings_as_of:
+                  VOO: '2026-08-31'
+                  QQQ: '2026-10-08'
+                holdings_source:
+                  VOO: issuer file
+                  QQQ: issuer file
+                companies:
+                - ticker: NVDA
+                  weight_pct: 8.189
+                  weight_pct_2dp: 8.19
+                  through:
+                  - fund: VOO
+                    weight_pct: 4.8556
+                  - fund: QQQ
+                    weight_pct: 3.3337
+                  value: 8.19
+                - ticker: AAPL
+                  weight_pct: 7.208
+                  weight_pct_2dp: 7.21
+                  through:
+                  - fund: VOO
+                    weight_pct: 4.2259
+                  - fund: QQQ
+                    weight_pct: 2.9818
+                  value: 7.21
+                - ticker: MSFT
+                  weight_pct: 5.751
+                  weight_pct_2dp: 5.75
+                  through:
+                  - fund: VOO
+                    weight_pct: 3.422
+                  - fund: QQQ
+                    weight_pct: 2.3291
+                  value: 5.75
+                source:
+                  provider: TickerInside
+                  links:
+                  - ticker: VOO
+                    page_url: https://tickerinside.com/etf/voo/
+                    api_url: https://tickerinside.com/api/v1/fund/voo.json
+                    holdings_source: issuer file
+                  - ticker: QQQ
+                    page_url: https://tickerinside.com/etf/qqq/
+                    api_url: https://tickerinside.com/api/v1/fund/qqq.json
+                    holdings_source: issuer file
+                  license: CC BY 4.0
+                  cite_as: TickerInside (https://tickerinside.com/), look-through of VOO and QQQ, from the issuers' holdings files, dated as shown.
+                note: Measurement, not investment advice.
+                license: CC BY 4.0
+                attribution: Credit TickerInside with a link to the page of a fund the figure comes from (source names them), or to this address, wherever the medium allows a link, and by name where it does not. How you mark the link is up to you.
+                docs: https://tickerinside.com/api/#lookthrough
+            text/csv:
+              schema:
+                type: string
+              example: 'rank,ticker,weight_pct,value,currency,listed_abroad,through,holdings_as_of,note
+
+                1,NVDA,8.189,8.19,unstated,,VOO 4.8556; QQQ 3.3337,VOO 2026-08-31; QQQ 2026-10-08,
+
+                2,AAPL,7.208,7.21,unstated,,VOO 4.2259; QQQ 2.9818,VOO 2026-08-31; QQQ 2026-10-08,
+
+                3,MSFT,5.751,5.75,unstated,,VOO 3.422; QQQ 2.3291,VOO 2026-08-31; QQQ 2026-10-08,
+
+                '
+        '304':
+          description: 'Not modified: the ETag of your copy, sent in If-None-Match, is still current.'
+        '400':
+          description: 'The query was refused: reason and parameter say what to fix, and limit and asked give the figures of a call past the limits.'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/BadRequest'
+              example:
+                error: bad_request
+                reason: too_few_funds
+                message: funds must name at least 2 different funds.
+                parameter: funds
+                min: 2
+                docs: https://tickerinside.com/api/#overlap
+        '404':
+          description: 'A fund the answer needs is not covered: not_covered lists the tickers, with the reason in message, and reason has_security_file the stock file of one that has one (security).'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/NotCovered'
+        '405':
+          description: Another method than GET or HEAD.
+          content:
+            application/json:
+              schema:
+                type: object
+                additionalProperties: true
+                required:
+                - error
+                - message
+                properties:
+                  error:
+                    type: string
+                    const: method_not_allowed
+                  message:
+                    type: string
+                  docs:
+                    type: string
+        '503':
+          description: 'The answer could not be computed just then: retry after a minute.'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Unavailable'
+      tags:
+      - Lookthrough
+components:
+  schemas:
+    NotCovered:
+      type: object
+      additionalProperties: true
+      required:
+      - error
+      - ticker
+      - message
+      - docs
+      properties:
+        error:
+          type: string
+          const: not_covered
+          description: 'Always not_covered, whatever the reason: read reason and the next address.'
+        reason:
+          type: string
+          enum:
+          - has_security_file
+          - in_another_layer
+          - is_a_fund
+          - no_written_comparison
+          - not_a_shard
+          - not_held_by_daily_funds
+          - not_held
+          - earlier_key
+          - no_such_endpoint
+          - not_in_directory
+          - no_file
+          - funds_not_covered
+          - etn
+          - other_product
+          - no_filing_yet
+          - not_in_sec_list
+          - other_fund
+          - stale_filing
+          - no_prospectus_found
+          - not_in_archive
+          - holdings_at_date_not_enabled
+          - invalid_date
+          - before_history
+          description: 'Every code is explained on /contract/#reasons. not_in_directory: a fund address with no file, for a ticker not in the directory of US-listed funds; a ticker of the directory with no file gets the code universe.json gives it (etn, no_filing_yet and the others), and no_file when the directory was not read. not_held: under /sec/, no covered fund holds the key; earlier_key: an old key, with reads_as. no_such_endpoint: no endpoint at the address. funds_not_covered: several funds of /overlap or /lookthrough, with reasons. in_another_layer: sent only to the TickerInside clients released before /fund/ answered for a fund of the other layers too (see holdings_kind); etf gives the fund''s file. has_security_file: a ticker asked for as a fund has a stock file (see security). is_a_fund: a ticker asked for as a stock is a covered fund (see fund, and holders for the funds that hold it). no_written_comparison: no comparison file for this pair in either order (see fund_files and written_comparisons). not_a_shard: an address under /api/v1/holders/ that is not a shard (see holders). Under /api/v1/history/: not_in_archive: the fund has no history file (see history). holdings_at_date_not_enabled: holdings at a date are not served yet, and every valid date answers this (see changes). invalid_date: the date is not a calendar date, or is after today. before_history: the date is before the fund''s first file (see first), answered only once holdings at a date are served. Under /api/v1/flows/: reason not_held_by_daily_funds: no fund read daily from its issuer''s files held the key or moved it in the last 20 trading days; summary names the night''s summary.'
+        ticker:
+          type:
+          - string
+          - 'null'
+          description: What was asked for, upper case; null when the address names no single ticker, such as a pair under /compare/.
+        message:
+          type: string
+          description: What happened and where to look next, in words.
+        docs:
+          type: string
+          description: The reference.
+        security:
+          type: string
+          description: 'With has_security_file: the stock file of the ticker, or its holders-only answer.'
+        reads_as:
+          type: array
+          items:
+            type: string
+          description: 'Under /sec/, for an old key written before lines listed abroad carried their market (7203): the keys it reads as now, from the aliases of holders. Absent otherwise.'
+        fund:
+          type: string
+          description: 'With is_a_fund: the fund file of the ticker.'
+        etf:
+          type: string
+          description: 'With in_another_layer: the file of the fund, /api/v1/etf/{ticker}.json.'
+        holders:
+          type: string
+          description: 'The shard of the key''s first character: /api/v1/holders/{c}.json, c a to z, or 0 for any other character (7203.JP is in 0.json). It lists the covered funds that hold the key, from issuer files and from SEC filings, with or without a stock file.'
+        pair:
+          type:
+          - array
+          - 'null'
+          items:
+            type: string
+          description: 'With no_written_comparison: the two tickers asked for, upper case, or null when the address names no pair.'
+        written_comparisons:
+          type: array
+          items:
+            type: object
+            additionalProperties: true
+            properties:
+              pair:
+                type: array
+                items:
+                  type: string
+              url:
+                type: string
+          description: 'With no_written_comparison: the pairs that have a comparison file, as index.json lists them.'
+        fund_files:
+          type: array
+          items:
+            type: string
+          description: 'With no_written_comparison: the fund files of the tickers asked for that are covered funds, to compute the overlap from.'
+        covered:
+          type: string
+          description: 'What is covered: /api/v1/securities.json after a /sec/ address with no reason, /api/v1/index.json otherwise.'
+        not_covered:
+          type: array
+          items:
+            type: string
+          description: 'Under /overlap, /lookthrough and /diversify: the tickers asked for that are not covered.'
+        reasons:
+          type: object
+          additionalProperties:
+            type: string
+          description: 'Under /overlap, /lookthrough and /diversify: the reason code of each ticker of not_covered.'
+        covered_issuers:
+          type: array
+          items:
+            type: string
+          description: 'Under /overlap and /lookthrough: the issuers whose own files are read; the other covered funds are read from SEC filings.'
+        history:
+          type: string
+          description: 'With not_in_archive: the list of the funds that have a history.'
+        changes:
+          type: string
+          description: 'With holdings_at_date_not_enabled: the fund''s changes file, served today.'
+        first:
+          type:
+          - string
+          - 'null'
+          description: 'With before_history: the date of the fund''s oldest file. before_history is answered only once holdings at a date are served.'
+        date:
+          type: string
+          description: 'With invalid_date, holdings_at_date_not_enabled or before_history: the date asked for.'
+        summary:
+          type: string
+          description: 'With not_held_by_daily_funds: the night''s flows, /api/v1/flows.json.'
+    Lookthrough:
+      type: object
+      additionalProperties: true
+      properties:
+        page_url:
+          type:
+          - string
+          - 'null'
+          description: 'The web page whose HTML, as the server sends it, prints the answer''s figure, so that it reads without JavaScript: for a pair, its written comparison when there is one, else its "Does it diversify me?" answer within that answer''s limits; for three funds or more, the x-ray the site wrote of the same funds; for a look-through, the x-ray the site wrote of the portfolio at the same weights (listed under pages in /og/answers.json), or for one fund, its page. Null where no page prints the figure yet: any other overlap of three funds or more or look-through of two funds or more, a pair past those limits, a pair of bond funds.'
+        share_url:
+          type: string
+          description: 'The address whose HTML reproduces the whole answer on the site: for a pair, its "Does it diversify me?" answer within that answer''s limits; for three funds or more and for a portfolio, the x-ray the site wrote of the same funds (listed under pages in /og/answers.json), each weight in percent to 0.01 point and never an amount, in the order of the funds the site wrote it in. Absent where no page prints the answer.'
+        priced:
+          type: boolean
+          description: true when the portfolio gives each fund a weight or an amount; false when every fund counts equally.
+        portfolio_value:
+          type:
+          - number
+          - 'null'
+          description: 'The sum of the weights or amounts of the funds looked through: the funds under not_looked_through and skipped are left out of it, as they are left out of the percentages. Null when none is given.'
+        currency:
+          type:
+          - string
+          - 'null'
+          description: The currency given, upper case, echoed and never converted; unstated when amounts are given without one. Null when none is given.
+        prices_as_of:
+          type:
+          - string
+          - 'null'
+          description: The price date of the figures read from weekly returns. Null when no fund has prices.
+        funds:
+          type:
+          - integer
+          - 'null'
+          description: How many funds are looked through.
+        distinct_companies:
+          type:
+          - integer
+          - 'null'
+          description: 'How many distinct holdings they hold between them, counted by ticker: two share classes of one company (GOOGL and GOOG) count as two.'
+        top_10_weight_pct:
+          type:
+          - number
+          - 'null'
+          description: The weight of the ten largest companies, in percent of what is looked through, summed unrounded and rounded once.
+        looked_through_pct:
+          type:
+          - number
+          - 'null'
+          description: 'The part of the portfolio its covered funds make up that the funds looked through are, in percent, by amount or in equal parts: weight_pct and top_10_weight_pct are of that part, and not_looked_through names the rest.'
+        holdings_as_of:
+          type: object
+          additionalProperties:
+            type:
+            - string
+            - 'null'
+          description: 'Each fund''s holdings date, by ticker: the date of its issuer file, or the quarter end its SEC filing describes.'
+        holdings_source:
+          type: object
+          additionalProperties:
+            type:
+            - string
+            - 'null'
+          description: 'Each fund''s source, by ticker: issuer file, SEC Form N-PORT, trust''s own SEC filing, sponsor''s own holdings file, or prospectus, no holdings yet.'
+        companies:
+          type: array
+          items:
+            type: object
+            additionalProperties: true
+            properties:
+              ticker:
+                type: string
+                description: The company's key, as the funds' holdings write it.
+              weight_pct:
+                type:
+                - number
+                - 'null'
+                description: Its weight, in percent of what is looked through.
+              weight_pct_2dp:
+                type:
+                - number
+                - 'null'
+                description: Its weight to two decimals, rounded once from the unrounded sum, as the x-ray page prints it.
+              through:
+                type: array
+                items:
+                  type: object
+                  additionalProperties: true
+                  properties:
+                    fund:
+                      type: string
+                    weight_pct:
+                      type:
+                      - number
+                      - 'null'
+                description: Each fund it comes through, the largest first, with its part in percent of what is looked through.
+              value:
+                type:
+                - number
+                - 'null'
+                description: Its value, in the unit of the weights or amounts given. Null when none is given.
+              listed_abroad:
+                type: boolean
+                description: true for a foreign company's line whose local code is a US ticker too. Absent otherwise.
+            required:
+            - ticker
+            - weight_pct
+            - through
+          description: The companies underneath, largest first, top of them (25 when top is left out).
+        same_ticker_two_companies:
+          type: object
+          additionalProperties: true
+          description: 'The tickers listed twice: once for the US company of that ticker, once, marked listed_abroad, for the foreign company whose local code it is in another fund, with a note. Absent when there is none.'
+        skipped:
+          type: object
+          additionalProperties: true
+          required:
+          - not_covered
+          properties:
+            covered:
+              type: boolean
+            not_covered:
+              type: array
+              items:
+                type: string
+            covered_issuers:
+              type: array
+              items:
+                type: string
+            also_covered:
+              type: string
+            hint:
+              type: string
+          description: The tickers not covered, under not_covered, with what is covered (covered_issuers, also_covered and hint). Absent when every ticker is covered.
+        not_looked_through:
+          type: array
+          items:
+            type: object
+            additionalProperties: true
+            required:
+            - ticker
+            - why
+            properties:
+              ticker:
+                type: string
+              why:
+                type: string
+              fund_file:
+                type: string
+          description: The funds left out of the percentages and the value, each with why and fund_file.
+        covered:
+          type: boolean
+          description: true when the funds are covered but the answer has no figures (see comparable or computed).
+        computed:
+          type: boolean
+          description: false when none of the funds holds shares that can be looked through (see reason).
+        reason:
+          type: string
+          description: Why nothing is computed, when computed is false.
+        renamed:
+          type: object
+          additionalProperties:
+            type: string
+          description: Each ticker asked that a fund had before it was renamed, with its ticker now, under which the answer reads and names it. Absent when there is none.
+        source:
+          type: object
+          additionalProperties: true
+          required:
+          - provider
+          - links
+          - license
+          - cite_as
+          properties:
+            provider:
+              type: string
+            license:
+              type: string
+            cite_as:
+              type: string
+            benchmark_url:
+              type: string
+            links:
+              type: array
+              items:
+                type: object
+                additionalProperties: true
+                required:
+                - ticker
+                - page_url
+                - api_url
+                - holdings_source
+                properties:
+                  ticker:
+                    type: string
+                  page_url:
+                    type:
+                    - string
+                    - 'null'
+                  api_url:
+                    type: string
+                  holdings_source:
+                    type: string
+                  filing_url:
+                    type: string
+                  sponsor_page:
+                    type: string
+          description: 'The files the answer is computed from: each fund''s page_url, null without a page, api_url, holdings_source and, for a fund from a filing, filing_url; benchmark_url, SPY''s file, when a one-year beta is computed; license; and cite_as, the line to print under a figure.'
+        note:
+          type: string
+          description: Measurement, not investment advice.
+        license:
+          type: string
+          description: The licence the data is published under.
+        attribution:
+          type: string
+          description: 'How to credit the data: a link to the page of a fund the figure comes from, or to this address, where the medium allows one, the name where it does not.'
+        docs:
+          type: string
+          description: The reference of this endpoint.
+      required:
+      - note
+      - license
+      - attribution
+      - docs
+    BadRequest:
+      type: object
+      additionalProperties: true
+      properties:
+        error:
+          type: string
+          const: bad_request
+          description: Always bad_request.
+        reason:
+          type: string
+          enum:
+          - missing_parameter
+          - unknown_parameter
+          - repeated_parameter
+          - invalid_value
+          - too_few_funds
+          - too_many_funds
+          - too_large
+          - no_price_history
+          description: missing_parameter, unknown_parameter, repeated_parameter, invalid_value, too_few_funds, too_many_funds, too_large, a call past the limits of its endpoint (see limit and asked), or no_price_history, Find with no fund held that has weekly returns here.
+        message:
+          type: string
+          description: What to fix, in words.
+        parameter:
+          type: string
+          description: The parameter to fix. Absent with too_large.
+        min:
+          type: integer
+          description: 'With too_few_funds: the fewest funds the parameter takes.'
+        max:
+          type: integer
+          description: 'With too_many_funds: the most funds the parameter takes.'
+        limit:
+          type: object
+          additionalProperties:
+            type: integer
+          description: 'With too_large: the limit the call passed, as chars (the size of the files read, in bytes, a file of the other layers for a third of it), pairs (the holdings overlap compares), holdings (those a look-through or diversify reads), comparisons (those of diversify''s overlaps) or subrequests (the reads of files and of the edge cache one call makes).'
+        asked:
+          type: object
+          additionalProperties:
+            type: integer
+          description: 'With too_large: the call''s own figure for that limit.'
+        files:
+          type: object
+          additionalProperties:
+            type: integer
+          description: 'With too_large past limit.chars: what each fund''s file weighed, by ticker, in the units of chars (diversify''s asked.chars adds the reference file''s), so that a client can drop the largest.'
+        holdings_by_fund:
+          type: object
+          additionalProperties:
+            type: integer
+          description: 'With too_large on diversify past limit.holdings or limit.comparisons: the lines of each fund counted, by ticker (before any fund is read, those with a compact file).'
+        answered_by:
+          type: object
+          additionalProperties: true
+          description: 'With too_large from overlap or lookthrough, what answers the same question, as the message names it: mcp, the MCP server''s tool (url, tool, arguments); for two funds diversify answers, diversify and page; for a portfolio whose x-ray the site writes, page.'
+        docs:
+          type: string
+          description: The reference of this endpoint.
+      required:
+      - error
+      - reason
+      - message
+      - docs
+    Unavailable:
+      type: object
+      additionalProperties: true
+      required:
+      - error
+      - message
+      - status
+      - uptime
+      properties:
+        error:
+          type: string
+          const: unavailable
+        message:
+          type: string
+        status:
+          type: string
+          description: The nightly report.
+        uptime:
+          type: string
+          description: 'The live checks: whether the site fails its own checks.'
+externalDocs:
+  description: The reference, with examples and recipes
+  url: https://tickerinside.com/api/

@@ -1,0 +1,456 @@
+openapi: 3.2.0
+info:
+  title: TickerInside Universe.json API
+  version: '1'
+  summary: Holdings of 5,433 US ETFs, which ETFs hold a stock, and overlap, as static JSON.
+  description: TickerInside is an open, machine-readable database of US ETF holdings, with the source and date of each holding.
+  termsOfService: https://tickerinside.com/terms/
+  contact:
+    name: TickerInside
+    email: contact@tickerinside.com
+    url: https://tickerinside.com/api/
+  license:
+    name: CC BY 4.0
+    identifier: CC-BY-4.0
+servers:
+- url: https://tickerinside.com/api/v1
+  description: Static JSON files, and five answers computed from them when asked. No key.
+security: []
+tags:
+- name: Universe.json
+paths:
+  /universe.json:
+    get:
+      operationId: getUniverse
+      summary: The US-listed ETFs, and their coverage
+      description: 'One row for each ETF in Nasdaq Trader''s symbol directory: ticker, name, fund or exchange-traded note, and the layer that covers it or why it is not covered yet. The coverage is measured here over the funds only; the same block is in index.json and status.json. A ticker of the list with no fund file answers 404 at /api/v1/fund/{ticker}.json; this file says why.'
+      externalDocs:
+        url: https://tickerinside.com/api/#universe
+      responses:
+        '200':
+          description: 'The file. The example is a real answer, shortened: long lists and maps keep their first entries.'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Universe'
+              example:
+                as_of: '2026-10-09'
+                available: true
+                source: Nasdaq Trader symbol directory (nasdaqtraded.txt), https://www.nasdaqtrader.com/dynamic/SymDir/nasdaqtraded.txt
+                file_date: '2026-10-12'
+                sentence: 5,433 of the 5,717 US-listed ETFs in Nasdaq Trader's symbol directory of 2026-10-12 have holdings here (95.0%), and 282 more have a file from their prospectus, with the objective it states and no holdings.
+                coverage:
+                  etfs: 5717
+                  covered: 5433
+                  pct: 95.0
+                  by_layer:
+                    issuer_files: 688
+                    sec_nport: 1952
+                    sec_nport_derivatives: 1365
+                    sec_nport_bonds: 922
+                    sec_nport_multi_asset: 235
+                    trust_filings: 131
+                    sponsor_files: 140
+                  prospectus: 282
+                  with_file: 5715
+                  with_objective: 282
+                  not_covered:
+                    no_prospectus_found: 2
+                  etns: 53
+                  other_products: 1
+                  outside_universe: 82
+                  file_date: '2026-10-12'
+                  available: true
+                  source: Nasdaq Trader symbol directory (nasdaqtraded.txt)
+                  sentence: 5,433 of the 5,717 US-listed ETFs in Nasdaq Trader's symbol directory of 2026-10-12 have holdings here (95.0%), and 282 more have a file from their prospectus, with the objective it states and no holdings.
+                  all_us_etfs: true
+                  headline: All US ETFs
+                  claim: 'All US ETFs: 5,715 of the 5,717 in Nasdaq Trader''s symbol directory of 2026-10-12 have a file, 5,433 with holdings and 282 with the objective their prospectus states; the 2 listed most recently get theirs on the nights after.'
+                  assets:
+                    net_assets_b: 15961.5
+                    with_holdings_b: 15941.7
+                    pct: 99.9
+                    funds_sized: 5451
+                    funds_unsized: 266
+                    unsized_with_holdings: 124
+                    basis: Net assets of each ETF in US dollars, from the fund's own filing or file where it gives one and from market data otherwise; a fund the market data puts at 0.0 billion (under 50 million dollars) counts at that figure; only the totals are published.
+                    sentence: null
+                layers:
+                  issuer_files: Read every weekday night from the issuer's own daily holdings file.
+                  sec_nport: A US stock ETF, from its latest public SEC Form N-PORT filing.
+                  sec_nport_derivatives: 'A leveraged, inverse, option income or other derivative-based ETF, from its latest SEC Form N-PORT filing: what it holds, and its swaps, futures and options as notional exposure.'
+                  sec_nport_bonds: 'A fixed income ETF (bond, credit, mortgage, Treasury, municipal and the like), from its latest SEC Form N-PORT filing: its lines by issuer, coupon and maturity, and its weight by kind, maturity and country.'
+                  sec_nport_multi_asset: 'A multi-asset ETF: a fund that holds other funds or several asset classes (allocation, target date, buffer, income and hedged strategies), from its latest SEC Form N-PORT filing.'
+                  trust_filings: A trust or pool that files no Form N-PORT (physical metal, crypto, currency, commodity futures), from its own SEC filings.
+                  sponsor_files: 'A fund with no Form N-PORT yet, from the holdings its sponsor publishes on its own site, read every night by tickers only: the file''s date and the sponsor''s page are in the file.'
+                  prospectus: 'A fund with no holdings file yet: what its prospectus states (its objective, its index or target, its cost). No holdings; its first holdings filing replaces the file.'
+                reasons:
+                  etn: An exchange-traded note is a debt of the bank that issues it, not a fund, and holds nothing to list. Told from a fund by its name (ETN, ETNs, ETRACS, iPath, X-Links), unless the name also says ETF.
+                  other_product: 'Not a fund: a trust certificate, which holds nothing to list. Told by its name.'
+                  no_filing_yet: The SEC lists the fund's ticker and it has filed no public Form N-PORT yet. A new fund files its first about two to five months after it lists.
+                  not_in_sec_list: Not in the SEC's list of fund tickers yet, so it has no Form N-PORT to read. A new fund reaches that list after it lists.
+                  other_fund: The SEC's ticker file still gives this ticker the series of another fund, and that series' newest filing is under the other fund's name, so the ETF's own holdings are not read from it. It joins when its own filing does.
+                  stale_filing: The newest public Form N-PORT found for this ticker describes a portfolio more than nine months old, so it is not served as current holdings. It joins when a newer filing does.
+                  no_prospectus_found: No holdings file yet, and no prospectus of the fund was found on EDGAR. It is looked up again every few days.
+                funds:
+                - - AAA
+                  - Alternative Access First Priority CLO Bond ETF
+                  - etf
+                  - sec_nport_bonds
+                  - null
+                - - AAAA
+                  - Amplius Aggressive Asset Allocation ETF
+                  - etf
+                  - sec_nport
+                  - null
+                - - AAAC
+                  - Columbia AAA CLO ETF
+                  - etf
+                  - sec_nport_bonds
+                  - null
+                license: CC BY 4.0
+                attribution: Credit TickerInside with a link to this file, or to the page that shows the figure, wherever the medium allows a link, and by name where it does not. How you mark the link is up to you.
+        '304':
+          description: 'Not modified: the ETag of your copy, sent in If-None-Match, is still current. Files are cached five minutes.'
+        '503':
+          description: 'The file could not be served just then: retry after a minute. uptime says whether the site fails its own checks.'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Unavailable'
+      tags:
+      - Universe.json
+components:
+  schemas:
+    Universe:
+      type: object
+      properties:
+        as_of:
+          type:
+          - string
+          - 'null'
+          description: The price date across the whole site.
+        available:
+          type:
+          - boolean
+          - 'null'
+          description: False, with an empty funds list, when the list of US-listed ETFs could not be read for this build.
+        source:
+          type:
+          - string
+          - 'null'
+          description: Nasdaq Trader's symbol directory.
+        file_date:
+          type:
+          - string
+          - 'null'
+          description: The day of the directory file.
+        sentence:
+          type:
+          - string
+          - 'null'
+          description: The measured coverage in one sentence to quote.
+        coverage:
+          type: object
+          properties:
+            etfs:
+              type:
+              - number
+              - 'null'
+              description: How many funds the list has, less the notes and other lines in etns and other_products.
+            covered:
+              type:
+              - number
+              - 'null'
+              description: How many of them have a holdings file here (not a prospectus file).
+            pct:
+              type:
+              - number
+              - 'null'
+              description: covered over etfs, in percent, to one decimal.
+            by_layer:
+              type: object
+              properties:
+                issuer_files:
+                  type:
+                  - number
+                  - 'null'
+                sec_nport:
+                  type:
+                  - number
+                  - 'null'
+                sec_nport_derivatives:
+                  type:
+                  - number
+                  - 'null'
+                sec_nport_bonds:
+                  type:
+                  - number
+                  - 'null'
+                sec_nport_multi_asset:
+                  type:
+                  - number
+                  - 'null'
+                trust_filings:
+                  type:
+                  - number
+                  - 'null'
+                sponsor_files:
+                  type:
+                  - number
+                  - 'null'
+              additionalProperties: true
+              description: 'covered by layer: issuer_files, sec_nport, sec_nport_derivatives, sec_nport_bonds, sec_nport_multi_asset, trust_filings, sponsor_files.'
+            prospectus:
+              type:
+              - number
+              - 'null'
+              description: How many more have a prospectus file.
+            with_file:
+              type:
+              - number
+              - 'null'
+              description: covered plus prospectus.
+            with_objective:
+              type:
+              - number
+              - 'null'
+              description: How many files quote the fund's objective.
+            not_covered:
+              type: object
+              properties:
+                no_prospectus_found:
+                  type:
+                  - number
+                  - 'null'
+                no_filing_yet:
+                  type:
+                  - number
+                  - 'null'
+                not_in_sec_list:
+                  type:
+                  - number
+                  - 'null'
+                other_fund:
+                  type:
+                  - number
+                  - 'null'
+                stale_filing:
+                  type:
+                  - number
+                  - 'null'
+              additionalProperties: true
+              description: The funds with no file, by reason code; the reasons object says what each means.
+            etns:
+              type:
+              - number
+              - 'null'
+              description: Lines that are exchange-traded notes, debts of their banks and not funds.
+            other_products:
+              type:
+              - number
+              - 'null'
+              description: Other lines that are not funds (a trust certificate).
+            outside_universe:
+              type:
+              - number
+              - 'null'
+              description: Fund files for tickers the list no longer has.
+            file_date:
+              type:
+              - string
+              - 'null'
+              description: The day of the directory file.
+            available:
+              type:
+              - boolean
+              - 'null'
+              description: True when the list was read.
+            source:
+              type:
+              - string
+              - 'null'
+              description: Where the list comes from.
+            sentence:
+              type:
+              - string
+              - 'null'
+              description: The measured coverage in one sentence to quote.
+            all_us_etfs:
+              type:
+              - boolean
+              - 'null'
+              description: 'True only when each ETF of the directory has a file tonight, a holdings file or a prospectus file. It does not say that every ETF has holdings: covered counts those.'
+            headline:
+              type:
+              - string
+              - 'null'
+              description: The words the claim opens with, while all_us_etfs is true, else null. Quote them with the counts of claim, never alone.
+            claim:
+              type:
+              - string
+              - 'null'
+              description: The headline with its counts (the ETFs with a file, how many have holdings, how many the objective their prospectus states), or null while all_us_etfs is false. The exact counts are in sentence.
+            assets:
+              type: object
+              properties:
+                net_assets_b:
+                  type:
+                  - number
+                  - 'null'
+                with_holdings_b:
+                  type:
+                  - number
+                  - 'null'
+                pct:
+                  type:
+                  - number
+                  - 'null'
+                funds_sized:
+                  type:
+                  - number
+                  - 'null'
+                funds_unsized:
+                  type:
+                  - number
+                  - 'null'
+                unsized_with_holdings:
+                  type:
+                  - number
+                  - 'null'
+                basis:
+                  type:
+                  - string
+                  - 'null'
+                sentence: {}
+              additionalProperties: true
+              description: 'Coverage of assets from holdings files only: net_assets_b, with_holdings_b, pct, funds_sized, funds_unsized, unsized_with_holdings, basis, sentence.'
+          additionalProperties: true
+          description: 'The measure, the block of index.json coverage.universe: etfs, covered (with holdings), pct, by_layer, prospectus, with_file, with_objective, not_covered by reason, etns, other_products, outside_universe, file_date, source, sentence, all_us_etfs, headline, claim and assets.'
+        layers:
+          type: object
+          properties:
+            issuer_files:
+              type:
+              - string
+              - 'null'
+            sec_nport:
+              type:
+              - string
+              - 'null'
+            sec_nport_derivatives:
+              type:
+              - string
+              - 'null'
+            sec_nport_bonds:
+              type:
+              - string
+              - 'null'
+            sec_nport_multi_asset:
+              type:
+              - string
+              - 'null'
+            trust_filings:
+              type:
+              - string
+              - 'null'
+            sponsor_files:
+              type:
+              - string
+              - 'null'
+            prospectus:
+              type:
+              - string
+              - 'null'
+          additionalProperties: true
+          description: What each layer of fund files is.
+        reasons:
+          type: object
+          properties:
+            etn:
+              type:
+              - string
+              - 'null'
+            other_product:
+              type:
+              - string
+              - 'null'
+            no_filing_yet:
+              type:
+              - string
+              - 'null'
+            not_in_sec_list:
+              type:
+              - string
+              - 'null'
+            other_fund:
+              type:
+              - string
+              - 'null'
+            stale_filing:
+              type:
+              - string
+              - 'null'
+            no_prospectus_found:
+              type:
+              - string
+              - 'null'
+          additionalProperties: true
+          description: Why a fund has no fund file, by code.
+        funds:
+          type:
+          - array
+          - 'null'
+          items:
+            type: array
+            items:
+              type:
+              - 'null'
+              - string
+          description: 'One row for each US-listed ETF and each exchange-traded note the directory flags: [ticker, name, kind, layer, why]. kind: etf, etn (a debt of the issuing bank, not a fund) or other. layer: how the fund is covered, null when it is not yet, and why is then its reason.'
+        license:
+          type:
+          - string
+          - 'null'
+          description: The licence the data is published under.
+        attribution:
+          type:
+          - string
+          - 'null'
+          description: 'How to credit the data: a link to this file where the medium allows one, the name where it does not.'
+      additionalProperties: true
+      required:
+      - as_of
+      - available
+      - source
+      - file_date
+      - sentence
+      - coverage
+      - layers
+      - reasons
+      - funds
+      - license
+      - attribution
+    Unavailable:
+      type: object
+      additionalProperties: true
+      required:
+      - error
+      - message
+      - status
+      - uptime
+      properties:
+        error:
+          type: string
+          const: unavailable
+        message:
+          type: string
+        status:
+          type: string
+          description: The nightly report.
+        uptime:
+          type: string
+          description: 'The live checks: whether the site fails its own checks.'
+externalDocs:
+  description: The reference, with examples and recipes
+  url: https://tickerinside.com/api/

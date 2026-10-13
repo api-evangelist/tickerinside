@@ -1,0 +1,939 @@
+openapi: 3.2.0
+info:
+  title: TickerInside Overlap API
+  version: '1'
+  summary: Holdings of 5,433 US ETFs, which ETFs hold a stock, and overlap, as static JSON.
+  description: TickerInside is an open, machine-readable database of US ETF holdings, with the source and date of each holding.
+  termsOfService: https://tickerinside.com/terms/
+  contact:
+    name: TickerInside
+    email: contact@tickerinside.com
+    url: https://tickerinside.com/api/
+  license:
+    name: CC BY 4.0
+    identifier: CC-BY-4.0
+servers:
+- url: https://tickerinside.com/api/v1
+  description: Static JSON files, and five answers computed from them when asked. No key.
+security: []
+tags:
+- name: Overlap
+paths:
+  /overlap:
+    get:
+      operationId: getOverlap
+      summary: Overlap of funds, computed
+      description: Two funds give the pair answer of the MCP tool compare_etfs (kind pair), three or more the ranked pairs of get_etf_overlap_matrix (kind matrix). 2 to 10 funds. The files read weigh at most 64 KB for two funds and 58 KB for three or more, a file of the other layers a third of its size, and the pairs compare at most 2,600 holdings, each pair the holdings of the fund that holds fewer.
+      externalDocs:
+        url: https://tickerinside.com/api/#overlap
+      parameters:
+      - name: funds
+        in: query
+        required: true
+        description: Tickers separated by commas, 2 to 10; case does not matter and a ticker given twice counts once.
+        schema:
+          type: string
+        example: VOO,QQQ
+      - name: format
+        in: query
+        required: false
+        description: json, the default, or csv for the CSV twin, which the path with .csv also gives.
+        schema:
+          type: string
+          enum:
+          - json
+          - csv
+      responses:
+        '200':
+          description: The answer, computed when asked and kept in the edge cache for up to a day. The example is a real answer, shortened.
+          content:
+            application/json:
+              schema:
+                oneOf:
+                - $ref: '#/components/schemas/OverlapPair'
+                - $ref: '#/components/schemas/OverlapMatrix'
+              example:
+                kind: pair
+                page_url: https://tickerinside.com/compare/voo-vs-qqq/
+                share_url: https://tickerinside.com/diversify/?have=VOO&try=QQQ
+                pair:
+                - VOO
+                - QQQ
+                prices_as_of: '2026-10-09'
+                holdings_as_of:
+                  VOO: '2026-08-31'
+                  QQQ: '2026-10-08'
+                holdings_source:
+                  VOO: issuer file
+                  QQQ: issuer file
+                overlap:
+                  by_weight: 53.9
+                  share_of_a: 54
+                  share_of_b: 92.9
+                  companies_in_both: 85
+                  positions_a: 503
+                  positions_b: 100
+                  largest_shared:
+                  - ticker: NVDA
+                    in_a: 8.09
+                    in_b: 8.33
+                    counted: 8.09
+                  - ticker: AAPL
+                    in_a: 7.04
+                    in_b: 7.45
+                    counted: 7.04
+                  - ticker: MSFT
+                    in_a: 5.7
+                    in_b: 5.82
+                    counted: 5.7
+                correlation_3y: 0.95
+                covariance_annualised_pct2: 262.3
+                weeks_used: 156
+                funds:
+                  VOO:
+                    name: Vanguard S&P 500 ETF
+                    expense_ratio_pct: 0.03
+                    return_3y_pct: 87.5
+                    volatility_pct: 14.2
+                    worst_fall_3y_pct: -16.7
+                    beta_vs_sp500: 0.99
+                    beta_vs_sp500_1y: 1
+                    positions: 503
+                  QQQ:
+                    name: Invesco QQQ Trust
+                    expense_ratio_pct: 0.18
+                    return_3y_pct: 109.2
+                    volatility_pct: 19.5
+                    worst_fall_3y_pct: -21.3
+                    beta_vs_sp500: 1.29
+                    beta_vs_sp500_1y: 1.41
+                    positions: 100
+                how_to_quote: Name the overlap measure quoted and give the holdings_as_of dates. by_weight is symmetric; the two shares are not.
+                source:
+                  provider: TickerInside
+                  links:
+                  - ticker: VOO
+                    page_url: https://tickerinside.com/etf/voo/
+                    api_url: https://tickerinside.com/api/v1/fund/voo.json
+                    holdings_source: issuer file
+                  - ticker: QQQ
+                    page_url: https://tickerinside.com/etf/qqq/
+                    api_url: https://tickerinside.com/api/v1/fund/qqq.json
+                    holdings_source: issuer file
+                  license: CC BY 4.0
+                  cite_as: TickerInside (tickerinside.com), VOO vs QQQ, https://tickerinside.com/compare/voo-vs-qqq/, from the issuers' holdings files, dated as shown.
+                  benchmark_url: https://tickerinside.com/api/v1/fund/spy.json
+                note: Measurement, not investment advice.
+                license: CC BY 4.0
+                attribution: Credit TickerInside with a link to the page of a fund the figure comes from (source names them), or to this address, wherever the medium allows a link, and by name where it does not. How you mark the link is up to you.
+                docs: https://tickerinside.com/api/#overlap
+            text/csv:
+              schema:
+                type: string
+              example: 'fund_a,fund_b,overlap_kind,by_weight,share_of_a,share_of_b,in_both,correlation_3y,holdings_as_of_a,holdings_as_of_b,holdings_source_a,holdings_source_b,note
+
+                VOO,QQQ,shares,53.9,54,92.9,85,,2026-08-31,2026-10-08,issuer file,issuer file,
+
+                VOO,SCHD,shares,8,8,95.1,46,,2026-08-31,2026-05-31,issuer file,SEC Form N-PORT,
+
+                QQQ,SCHD,shares,4.6,4.7,26.2,8,,2026-10-08,2026-05-31,issuer file,SEC Form N-PORT,
+
+                '
+        '304':
+          description: 'Not modified: the ETag of your copy, sent in If-None-Match, is still current.'
+        '400':
+          description: 'The query was refused: reason and parameter say what to fix, and limit and asked give the figures of a call past the limits.'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/BadRequest'
+              example:
+                error: bad_request
+                reason: too_few_funds
+                message: funds must name at least 2 different funds.
+                parameter: funds
+                min: 2
+                docs: https://tickerinside.com/api/#overlap
+        '404':
+          description: 'A fund the answer needs is not covered: not_covered lists the tickers, with the reason in message, and reason has_security_file the stock file of one that has one (security).'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/NotCovered'
+        '405':
+          description: Another method than GET or HEAD.
+          content:
+            application/json:
+              schema:
+                type: object
+                additionalProperties: true
+                required:
+                - error
+                - message
+                properties:
+                  error:
+                    type: string
+                    const: method_not_allowed
+                  message:
+                    type: string
+                  docs:
+                    type: string
+        '503':
+          description: 'The answer could not be computed just then: retry after a minute.'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Unavailable'
+      tags:
+      - Overlap
+components:
+  schemas:
+    OverlapPair:
+      type: object
+      additionalProperties: true
+      properties:
+        kind:
+          type: string
+          const: pair
+          description: 'pair for two funds, matrix for three or more: which of the two shapes the answer has.'
+        page_url:
+          type:
+          - string
+          - 'null'
+          description: 'The web page whose HTML, as the server sends it, prints the answer''s figure, so that it reads without JavaScript: for a pair, its written comparison when there is one, else its "Does it diversify me?" answer within that answer''s limits; for three funds or more, the x-ray the site wrote of the same funds; for a look-through, the x-ray the site wrote of the portfolio at the same weights (listed under pages in /og/answers.json), or for one fund, its page. Null where no page prints the figure yet: any other overlap of three funds or more or look-through of two funds or more, a pair past those limits, a pair of bond funds.'
+        share_url:
+          type: string
+          description: 'The address whose HTML reproduces the whole answer on the site: for a pair, its "Does it diversify me?" answer within that answer''s limits; for three funds or more and for a portfolio, the x-ray the site wrote of the same funds (listed under pages in /og/answers.json), each weight in percent to 0.01 point and never an amount, in the order of the funds the site wrote it in. Absent where no page prints the answer.'
+        pair:
+          type: array
+          items:
+            type: string
+          description: The two funds, upper case, in the order asked.
+        prices_as_of:
+          type:
+          - string
+          - 'null'
+          description: The price date of the figures read from weekly returns. Null when no fund has prices.
+        holdings_as_of:
+          type: object
+          additionalProperties:
+            type:
+            - string
+            - 'null'
+          description: 'Each fund''s holdings date, by ticker: the date of its issuer file, or the quarter end its SEC filing describes.'
+        holdings_source:
+          type: object
+          additionalProperties:
+            type:
+            - string
+            - 'null'
+          description: 'Each fund''s source, by ticker: issuer file, SEC Form N-PORT, trust''s own SEC filing, sponsor''s own holdings file, or prospectus, no holdings yet.'
+        overlap:
+          type: object
+          additionalProperties: true
+          required:
+          - by_weight
+          - share_of_a
+          - share_of_b
+          - companies_in_both
+          - largest_shared
+          properties:
+            by_weight:
+              type:
+              - number
+              - 'null'
+            share_of_a:
+              type:
+              - number
+              - 'null'
+            share_of_b:
+              type:
+              - number
+              - 'null'
+            companies_in_both:
+              type:
+              - integer
+              - 'null'
+            positions_a:
+              type:
+              - integer
+              - 'null'
+            positions_b:
+              type:
+              - integer
+              - 'null'
+            largest_shared:
+              type: array
+              items:
+                type: object
+                additionalProperties: true
+                properties:
+                  ticker:
+                    type: string
+                  in_a:
+                    type:
+                    - number
+                    - 'null'
+                  in_b:
+                    type:
+                    - number
+                    - 'null'
+                  counted:
+                    type:
+                    - number
+                    - 'null'
+            same_ticker_two_companies:
+              type: array
+              items:
+                type: string
+            same_ticker_note:
+              type: string
+          description: 'For two funds holding shares, in percent: by_weight, the sum over the companies both hold of the smaller of their two weights; share_of_a and share_of_b, the part of each fund in companies the other holds too; companies_in_both, the holdings both have, counted by ticker (GOOGL and GOOG count as two), positions_a and positions_b; and largest_shared, the 15 largest shared holdings with each weight and the smaller one counted. A ticker the two hold for two different companies is left out of every figure and listed in same_ticker_two_companies, with same_ticker_note.'
+        overlap_kind:
+          type: string
+          enum:
+          - issuer
+          description: issuer when the figures are an overlap by issuer, of fixed income funds. Absent otherwise.
+        issuer_overlap:
+          type: object
+          additionalProperties: true
+          required:
+          - by_weight
+          - issuers_in_both
+          properties:
+            by_weight:
+              type:
+              - number
+              - 'null'
+            share_of_a:
+              type:
+              - number
+              - 'null'
+            share_of_b:
+              type:
+              - number
+              - 'null'
+            issuers_in_both:
+              type:
+              - integer
+              - 'null'
+            issuers_compared:
+              type: object
+              additionalProperties: true
+            weight_compared_pct:
+              type: object
+              additionalProperties: true
+            top_shared_issuers:
+              type: array
+              items:
+                type: object
+            largest_only_in_a:
+              type: array
+              items:
+                type: object
+            largest_only_in_b:
+              type: array
+              items:
+                type: object
+          description: 'For two fixed income funds: the overlap by issuer, the smaller weight of each issuer both hold summed (by_weight), the share of each, issuers_in_both, the issuers compared and the largest shared and unshared ones. Never mixed with the overlap by shares.'
+        correlation_3y:
+          type:
+          - number
+          - 'null'
+          description: The correlation of the two funds' weekly returns over up to three years, on the weeks both have. Null under 52 such weeks.
+        covariance_annualised_pct2:
+          type:
+          - number
+          - 'null'
+          description: The annualised covariance of the same returns, in percent squared. Null with correlation_3y.
+        weeks_used:
+          type:
+          - integer
+          - 'null'
+          description: How many weeks the two figures above read. Null when they are.
+        funds:
+          type: object
+          additionalProperties:
+            type: object
+            additionalProperties: true
+            properties:
+              name:
+                type:
+                - string
+                - 'null'
+              expense_ratio_pct:
+                type:
+                - number
+                - 'null'
+              return_3y_pct:
+                type:
+                - number
+                - 'null'
+              volatility_pct:
+                type:
+                - number
+                - 'null'
+              worst_fall_3y_pct:
+                type:
+                - number
+                - 'null'
+              beta_vs_sp500:
+                type:
+                - number
+                - 'null'
+              beta_vs_sp500_1y:
+                type:
+                - number
+                - 'null'
+              positions:
+                type:
+                - integer
+                - 'null'
+          description: 'Each fund by ticker: name, expense_ratio_pct, return_3y_pct, volatility_pct, worst_fall_3y_pct, beta_vs_sp500 (three years, from its file), beta_vs_sp500_1y (the last 52 weeks against SPY''s) and positions; a fixed income fund''s average coupon, maturity and duration. Null where the data has no figure.'
+        how_to_quote:
+          type: string
+          description: 'How to quote the figures: which measure, with the holdings dates.'
+        covered:
+          type: boolean
+          description: true when the funds are covered but the answer has no figures (see comparable or computed).
+        comparable:
+          type: boolean
+          description: false when a fund of the two holds no shares that can be overlapped (see not_comparable). Absent when the figures are given.
+        not_comparable:
+          type: array
+          items:
+            type: object
+            additionalProperties: true
+            required:
+            - ticker
+            - why
+            properties:
+              ticker:
+                type: string
+              why:
+                type: string
+              fund_file:
+                type: string
+          description: 'The funds set aside, each with why and the address of its file (fund_file): a leveraged, inverse or other derivative-based fund, a trust or pool, a multi-asset, sponsor-file or prospectus-only fund, or a bond fund beside a stock fund.'
+        renamed:
+          type: object
+          additionalProperties:
+            type: string
+          description: Each ticker asked that a fund had before it was renamed, with its ticker now, under which the answer reads and names it. Absent when there is none.
+        source:
+          type: object
+          additionalProperties: true
+          required:
+          - provider
+          - links
+          - license
+          - cite_as
+          properties:
+            provider:
+              type: string
+            license:
+              type: string
+            cite_as:
+              type: string
+            benchmark_url:
+              type: string
+            links:
+              type: array
+              items:
+                type: object
+                additionalProperties: true
+                required:
+                - ticker
+                - page_url
+                - api_url
+                - holdings_source
+                properties:
+                  ticker:
+                    type: string
+                  page_url:
+                    type:
+                    - string
+                    - 'null'
+                  api_url:
+                    type: string
+                  holdings_source:
+                    type: string
+                  filing_url:
+                    type: string
+                  sponsor_page:
+                    type: string
+          description: 'The files the answer is computed from: each fund''s page_url, null without a page, api_url, holdings_source and, for a fund from a filing, filing_url; benchmark_url, SPY''s file, when a one-year beta is computed; license; and cite_as, the line to print under a figure.'
+        note:
+          type: string
+          description: Measurement, not investment advice.
+        license:
+          type: string
+          description: The licence the data is published under.
+        attribution:
+          type: string
+          description: 'How to credit the data: a link to the page of a fund the figure comes from, or to this address, where the medium allows one, the name where it does not.'
+        docs:
+          type: string
+          description: The reference of this endpoint.
+      required:
+      - kind
+      - pair
+      - holdings_as_of
+      - holdings_source
+      - source
+      - note
+      - license
+      - attribution
+      - docs
+    NotCovered:
+      type: object
+      additionalProperties: true
+      required:
+      - error
+      - ticker
+      - message
+      - docs
+      properties:
+        error:
+          type: string
+          const: not_covered
+          description: 'Always not_covered, whatever the reason: read reason and the next address.'
+        reason:
+          type: string
+          enum:
+          - has_security_file
+          - in_another_layer
+          - is_a_fund
+          - no_written_comparison
+          - not_a_shard
+          - not_held_by_daily_funds
+          - not_held
+          - earlier_key
+          - no_such_endpoint
+          - not_in_directory
+          - no_file
+          - funds_not_covered
+          - etn
+          - other_product
+          - no_filing_yet
+          - not_in_sec_list
+          - other_fund
+          - stale_filing
+          - no_prospectus_found
+          - not_in_archive
+          - holdings_at_date_not_enabled
+          - invalid_date
+          - before_history
+          description: 'Every code is explained on /contract/#reasons. not_in_directory: a fund address with no file, for a ticker not in the directory of US-listed funds; a ticker of the directory with no file gets the code universe.json gives it (etn, no_filing_yet and the others), and no_file when the directory was not read. not_held: under /sec/, no covered fund holds the key; earlier_key: an old key, with reads_as. no_such_endpoint: no endpoint at the address. funds_not_covered: several funds of /overlap or /lookthrough, with reasons. in_another_layer: sent only to the TickerInside clients released before /fund/ answered for a fund of the other layers too (see holdings_kind); etf gives the fund''s file. has_security_file: a ticker asked for as a fund has a stock file (see security). is_a_fund: a ticker asked for as a stock is a covered fund (see fund, and holders for the funds that hold it). no_written_comparison: no comparison file for this pair in either order (see fund_files and written_comparisons). not_a_shard: an address under /api/v1/holders/ that is not a shard (see holders). Under /api/v1/history/: not_in_archive: the fund has no history file (see history). holdings_at_date_not_enabled: holdings at a date are not served yet, and every valid date answers this (see changes). invalid_date: the date is not a calendar date, or is after today. before_history: the date is before the fund''s first file (see first), answered only once holdings at a date are served. Under /api/v1/flows/: reason not_held_by_daily_funds: no fund read daily from its issuer''s files held the key or moved it in the last 20 trading days; summary names the night''s summary.'
+        ticker:
+          type:
+          - string
+          - 'null'
+          description: What was asked for, upper case; null when the address names no single ticker, such as a pair under /compare/.
+        message:
+          type: string
+          description: What happened and where to look next, in words.
+        docs:
+          type: string
+          description: The reference.
+        security:
+          type: string
+          description: 'With has_security_file: the stock file of the ticker, or its holders-only answer.'
+        reads_as:
+          type: array
+          items:
+            type: string
+          description: 'Under /sec/, for an old key written before lines listed abroad carried their market (7203): the keys it reads as now, from the aliases of holders. Absent otherwise.'
+        fund:
+          type: string
+          description: 'With is_a_fund: the fund file of the ticker.'
+        etf:
+          type: string
+          description: 'With in_another_layer: the file of the fund, /api/v1/etf/{ticker}.json.'
+        holders:
+          type: string
+          description: 'The shard of the key''s first character: /api/v1/holders/{c}.json, c a to z, or 0 for any other character (7203.JP is in 0.json). It lists the covered funds that hold the key, from issuer files and from SEC filings, with or without a stock file.'
+        pair:
+          type:
+          - array
+          - 'null'
+          items:
+            type: string
+          description: 'With no_written_comparison: the two tickers asked for, upper case, or null when the address names no pair.'
+        written_comparisons:
+          type: array
+          items:
+            type: object
+            additionalProperties: true
+            properties:
+              pair:
+                type: array
+                items:
+                  type: string
+              url:
+                type: string
+          description: 'With no_written_comparison: the pairs that have a comparison file, as index.json lists them.'
+        fund_files:
+          type: array
+          items:
+            type: string
+          description: 'With no_written_comparison: the fund files of the tickers asked for that are covered funds, to compute the overlap from.'
+        covered:
+          type: string
+          description: 'What is covered: /api/v1/securities.json after a /sec/ address with no reason, /api/v1/index.json otherwise.'
+        not_covered:
+          type: array
+          items:
+            type: string
+          description: 'Under /overlap, /lookthrough and /diversify: the tickers asked for that are not covered.'
+        reasons:
+          type: object
+          additionalProperties:
+            type: string
+          description: 'Under /overlap, /lookthrough and /diversify: the reason code of each ticker of not_covered.'
+        covered_issuers:
+          type: array
+          items:
+            type: string
+          description: 'Under /overlap and /lookthrough: the issuers whose own files are read; the other covered funds are read from SEC filings.'
+        history:
+          type: string
+          description: 'With not_in_archive: the list of the funds that have a history.'
+        changes:
+          type: string
+          description: 'With holdings_at_date_not_enabled: the fund''s changes file, served today.'
+        first:
+          type:
+          - string
+          - 'null'
+          description: 'With before_history: the date of the fund''s oldest file. before_history is answered only once holdings at a date are served.'
+        date:
+          type: string
+          description: 'With invalid_date, holdings_at_date_not_enabled or before_history: the date asked for.'
+        summary:
+          type: string
+          description: 'With not_held_by_daily_funds: the night''s flows, /api/v1/flows.json.'
+    OverlapMatrix:
+      type: object
+      additionalProperties: true
+      properties:
+        kind:
+          type: string
+          const: matrix
+          description: 'pair for two funds, matrix for three or more: which of the two shapes the answer has.'
+        page_url:
+          type:
+          - string
+          - 'null'
+          description: 'The web page whose HTML, as the server sends it, prints the answer''s figure, so that it reads without JavaScript: for a pair, its written comparison when there is one, else its "Does it diversify me?" answer within that answer''s limits; for three funds or more, the x-ray the site wrote of the same funds; for a look-through, the x-ray the site wrote of the portfolio at the same weights (listed under pages in /og/answers.json), or for one fund, its page. Null where no page prints the figure yet: any other overlap of three funds or more or look-through of two funds or more, a pair past those limits, a pair of bond funds.'
+        share_url:
+          type: string
+          description: 'The address whose HTML reproduces the whole answer on the site: for a pair, its "Does it diversify me?" answer within that answer''s limits; for three funds or more and for a portfolio, the x-ray the site wrote of the same funds (listed under pages in /og/answers.json), each weight in percent to 0.01 point and never an amount, in the order of the funds the site wrote it in. Absent where no page prints the answer.'
+        covered:
+          type: boolean
+          description: true when the funds are covered but the answer has no figures (see comparable or computed).
+        computed:
+          type: boolean
+          description: false when fewer than two of the funds hold shares that can be overlapped (see reason).
+        reason:
+          type: string
+          description: Why nothing is computed, when computed is false.
+        overlap_kind:
+          type: string
+          enum:
+          - issuer
+          description: issuer when the figures are an overlap by issuer, of fixed income funds. Absent otherwise.
+        prices_as_of:
+          type:
+          - string
+          - 'null'
+          description: The price date of the figures read from weekly returns. Null when no fund has prices.
+        holdings_as_of:
+          type: object
+          additionalProperties:
+            type:
+            - string
+            - 'null'
+          description: 'Each fund''s holdings date, by ticker: the date of its issuer file, or the quarter end its SEC filing describes.'
+        holdings_source:
+          type: object
+          additionalProperties:
+            type:
+            - string
+            - 'null'
+          description: 'Each fund''s source, by ticker: issuer file, SEC Form N-PORT, trust''s own SEC filing, sponsor''s own holdings file, or prospectus, no holdings yet.'
+        skipped:
+          type: object
+          additionalProperties: true
+          required:
+          - not_covered
+          properties:
+            covered:
+              type: boolean
+            not_covered:
+              type: array
+              items:
+                type: string
+            covered_issuers:
+              type: array
+              items:
+                type: string
+            also_covered:
+              type: string
+            hint:
+              type: string
+          description: The tickers not covered, under not_covered, with what is covered (covered_issuers, also_covered and hint). Absent when every ticker is covered.
+        not_comparable:
+          type: array
+          items:
+            type: object
+            additionalProperties: true
+            required:
+            - ticker
+            - why
+            properties:
+              ticker:
+                type: string
+              why:
+                type: string
+              fund_file:
+                type: string
+          description: 'The funds set aside, each with why and the address of its file (fund_file): a leveraged, inverse or other derivative-based fund, a trust or pool, a multi-asset, sponsor-file or prospectus-only fund, or a bond fund beside a stock fund.'
+        pairs:
+          type: array
+          items:
+            type: object
+            additionalProperties: true
+            required:
+            - pair
+            - by_weight
+            properties:
+              pair:
+                type: array
+                items:
+                  type: string
+              by_weight:
+                type:
+                - number
+                - 'null'
+              share_of_first:
+                type:
+                - number
+                - 'null'
+              share_of_second:
+                type:
+                - number
+                - 'null'
+              companies_in_both:
+                type:
+                - integer
+                - 'null'
+              issuers_in_both:
+                type:
+                - integer
+                - 'null'
+              same_ticker_two_companies:
+                type: array
+                items:
+                  type: string
+          description: 'Every pair of the funds holding shares, the largest overlap by weight first: pair, by_weight, share_of_first, share_of_second and companies_in_both, as overlap gives them for two funds, and same_ticker_two_companies when a ticker stands for two companies.'
+        same_ticker_note:
+          type: string
+          description: What same_ticker_two_companies means, when a pair has it.
+        issuer_overlap_pairs:
+          type: array
+          items:
+            type: object
+            additionalProperties: true
+            required:
+            - pair
+            - by_weight
+            properties:
+              pair:
+                type: array
+                items:
+                  type: string
+              by_weight:
+                type:
+                - number
+                - 'null'
+              share_of_first:
+                type:
+                - number
+                - 'null'
+              share_of_second:
+                type:
+                - number
+                - 'null'
+              companies_in_both:
+                type:
+                - integer
+                - 'null'
+              issuers_in_both:
+                type:
+                - integer
+                - 'null'
+              same_ticker_two_companies:
+                type: array
+                items:
+                  type: string
+          description: 'Every pair of the fixed income funds by issuer overlap, largest first: pair, by_weight, share_of_first, share_of_second, issuers_in_both. Never mixed with pairs.'
+        issuer_overlap_note:
+          type: string
+          description: How to read issuer_overlap_pairs, when there are some.
+        how_to_quote:
+          type: string
+          description: 'How to quote the figures: which measure, with the holdings dates.'
+        renamed:
+          type: object
+          additionalProperties:
+            type: string
+          description: Each ticker asked that a fund had before it was renamed, with its ticker now, under which the answer reads and names it. Absent when there is none.
+        source:
+          type: object
+          additionalProperties: true
+          required:
+          - provider
+          - links
+          - license
+          - cite_as
+          properties:
+            provider:
+              type: string
+            license:
+              type: string
+            cite_as:
+              type: string
+            benchmark_url:
+              type: string
+            links:
+              type: array
+              items:
+                type: object
+                additionalProperties: true
+                required:
+                - ticker
+                - page_url
+                - api_url
+                - holdings_source
+                properties:
+                  ticker:
+                    type: string
+                  page_url:
+                    type:
+                    - string
+                    - 'null'
+                  api_url:
+                    type: string
+                  holdings_source:
+                    type: string
+                  filing_url:
+                    type: string
+                  sponsor_page:
+                    type: string
+          description: 'The files the answer is computed from: each fund''s page_url, null without a page, api_url, holdings_source and, for a fund from a filing, filing_url; benchmark_url, SPY''s file, when a one-year beta is computed; license; and cite_as, the line to print under a figure.'
+        note:
+          type: string
+          description: Measurement, not investment advice.
+        license:
+          type: string
+          description: The licence the data is published under.
+        attribution:
+          type: string
+          description: 'How to credit the data: a link to the page of a fund the figure comes from, or to this address, where the medium allows one, the name where it does not.'
+        docs:
+          type: string
+          description: The reference of this endpoint.
+      required:
+      - kind
+      - note
+      - license
+      - attribution
+      - docs
+    BadRequest:
+      type: object
+      additionalProperties: true
+      properties:
+        error:
+          type: string
+          const: bad_request
+          description: Always bad_request.
+        reason:
+          type: string
+          enum:
+          - missing_parameter
+          - unknown_parameter
+          - repeated_parameter
+          - invalid_value
+          - too_few_funds
+          - too_many_funds
+          - too_large
+          - no_price_history
+          description: missing_parameter, unknown_parameter, repeated_parameter, invalid_value, too_few_funds, too_many_funds, too_large, a call past the limits of its endpoint (see limit and asked), or no_price_history, Find with no fund held that has weekly returns here.
+        message:
+          type: string
+          description: What to fix, in words.
+        parameter:
+          type: string
+          description: The parameter to fix. Absent with too_large.
+        min:
+          type: integer
+          description: 'With too_few_funds: the fewest funds the parameter takes.'
+        max:
+          type: integer
+          description: 'With too_many_funds: the most funds the parameter takes.'
+        limit:
+          type: object
+          additionalProperties:
+            type: integer
+          description: 'With too_large: the limit the call passed, as chars (the size of the files read, in bytes, a file of the other layers for a third of it), pairs (the holdings overlap compares), holdings (those a look-through or diversify reads), comparisons (those of diversify''s overlaps) or subrequests (the reads of files and of the edge cache one call makes).'
+        asked:
+          type: object
+          additionalProperties:
+            type: integer
+          description: 'With too_large: the call''s own figure for that limit.'
+        files:
+          type: object
+          additionalProperties:
+            type: integer
+          description: 'With too_large past limit.chars: what each fund''s file weighed, by ticker, in the units of chars (diversify''s asked.chars adds the reference file''s), so that a client can drop the largest.'
+        holdings_by_fund:
+          type: object
+          additionalProperties:
+            type: integer
+          description: 'With too_large on diversify past limit.holdings or limit.comparisons: the lines of each fund counted, by ticker (before any fund is read, those with a compact file).'
+        answered_by:
+          type: object
+          additionalProperties: true
+          description: 'With too_large from overlap or lookthrough, what answers the same question, as the message names it: mcp, the MCP server''s tool (url, tool, arguments); for two funds diversify answers, diversify and page; for a portfolio whose x-ray the site writes, page.'
+        docs:
+          type: string
+          description: The reference of this endpoint.
+      required:
+      - error
+      - reason
+      - message
+      - docs
+    Unavailable:
+      type: object
+      additionalProperties: true
+      required:
+      - error
+      - message
+      - status
+      - uptime
+      properties:
+        error:
+          type: string
+          const: unavailable
+        message:
+          type: string
+        status:
+          type: string
+          description: The nightly report.
+        uptime:
+          type: string
+          description: 'The live checks: whether the site fails its own checks.'
+externalDocs:
+  description: The reference, with examples and recipes
+  url: https://tickerinside.com/api/

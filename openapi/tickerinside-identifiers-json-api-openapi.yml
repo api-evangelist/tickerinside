@@ -1,0 +1,291 @@
+openapi: 3.2.0
+info:
+  title: TickerInside Identifiers.json API
+  version: '1'
+  summary: Holdings of 5,433 US ETFs, which ETFs hold a stock, and overlap, as static JSON.
+  description: TickerInside is an open, machine-readable database of US ETF holdings, with the source and date of each holding.
+  termsOfService: https://tickerinside.com/terms/
+  contact:
+    name: TickerInside
+    email: contact@tickerinside.com
+    url: https://tickerinside.com/api/
+  license:
+    name: CC BY 4.0
+    identifier: CC-BY-4.0
+servers:
+- url: https://tickerinside.com/api/v1
+  description: Static JSON files, and five answers computed from them when asked. No key.
+security: []
+tags:
+- name: Identifiers.json
+paths:
+  /identifiers.json:
+    get:
+      operationId: getIdentifiers
+      summary: Identifiers that outlive a ticker
+      description: 'One row for each of the 10,852 funds and stocks with a file here: ticker, name, asset type, the exchange it is listed on, its composite and share class FIGIs from OpenFIGI, its SEC CIK and, for a fund, its SEC series and class ids, in one file of 1.3 MB, and the same rows in /api/v1/identifiers.csv. A ticker can change, and a ticker given up can pass to another security. Key your records on the composite FIGI or, for a fund, its SEC class id, not on the ticker: neither changes with the ticker nor passes to another security. A CIK names the company or trust that files with the SEC, and several securities can share one. Of them, 10,753 have a FIGI, 9,831 a CIK and 5,425 a series id; a field is null where its source does not list the security yet. Each fund and stock file carries its row''s values under identifiers.'
+      externalDocs:
+        url: https://tickerinside.com/api/#identifiers
+      responses:
+        '200':
+          description: 'The file. The example is a real answer, shortened: long lists and maps keep their first entries.'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Identifiers'
+              example:
+                read_on: '2026-10-12'
+                count: 10852
+                note: 'One row per fund and stock with a file here, the columns in the order of fields: the ticker, the name its file gives, asset_type (etf, etn or stock), the exchange it is listed on, its composite FIGI (the US listing) and share class FIGI, its SEC CIK (for a fund, that of the registrant that files for it) and, for a fund, its SEC series and class ids. A ticker can change, and a ticker given up can pass to another security. Key your records on the composite FIGI or, for a fund, its SEC class id, not on the ticker: neither changes with the ticker nor passes to another security. A CIK names the company or trust that files with the SEC, and several securities can share one. A field is null where its source does not list the security yet. The same values are in each fund and stock file, under identifiers.'
+                fields:
+                - ticker
+                - name
+                - asset_type
+                counts:
+                  securities: 10852
+                  etf: 5797
+                  etn: 15
+                  stock: 5040
+                  exchange: 10755
+                  composite_figi: 10753
+                  share_class_figi: 10753
+                  cik: 9831
+                  series_id: 5425
+                  class_id: 4638
+                sources:
+                - name: OpenFIGI
+                  url: https://api.openfigi.com/v3/mapping
+                  fields:
+                  - composite_figi
+                  - share_class_figi
+                  read_on: '2026-10-12'
+                  terms: 'FIGIs are in the public domain under OpenFIGI''s terms: https://www.openfigi.com/docs/terms-of-service'
+                - name: SEC company tickers
+                  url: https://www.sec.gov/files/company_tickers_exchange.json
+                  fields:
+                  - cik
+                  read_on: '2026-10-12'
+                - name: SEC fund tickers
+                  url: https://www.sec.gov/files/company_tickers_mf.json
+                  fields:
+                  - cik
+                  - series_id
+                  - class_id
+                  read_on: '2026-10-12'
+                securities:
+                - - A
+                  - Agilent Technologies
+                  - stock
+                - - AA
+                  - Alcoa Corporation
+                  - stock
+                - - AAA
+                  - Alternative Access First Priority CLO Bond ETF
+                  - etf
+                license: CC BY 4.0
+                attribution: Credit TickerInside with a link to this file, or to the page that shows the figure, wherever the medium allows a link, and by name where it does not. How you mark the link is up to you.
+        '304':
+          description: 'Not modified: the ETag of your copy, sent in If-None-Match, is still current. Files are cached five minutes.'
+        '503':
+          description: 'The file could not be served just then: retry after a minute. uptime says whether the site fails its own checks.'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Unavailable'
+      tags:
+      - Identifiers.json
+components:
+  schemas:
+    Identifiers:
+      type: object
+      properties:
+        read_on:
+          type:
+          - string
+          - 'null'
+          description: The day the sources were last read. Each source's own date is in sources.
+        count:
+          type:
+          - integer
+          - 'null'
+          description: How many securities are listed, the length of securities.
+        note:
+          type:
+          - string
+          - 'null'
+          description: How to read the rows.
+        fields:
+          type:
+          - array
+          - 'null'
+          items:
+            type:
+            - 'null'
+            - string
+          description: 'The names of the columns of each row, in their order: ticker, name, then the fields of the identifiers object a fund or stock file carries.'
+        counts:
+          type: object
+          properties:
+            securities:
+              type:
+              - integer
+              - 'null'
+            etf:
+              type:
+              - integer
+              - 'null'
+            etn:
+              type:
+              - integer
+              - 'null'
+            stock:
+              type:
+              - integer
+              - 'null'
+            exchange:
+              type:
+              - integer
+              - 'null'
+            composite_figi:
+              type:
+              - integer
+              - 'null'
+            share_class_figi:
+              type:
+              - integer
+              - 'null'
+            cik:
+              type:
+              - integer
+              - 'null'
+            series_id:
+              type:
+              - integer
+              - 'null'
+            class_id:
+              type:
+              - integer
+              - 'null'
+          additionalProperties: true
+          description: How many rows there are, by asset_type, and how many have each field.
+        sources:
+          type:
+          - array
+          - 'null'
+          items:
+            type: object
+            properties:
+              name:
+                type:
+                - string
+                - 'null'
+              url:
+                type:
+                - string
+                - 'null'
+              fields:
+                type:
+                - array
+                - 'null'
+                items:
+                  type:
+                  - 'null'
+                  - string
+              read_on:
+                type:
+                - string
+                - 'null'
+              terms:
+                type:
+                - string
+                - 'null'
+            additionalProperties: true
+          description: 'Where each column comes from: name, url, the fields it gives, read_on (for the directory, the date of its file) and, for OpenFIGI, its terms.'
+        securities:
+          type:
+          - array
+          - 'null'
+          items:
+            type: array
+            prefixItems:
+            - title: ticker
+              type: string
+            - title: name
+              type:
+              - string
+              - 'null'
+            - title: asset_type
+              type: string
+            - title: exchange
+              type:
+              - string
+              - 'null'
+            - title: composite_figi
+              type:
+              - string
+              - 'null'
+            - title: share_class_figi
+              type:
+              - string
+              - 'null'
+            - title: cik
+              type:
+              - string
+              - 'null'
+            - title: series_id
+              type:
+              - string
+              - 'null'
+            - title: class_id
+              type:
+              - string
+              - 'null'
+            items:
+              type:
+              - 'null'
+              - string
+          description: 'One row per fund and stock with a file here, in ticker order, in the columns of fields: [ticker, name, asset_type, exchange, composite_figi, share_class_figi, cik, series_id, class_id]. A fund''s file is /api/v1/fund/{ticker}.json, a stock''s /api/v1/sec/{ticker}.json.'
+        license:
+          type:
+          - string
+          - 'null'
+          description: The licence the data is published under.
+        attribution:
+          type:
+          - string
+          - 'null'
+          description: 'How to credit the data: a link to this file where the medium allows one, the name where it does not.'
+      additionalProperties: true
+      required:
+      - read_on
+      - count
+      - note
+      - fields
+      - counts
+      - sources
+      - securities
+      - license
+      - attribution
+    Unavailable:
+      type: object
+      additionalProperties: true
+      required:
+      - error
+      - message
+      - status
+      - uptime
+      properties:
+        error:
+          type: string
+          const: unavailable
+        message:
+          type: string
+        status:
+          type: string
+          description: The nightly report.
+        uptime:
+          type: string
+          description: 'The live checks: whether the site fails its own checks.'
+externalDocs:
+  description: The reference, with examples and recipes
+  url: https://tickerinside.com/api/

@@ -1,0 +1,1375 @@
+{
+  "@context": {
+    "@vocab": "https://tickerinside.com/schema#",
+    "schema": "https://schema.org/",
+    "xsd": "http://www.w3.org/2001/XMLSchema#",
+    "dcterms": "http://purl.org/dc/terms/",
+    "tickerinside": "https://tickerinside.com/schema#",
+    "Index": "tickerinside:Index",
+    "as_of": {
+      "@id": "tickerinside:as_of",
+      "@type": "xsd:string"
+    },
+    "coverage": {
+      "@id": "tickerinside:coverage"
+    },
+    "endpoints": {
+      "@id": "tickerinside:endpoints"
+    },
+    "tickers": {
+      "@id": "tickerinside:tickers",
+      "@container": "@list"
+    },
+    "tickers_sec": {
+      "@id": "tickerinside:tickers_sec",
+      "@container": "@list"
+    },
+    "tickers_derivative": {
+      "@id": "tickerinside:tickers_derivative",
+      "@container": "@list"
+    },
+    "tickers_trust": {
+      "@id": "tickerinside:tickers_trust",
+      "@container": "@list"
+    },
+    "tickers_bond": {
+      "@id": "tickerinside:tickers_bond",
+      "@container": "@list"
+    },
+    "tickers_multi_asset": {
+      "@id": "tickerinside:tickers_multi_asset",
+      "@container": "@list"
+    },
+    "tickers_sponsor": {
+      "@id": "tickerinside:tickers_sponsor",
+      "@container": "@list"
+    },
+    "tickers_prospectus": {
+      "@id": "tickerinside:tickers_prospectus",
+      "@container": "@list"
+    },
+    "written_comparisons": {
+      "@id": "tickerinside:written_comparisons",
+      "@container": "@list"
+    },
+    "without_file": {
+      "@id": "tickerinside:without_file"
+    },
+    "docs": {
+      "@id": "tickerinside:docs",
+      "@type": "xsd:string"
+    },
+    "license": {
+      "@id": "tickerinside:license",
+      "@type": "xsd:string"
+    },
+    "attribution": {
+      "@id": "tickerinside:attribution",
+      "@type": "xsd:string"
+    },
+    "terms": {
+      "@id": "tickerinside:terms",
+      "@type": "xsd:string"
+    },
+    "Fund": "tickerinside:Fund",
+    "ticker": {
+      "@id": "tickerinside:ticker",
+      "@type": "xsd:string"
+    },
+    "name": {
+      "@id": "tickerinside:name",
+      "@type": "xsd:string"
+    },
+    "page_url": {
+      "@id": "tickerinside:page_url",
+      "@type": "xsd:string"
+    },
+    "cite_as": {
+      "@id": "tickerinside:cite_as",
+      "@type": "xsd:string"
+    },
+    "cite_html": {
+      "@id": "tickerinside:cite_html",
+      "@type": "xsd:string"
+    },
+    "identifiers": {
+      "@id": "tickerinside:identifiers"
+    },
+    "source_layer": {
+      "@id": "tickerinside:source_layer",
+      "@type": "xsd:string"
+    },
+    "category": {
+      "@id": "tickerinside:category"
+    },
+    "holdings_as_of": {
+      "@id": "tickerinside:holdings_as_of",
+      "@type": "xsd:string"
+    },
+    "expense_ratio": {
+      "@id": "tickerinside:expense_ratio",
+      "@type": "xsd:decimal"
+    },
+    "expense_ratio_gross": {
+      "@id": "tickerinside:expense_ratio_gross",
+      "@type": "xsd:decimal"
+    },
+    "expense_ratio_source": {
+      "@id": "tickerinside:expense_ratio_source",
+      "@type": "xsd:string"
+    },
+    "expense_ratio_as_of": {
+      "@id": "tickerinside:expense_ratio_as_of",
+      "@type": "xsd:string"
+    },
+    "expense_ratio_filing_url": {
+      "@id": "tickerinside:expense_ratio_filing_url",
+      "@type": "xsd:string"
+    },
+    "yield": {
+      "@id": "tickerinside:yield",
+      "@type": "xsd:decimal"
+    },
+    "aum_b": {
+      "@id": "tickerinside:aum_b",
+      "@type": "xsd:decimal"
+    },
+    "aum_source": {
+      "@id": "tickerinside:aum_source",
+      "@type": "xsd:string"
+    },
+    "aum_date": {
+      "@id": "tickerinside:aum_date",
+      "@type": "xsd:string"
+    },
+    "etf_class_net_assets_b": {
+      "@id": "tickerinside:etf_class_net_assets_b",
+      "@type": "xsd:decimal"
+    },
+    "etf_class_net_assets_as_of": {
+      "@id": "tickerinside:etf_class_net_assets_as_of",
+      "@type": "xsd:string"
+    },
+    "positions": {
+      "@id": "tickerinside:positions",
+      "@type": "xsd:integer"
+    },
+    "breakdown": {
+      "@id": "tickerinside:breakdown"
+    },
+    "vol": {
+      "@id": "tickerinside:vol",
+      "@type": "xsd:decimal"
+    },
+    "beta": {
+      "@id": "tickerinside:beta",
+      "@type": "xsd:decimal"
+    },
+    "mdd3": {
+      "@id": "tickerinside:mdd3",
+      "@type": "xsd:decimal"
+    },
+    "r1": {
+      "@id": "tickerinside:r1",
+      "@type": "xsd:decimal"
+    },
+    "r3": {
+      "@id": "tickerinside:r3",
+      "@type": "xsd:decimal"
+    },
+    "r5": {
+      "@id": "tickerinside:r5",
+      "@type": "xsd:decimal"
+    },
+    "last_close": {
+      "@id": "tickerinside:last_close",
+      "@type": "xsd:decimal"
+    },
+    "last_close_date": {
+      "@id": "tickerinside:last_close_date",
+      "@type": "xsd:string"
+    },
+    "day_change_pct": {
+      "@id": "tickerinside:day_change_pct",
+      "@type": "xsd:decimal"
+    },
+    "high_52w": {
+      "@id": "tickerinside:high_52w",
+      "@type": "xsd:decimal"
+    },
+    "low_52w": {
+      "@id": "tickerinside:low_52w",
+      "@type": "xsd:decimal"
+    },
+    "currency": {
+      "@id": "tickerinside:currency",
+      "@type": "xsd:string"
+    },
+    "holdings": {
+      "@id": "tickerinside:holdings"
+    },
+    "weekly": {
+      "@id": "tickerinside:weekly",
+      "@container": "@list"
+    },
+    "weeks_end": {
+      "@id": "tickerinside:weeks_end",
+      "@type": "xsd:string"
+    },
+    "source": {
+      "@id": "tickerinside:source",
+      "@type": "xsd:string"
+    },
+    "report_date": {
+      "@id": "tickerinside:report_date",
+      "@type": "xsd:string"
+    },
+    "filed": {
+      "@id": "tickerinside:filed",
+      "@type": "xsd:string"
+    },
+    "filing_url": {
+      "@id": "tickerinside:filing_url",
+      "@type": "xsd:string"
+    },
+    "net_assets": {
+      "@id": "tickerinside:net_assets",
+      "@type": "xsd:integer"
+    },
+    "multi_class": {
+      "@id": "tickerinside:multi_class",
+      "@type": "xsd:boolean"
+    },
+    "stock_pct": {
+      "@id": "tickerinside:stock_pct",
+      "@type": "xsd:decimal"
+    },
+    "unmapped_pct": {
+      "@id": "tickerinside:unmapped_pct",
+      "@type": "xsd:decimal"
+    },
+    "abroad": {
+      "@id": "tickerinside:abroad",
+      "@container": "@list"
+    },
+    "holdings_kind": {
+      "@id": "tickerinside:holdings_kind",
+      "@type": "xsd:string"
+    },
+    "listed_pct": {
+      "@id": "tickerinside:listed_pct",
+      "@type": "xsd:decimal"
+    },
+    "etf_file": {
+      "@id": "tickerinside:etf_file",
+      "@type": "xsd:string"
+    },
+    "LayerFund": "tickerinside:LayerFund",
+    "derivative_positions": {
+      "@id": "tickerinside:derivative_positions",
+      "@type": "xsd:integer"
+    },
+    "held_outright": {
+      "@id": "tickerinside:held_outright"
+    },
+    "summary": {
+      "@id": "tickerinside:summary",
+      "@type": "xsd:string"
+    },
+    "composition": {
+      "@id": "tickerinside:composition",
+      "@container": "@list"
+    },
+    "derivatives": {
+      "@id": "tickerinside:derivatives",
+      "@container": "@list"
+    },
+    "underlyings": {
+      "@id": "tickerinside:underlyings",
+      "@container": "@list"
+    },
+    "exposure": {
+      "@id": "tickerinside:exposure"
+    },
+    "exposure_notes": {
+      "@id": "tickerinside:exposure_notes",
+      "@container": "@list"
+    },
+    "structure": {
+      "@id": "tickerinside:structure",
+      "@type": "xsd:string"
+    },
+    "source_form": {
+      "@id": "tickerinside:source_form",
+      "@type": "xsd:string"
+    },
+    "target": {
+      "@id": "tickerinside:target"
+    },
+    "filing_lines": {
+      "@id": "tickerinside:filing_lines",
+      "@type": "xsd:integer"
+    },
+    "fixed_income": {
+      "@id": "tickerinside:fixed_income"
+    },
+    "lines": {
+      "@id": "tickerinside:lines",
+      "@container": "@list"
+    },
+    "notes": {
+      "@id": "tickerinside:notes",
+      "@container": "@list"
+    },
+    "sponsor": {
+      "@id": "tickerinside:sponsor",
+      "@type": "xsd:string"
+    },
+    "source_url": {
+      "@id": "tickerinside:source_url",
+      "@type": "xsd:string"
+    },
+    "file_date": {
+      "@id": "tickerinside:file_date",
+      "@type": "xsd:string"
+    },
+    "date_from": {
+      "@id": "tickerinside:date_from",
+      "@type": "xsd:string"
+    },
+    "read_on": {
+      "@id": "tickerinside:read_on",
+      "@type": "xsd:string"
+    },
+    "served_from_earlier_file": {
+      "@id": "tickerinside:served_from_earlier_file",
+      "@type": "xsd:boolean"
+    },
+    "file_lines": {
+      "@id": "tickerinside:file_lines",
+      "@type": "xsd:integer"
+    },
+    "lines_total": {
+      "@id": "tickerinside:lines_total",
+      "@type": "xsd:integer"
+    },
+    "form": {
+      "@id": "tickerinside:form",
+      "@type": "xsd:string"
+    },
+    "registrant": {
+      "@id": "tickerinside:registrant",
+      "@type": "xsd:string"
+    },
+    "objective": {
+      "@id": "tickerinside:objective",
+      "@type": "xsd:string"
+    },
+    "objective_is_quoted": {
+      "@id": "tickerinside:objective_is_quoted",
+      "@type": "xsd:boolean"
+    },
+    "objective_cut": {
+      "@id": "tickerinside:objective_cut",
+      "@type": "xsd:boolean"
+    },
+    "stated_target": {
+      "@id": "tickerinside:stated_target"
+    },
+    "index": {
+      "@id": "tickerinside:index"
+    },
+    "expense_ratio_pct": {
+      "@id": "tickerinside:expense_ratio_pct",
+      "@type": "xsd:decimal"
+    },
+    "inception_date": {
+      "@id": "tickerinside:inception_date"
+    },
+    "holdings_note": {
+      "@id": "tickerinside:holdings_note",
+      "@type": "xsd:string"
+    },
+    "Security": "tickerinside:Security",
+    "sector": {
+      "@id": "tickerinside:sector",
+      "@type": "xsd:string"
+    },
+    "industry": {
+      "@id": "tickerinside:industry",
+      "@type": "xsd:string"
+    },
+    "page": {
+      "@id": "tickerinside:page",
+      "@type": "xsd:boolean"
+    },
+    "cap_b": {
+      "@id": "tickerinside:cap_b",
+      "@type": "xsd:decimal"
+    },
+    "pe": {
+      "@id": "tickerinside:pe",
+      "@type": "xsd:decimal"
+    },
+    "calendar": {
+      "@id": "tickerinside:calendar"
+    },
+    "held_by": {
+      "@id": "tickerinside:held_by",
+      "@type": "xsd:integer"
+    },
+    "heaviest": {
+      "@id": "tickerinside:heaviest",
+      "@container": "@list"
+    },
+    "held_by_sec_nport": {
+      "@id": "tickerinside:held_by_sec_nport",
+      "@type": "xsd:integer"
+    },
+    "holders": {
+      "@id": "tickerinside:holders",
+      "@container": "@list"
+    },
+    "holders_sec_nport": {
+      "@id": "tickerinside:holders_sec_nport",
+      "@container": "@list"
+    },
+    "synthetic_exposure": {
+      "@id": "tickerinside:synthetic_exposure",
+      "@container": "@list"
+    },
+    "left_out": {
+      "@id": "tickerinside:left_out",
+      "@container": "@list"
+    },
+    "same_code_abroad": {
+      "@id": "tickerinside:same_code_abroad",
+      "@container": "@list"
+    },
+    "earlier_key_reads_as": {
+      "@id": "tickerinside:earlier_key_reads_as",
+      "@container": "@list"
+    },
+    "etf_ownership": {
+      "@id": "tickerinside:etf_ownership"
+    },
+    "holders_all": {
+      "@id": "tickerinside:holders_all",
+      "@container": "@list"
+    },
+    "rank_summary": {
+      "@id": "tickerinside:rank_summary"
+    },
+    "top_by_value": {
+      "@id": "tickerinside:top_by_value",
+      "@container": "@list"
+    },
+    "membership": {
+      "@id": "tickerinside:membership",
+      "@container": "@list"
+    },
+    "by_issuer": {
+      "@id": "tickerinside:by_issuer",
+      "@container": "@list"
+    },
+    "fee_per_1000": {
+      "@id": "tickerinside:fee_per_1000",
+      "@container": "@list"
+    },
+    "name_collision": {
+      "@id": "tickerinside:name_collision"
+    },
+    "answer": {
+      "@id": "tickerinside:answer",
+      "@type": "xsd:string"
+    },
+    "least_correlated": {
+      "@id": "tickerinside:least_correlated",
+      "@container": "@list"
+    },
+    "most_correlated": {
+      "@id": "tickerinside:most_correlated",
+      "@container": "@list"
+    },
+    "Ownership": "tickerinside:Ownership",
+    "method": {
+      "@id": "tickerinside:method",
+      "@type": "xsd:string"
+    },
+    "method_url": {
+      "@id": "tickerinside:method_url",
+      "@type": "xsd:string"
+    },
+    "count": {
+      "@id": "tickerinside:count",
+      "@type": "xsd:integer"
+    },
+    "note": {
+      "@id": "tickerinside:note",
+      "@type": "xsd:string"
+    },
+    "stocks": {
+      "@id": "tickerinside:stocks",
+      "@container": "@list"
+    },
+    "refused": {
+      "@id": "tickerinside:refused"
+    },
+    "refused_reasons": {
+      "@id": "tickerinside:refused_reasons"
+    },
+    "top10_share": {
+      "@id": "tickerinside:top10_share"
+    },
+    "most_widely_held": {
+      "@id": "tickerinside:most_widely_held",
+      "@container": "@list"
+    },
+    "held_back": {
+      "@id": "tickerinside:held_back"
+    },
+    "Methods": "tickerinside:Methods",
+    "methods": {
+      "@id": "tickerinside:methods",
+      "@container": "@list"
+    },
+    "Compare": "tickerinside:Compare",
+    "pair": {
+      "@id": "tickerinside:pair",
+      "@container": "@list"
+    },
+    "overlap": {
+      "@id": "tickerinside:overlap"
+    },
+    "correlation": {
+      "@id": "tickerinside:correlation"
+    },
+    "funds": {
+      "@id": "tickerinside:funds"
+    },
+    "Funds": "tickerinside:Funds",
+    "with_a_page": {
+      "@id": "tickerinside:with_a_page",
+      "@type": "xsd:integer"
+    },
+    "sec_count": {
+      "@id": "tickerinside:sec_count",
+      "@type": "xsd:integer"
+    },
+    "sec_note": {
+      "@id": "tickerinside:sec_note",
+      "@type": "xsd:string"
+    },
+    "sec_funds": {
+      "@id": "tickerinside:sec_funds",
+      "@container": "@list"
+    },
+    "sponsor_funds": {
+      "@id": "tickerinside:sponsor_funds",
+      "@container": "@list"
+    },
+    "prospectus_funds": {
+      "@id": "tickerinside:prospectus_funds",
+      "@container": "@list"
+    },
+    "bond_funds": {
+      "@id": "tickerinside:bond_funds",
+      "@container": "@list"
+    },
+    "multi_asset_funds": {
+      "@id": "tickerinside:multi_asset_funds",
+      "@container": "@list"
+    },
+    "derivative_funds": {
+      "@id": "tickerinside:derivative_funds",
+      "@container": "@list"
+    },
+    "trust_funds": {
+      "@id": "tickerinside:trust_funds",
+      "@container": "@list"
+    },
+    "Universe": "tickerinside:Universe",
+    "available": {
+      "@id": "tickerinside:available",
+      "@type": "xsd:boolean"
+    },
+    "sentence": {
+      "@id": "tickerinside:sentence",
+      "@type": "xsd:string"
+    },
+    "layers": {
+      "@id": "tickerinside:layers"
+    },
+    "reasons": {
+      "@id": "tickerinside:reasons"
+    },
+    "Holders": "tickerinside:Holders",
+    "securities": {
+      "@id": "tickerinside:securities",
+      "@type": "xsd:integer"
+    },
+    "names": {
+      "@id": "tickerinside:names"
+    },
+    "aliases": {
+      "@id": "tickerinside:aliases"
+    },
+    "HoldersShard": "tickerinside:HoldersShard",
+    "facts": {
+      "@id": "tickerinside:facts"
+    },
+    "sec_nport_as_of": {
+      "@id": "tickerinside:sec_nport_as_of"
+    },
+    "Securities": "tickerinside:Securities",
+    "Identifiers": "tickerinside:Identifiers",
+    "fields": {
+      "@id": "tickerinside:fields",
+      "@container": "@list"
+    },
+    "counts": {
+      "@id": "tickerinside:counts"
+    },
+    "sources": {
+      "@id": "tickerinside:sources",
+      "@container": "@list"
+    },
+    "DiversifyList": "tickerinside:DiversifyList",
+    "list_date": {
+      "@id": "tickerinside:list_date",
+      "@type": "xsd:string"
+    },
+    "about": {
+      "@id": "tickerinside:about",
+      "@type": "xsd:string"
+    },
+    "left_out_on_purpose": {
+      "@id": "tickerinside:left_out_on_purpose",
+      "@container": "@list"
+    },
+    "rule": {
+      "@id": "tickerinside:rule",
+      "@type": "xsd:string"
+    },
+    "top": {
+      "@id": "tickerinside:top",
+      "@type": "xsd:integer"
+    },
+    "min_weeks": {
+      "@id": "tickerinside:min_weeks",
+      "@type": "xsd:integer"
+    },
+    "groups": {
+      "@id": "tickerinside:groups",
+      "@container": "@list"
+    },
+    "unit": {
+      "@id": "tickerinside:unit",
+      "@type": "xsd:string"
+    },
+    "left_out_tonight": {
+      "@id": "tickerinside:left_out_tonight",
+      "@container": "@list"
+    },
+    "reference_weight": {
+      "@id": "tickerinside:reference_weight",
+      "@type": "xsd:integer"
+    },
+    "DiversifyWeekly": "tickerinside:DiversifyWeekly",
+    "t": {
+      "@id": "tickerinside:t",
+      "@type": "xsd:string"
+    },
+    "n": {
+      "@id": "tickerinside:n",
+      "@type": "xsd:string"
+    },
+    "size": {
+      "@id": "tickerinside:size",
+      "@type": "xsd:integer"
+    },
+    "l": {
+      "@id": "tickerinside:l",
+      "@type": "xsd:string"
+    },
+    "h": {
+      "@id": "tickerinside:h",
+      "@type": "xsd:string"
+    },
+    "bd": {
+      "@id": "tickerinside:bd"
+    },
+    "comp": {
+      "@id": "tickerinside:comp",
+      "@container": "@list"
+    },
+    "w": {
+      "@id": "tickerinside:w",
+      "@container": "@list"
+    },
+    "end": {
+      "@id": "tickerinside:end",
+      "@type": "xsd:string"
+    },
+    "solo": {
+      "@id": "tickerinside:solo"
+    },
+    "Status": "tickerinside:Status",
+    "built_at": {
+      "@id": "tickerinside:built_at",
+      "@type": "xsd:string"
+    },
+    "run": {
+      "@id": "tickerinside:run"
+    },
+    "data": {
+      "@id": "tickerinside:data"
+    },
+    "pages": {
+      "@id": "tickerinside:pages"
+    },
+    "versions": {
+      "@id": "tickerinside:versions"
+    },
+    "live": {
+      "@id": "tickerinside:live",
+      "@type": "xsd:string"
+    },
+    "Uptime": "tickerinside:Uptime",
+    "generated_at": {
+      "@id": "tickerinside:generated_at",
+      "@type": "xsd:string"
+    },
+    "deployed": {
+      "@id": "tickerinside:deployed"
+    },
+    "components": {
+      "@id": "tickerinside:components",
+      "@container": "@list"
+    },
+    "today": {
+      "@id": "tickerinside:today"
+    },
+    "days": {
+      "@id": "tickerinside:days",
+      "@container": "@list"
+    },
+    "incidents": {
+      "@id": "tickerinside:incidents",
+      "@container": "@list"
+    },
+    "status": {
+      "@id": "tickerinside:status",
+      "@type": "xsd:string"
+    },
+    "NotCovered": "tickerinside:NotCovered",
+    "error": {
+      "@id": "tickerinside:error",
+      "@type": "xsd:string"
+    },
+    "reason": {
+      "@id": "tickerinside:reason",
+      "@type": "xsd:string"
+    },
+    "message": {
+      "@id": "tickerinside:message",
+      "@type": "xsd:string"
+    },
+    "security": {
+      "@id": "tickerinside:security",
+      "@type": "xsd:string"
+    },
+    "reads_as": {
+      "@id": "tickerinside:reads_as",
+      "@container": "@list"
+    },
+    "fund": {
+      "@id": "tickerinside:fund",
+      "@type": "xsd:string"
+    },
+    "etf": {
+      "@id": "tickerinside:etf",
+      "@type": "xsd:string"
+    },
+    "fund_files": {
+      "@id": "tickerinside:fund_files",
+      "@container": "@list"
+    },
+    "covered": {
+      "@id": "tickerinside:covered",
+      "@type": "xsd:string"
+    },
+    "not_covered": {
+      "@id": "tickerinside:not_covered",
+      "@container": "@list"
+    },
+    "covered_issuers": {
+      "@id": "tickerinside:covered_issuers",
+      "@container": "@list"
+    },
+    "history": {
+      "@id": "tickerinside:history",
+      "@type": "xsd:string"
+    },
+    "changes": {
+      "@id": "tickerinside:changes",
+      "@type": "xsd:string"
+    },
+    "first": {
+      "@id": "tickerinside:first",
+      "@type": "xsd:string"
+    },
+    "date": {
+      "@id": "tickerinside:date",
+      "@type": "xsd:string"
+    },
+    "Unavailable": "tickerinside:Unavailable",
+    "uptime": {
+      "@id": "tickerinside:uptime",
+      "@type": "xsd:string"
+    },
+    "HistoryIndex": "tickerinside:HistoryIndex",
+    "since": {
+      "@id": "tickerinside:since",
+      "@type": "xsd:string"
+    },
+    "holdings_at": {
+      "@id": "tickerinside:holdings_at",
+      "@type": "xsd:string"
+    },
+    "FundHistory": "tickerinside:FundHistory",
+    "key_scheme": {
+      "@id": "tickerinside:key_scheme",
+      "@type": "xsd:integer"
+    },
+    "last": {
+      "@id": "tickerinside:last",
+      "@type": "xsd:string"
+    },
+    "file_dates": {
+      "@id": "tickerinside:file_dates",
+      "@type": "xsd:integer"
+    },
+    "cadence": {
+      "@id": "tickerinside:cadence",
+      "@type": "xsd:string"
+    },
+    "snapshots": {
+      "@id": "tickerinside:snapshots"
+    },
+    "moved_threshold_pp": {
+      "@id": "tickerinside:moved_threshold_pp",
+      "@type": "xsd:decimal"
+    },
+    "traded_min_pairs": {
+      "@id": "tickerinside:traded_min_pairs",
+      "@type": "xsd:integer"
+    },
+    "traded_pairs": {
+      "@id": "tickerinside:traded_pairs",
+      "@type": "xsd:integer"
+    },
+    "traded_pp_from": {
+      "@id": "tickerinside:traded_pp_from",
+      "@type": "xsd:string"
+    },
+    "traded_pp_reason": {
+      "@id": "tickerinside:traded_pp_reason",
+      "@type": "xsd:string"
+    },
+    "overlap_history": {
+      "@id": "tickerinside:overlap_history"
+    },
+    "ended": {
+      "@id": "tickerinside:ended"
+    },
+    "HistoryChange": "tickerinside:HistoryChange",
+    "previous": {
+      "@id": "tickerinside:previous",
+      "@type": "xsd:string"
+    },
+    "entered": {
+      "@id": "tickerinside:entered",
+      "@container": "@list"
+    },
+    "exited": {
+      "@id": "tickerinside:exited",
+      "@container": "@list"
+    },
+    "moved": {
+      "@id": "tickerinside:moved",
+      "@container": "@list"
+    },
+    "moved_below_threshold": {
+      "@id": "tickerinside:moved_below_threshold",
+      "@type": "xsd:integer"
+    },
+    "names_turnover_pp": {
+      "@id": "tickerinside:names_turnover_pp",
+      "@type": "xsd:decimal"
+    },
+    "weights_moved_pp": {
+      "@id": "tickerinside:weights_moved_pp",
+      "@type": "xsd:decimal"
+    },
+    "traded_pp": {
+      "@id": "tickerinside:traded_pp",
+      "@type": "xsd:decimal"
+    },
+    "splits_seen": {
+      "@id": "tickerinside:splits_seen",
+      "@container": "@list"
+    },
+    "reverted": {
+      "@id": "tickerinside:reverted",
+      "@container": "@list"
+    },
+    "restated": {
+      "@id": "tickerinside:restated",
+      "@type": "xsd:boolean"
+    },
+    "rekeyed": {
+      "@id": "tickerinside:rekeyed",
+      "@container": "@list"
+    },
+    "market_added": {
+      "@id": "tickerinside:market_added",
+      "@type": "xsd:integer"
+    },
+    "coverage_added_pp": {
+      "@id": "tickerinside:coverage_added_pp",
+      "@type": "xsd:decimal"
+    },
+    "OverlapPair": "tickerinside:OverlapPair",
+    "kind": {
+      "@id": "tickerinside:kind",
+      "@type": "xsd:string"
+    },
+    "share_url": {
+      "@id": "tickerinside:share_url",
+      "@type": "xsd:string"
+    },
+    "prices_as_of": {
+      "@id": "tickerinside:prices_as_of",
+      "@type": "xsd:string"
+    },
+    "holdings_source": {
+      "@id": "tickerinside:holdings_source"
+    },
+    "overlap_kind": {
+      "@id": "tickerinside:overlap_kind",
+      "@type": "xsd:string"
+    },
+    "issuer_overlap": {
+      "@id": "tickerinside:issuer_overlap"
+    },
+    "correlation_3y": {
+      "@id": "tickerinside:correlation_3y",
+      "@type": "xsd:decimal"
+    },
+    "covariance_annualised_pct2": {
+      "@id": "tickerinside:covariance_annualised_pct2",
+      "@type": "xsd:decimal"
+    },
+    "weeks_used": {
+      "@id": "tickerinside:weeks_used",
+      "@type": "xsd:integer"
+    },
+    "how_to_quote": {
+      "@id": "tickerinside:how_to_quote",
+      "@type": "xsd:string"
+    },
+    "comparable": {
+      "@id": "tickerinside:comparable",
+      "@type": "xsd:boolean"
+    },
+    "not_comparable": {
+      "@id": "tickerinside:not_comparable",
+      "@container": "@list"
+    },
+    "renamed": {
+      "@id": "tickerinside:renamed"
+    },
+    "OverlapMatrix": "tickerinside:OverlapMatrix",
+    "computed": {
+      "@id": "tickerinside:computed",
+      "@type": "xsd:boolean"
+    },
+    "skipped": {
+      "@id": "tickerinside:skipped"
+    },
+    "pairs": {
+      "@id": "tickerinside:pairs",
+      "@container": "@list"
+    },
+    "same_ticker_note": {
+      "@id": "tickerinside:same_ticker_note",
+      "@type": "xsd:string"
+    },
+    "issuer_overlap_pairs": {
+      "@id": "tickerinside:issuer_overlap_pairs",
+      "@container": "@list"
+    },
+    "issuer_overlap_note": {
+      "@id": "tickerinside:issuer_overlap_note",
+      "@type": "xsd:string"
+    },
+    "Lookthrough": "tickerinside:Lookthrough",
+    "priced": {
+      "@id": "tickerinside:priced",
+      "@type": "xsd:boolean"
+    },
+    "portfolio_value": {
+      "@id": "tickerinside:portfolio_value",
+      "@type": "xsd:decimal"
+    },
+    "distinct_companies": {
+      "@id": "tickerinside:distinct_companies",
+      "@type": "xsd:integer"
+    },
+    "top_10_weight_pct": {
+      "@id": "tickerinside:top_10_weight_pct",
+      "@type": "xsd:decimal"
+    },
+    "looked_through_pct": {
+      "@id": "tickerinside:looked_through_pct",
+      "@type": "xsd:decimal"
+    },
+    "companies": {
+      "@id": "tickerinside:companies",
+      "@container": "@list"
+    },
+    "same_ticker_two_companies": {
+      "@id": "tickerinside:same_ticker_two_companies"
+    },
+    "not_looked_through": {
+      "@id": "tickerinside:not_looked_through",
+      "@container": "@list"
+    },
+    "Batch": "tickerinside:Batch",
+    "asked": {
+      "@id": "tickerinside:asked",
+      "@container": "@list"
+    },
+    "found": {
+      "@id": "tickerinside:found",
+      "@type": "xsd:integer"
+    },
+    "not_included": {
+      "@id": "tickerinside:not_included",
+      "@container": "@list"
+    },
+    "not_included_note": {
+      "@id": "tickerinside:not_included_note",
+      "@type": "xsd:string"
+    },
+    "Screen": "tickerinside:Screen",
+    "filters": {
+      "@id": "tickerinside:filters"
+    },
+    "sort": {
+      "@id": "tickerinside:sort",
+      "@type": "xsd:string"
+    },
+    "total": {
+      "@id": "tickerinside:total",
+      "@type": "xsd:integer"
+    },
+    "offset": {
+      "@id": "tickerinside:offset",
+      "@type": "xsd:integer"
+    },
+    "limit": {
+      "@id": "tickerinside:limit",
+      "@type": "xsd:integer"
+    },
+    "next": {
+      "@id": "tickerinside:next",
+      "@type": "xsd:string"
+    },
+    "Diversify": "tickerinside:Diversify",
+    "mode": {
+      "@id": "tickerinside:mode",
+      "@type": "xsd:string"
+    },
+    "question": {
+      "@id": "tickerinside:question",
+      "@type": "xsd:string"
+    },
+    "answers": {
+      "@id": "tickerinside:answers",
+      "@container": "@list"
+    },
+    "have": {
+      "@id": "tickerinside:have"
+    },
+    "candidates": {
+      "@id": "tickerinside:candidates",
+      "@container": "@list"
+    },
+    "ranking": {
+      "@id": "tickerinside:ranking",
+      "@type": "xsd:string"
+    },
+    "definitions": {
+      "@id": "tickerinside:definitions"
+    },
+    "api_url": {
+      "@id": "tickerinside:api_url",
+      "@type": "xsd:string"
+    },
+    "DiversifyFind": "tickerinside:DiversifyFind",
+    "list": {
+      "@id": "tickerinside:list"
+    },
+    "lowest": {
+      "@id": "tickerinside:lowest",
+      "@container": "@list"
+    },
+    "lowest_by_group": {
+      "@id": "tickerinside:lowest_by_group",
+      "@container": "@list"
+    },
+    "ranked": {
+      "@id": "tickerinside:ranked",
+      "@container": "@list"
+    },
+    "overlap_answered_by": {
+      "@id": "tickerinside:overlap_answered_by"
+    },
+    "ties": {
+      "@id": "tickerinside:ties",
+      "@container": "@list"
+    },
+    "BadRequest": "tickerinside:BadRequest",
+    "parameter": {
+      "@id": "tickerinside:parameter",
+      "@type": "xsd:string"
+    },
+    "min": {
+      "@id": "tickerinside:min",
+      "@type": "xsd:integer"
+    },
+    "max": {
+      "@id": "tickerinside:max",
+      "@type": "xsd:integer"
+    },
+    "files": {
+      "@id": "tickerinside:files"
+    },
+    "holdings_by_fund": {
+      "@id": "tickerinside:holdings_by_fund"
+    },
+    "answered_by": {
+      "@id": "tickerinside:answered_by"
+    },
+    "FlowsSummary": "tickerinside:FlowsSummary",
+    "newest_file": {
+      "@id": "tickerinside:newest_file",
+      "@type": "xsd:string"
+    },
+    "first_date": {
+      "@id": "tickerinside:first_date",
+      "@type": "xsd:string"
+    },
+    "added_by_value": {
+      "@id": "tickerinside:added_by_value",
+      "@container": "@list"
+    },
+    "reduced_by_value": {
+      "@id": "tickerinside:reduced_by_value",
+      "@container": "@list"
+    },
+    "added_by_shares_pct": {
+      "@id": "tickerinside:added_by_shares_pct",
+      "@container": "@list"
+    },
+    "reduced_by_shares_pct": {
+      "@id": "tickerinside:reduced_by_shares_pct",
+      "@container": "@list"
+    },
+    "added_beyond_growth_by_value": {
+      "@id": "tickerinside:added_beyond_growth_by_value",
+      "@container": "@list"
+    },
+    "reduced_beyond_growth_by_value": {
+      "@id": "tickerinside:reduced_beyond_growth_by_value",
+      "@container": "@list"
+    },
+    "index_events": {
+      "@id": "tickerinside:index_events",
+      "@container": "@list"
+    },
+    "corporate_actions": {
+      "@id": "tickerinside:corporate_actions",
+      "@container": "@list"
+    },
+    "not_ranked": {
+      "@id": "tickerinside:not_ranked",
+      "@container": "@list"
+    },
+    "funds_most_changed": {
+      "@id": "tickerinside:funds_most_changed",
+      "@container": "@list"
+    },
+    "not_counted": {
+      "@id": "tickerinside:not_counted",
+      "@container": "@list"
+    },
+    "file_gaps": {
+      "@id": "tickerinside:file_gaps",
+      "@type": "xsd:integer"
+    },
+    "csv": {
+      "@id": "tickerinside:csv",
+      "@type": "xsd:string"
+    },
+    "feed": {
+      "@id": "tickerinside:feed",
+      "@type": "xsd:string"
+    },
+    "feed_fund": {
+      "@id": "tickerinside:feed_fund",
+      "@type": "xsd:string"
+    },
+    "feed_stock": {
+      "@id": "tickerinside:feed_stock",
+      "@type": "xsd:string"
+    },
+    "SecurityFlows": "tickerinside:SecurityFlows",
+    "funds_holding": {
+      "@id": "tickerinside:funds_holding",
+      "@type": "xsd:integer"
+    },
+    "funds_counted": {
+      "@id": "tickerinside:funds_counted",
+      "@type": "xsd:integer"
+    },
+    "latest": {
+      "@id": "tickerinside:latest"
+    },
+    "series": {
+      "@id": "tickerinside:series"
+    },
+    "OwnershipIndex": "tickerinside:OwnershipIndex",
+    "ledger_method": {
+      "@id": "tickerinside:ledger_method",
+      "@type": "xsd:string"
+    },
+    "methodology": {
+      "@id": "tickerinside:methodology",
+      "@type": "xsd:string"
+    },
+    "holdings_dates": {
+      "@id": "tickerinside:holdings_dates"
+    },
+    "shares_outstanding_dates": {
+      "@id": "tickerinside:shares_outstanding_dates"
+    },
+    "caps_as_of": {
+      "@id": "tickerinside:caps_as_of",
+      "@type": "xsd:string"
+    },
+    "columns": {
+      "@id": "tickerinside:columns",
+      "@container": "@list"
+    },
+    "market": {
+      "@id": "tickerinside:market"
+    },
+    "sectors": {
+      "@id": "tickerinside:sectors",
+      "@container": "@list"
+    },
+    "class_basis_left_out": {
+      "@id": "tickerinside:class_basis_left_out",
+      "@type": "xsd:integer"
+    },
+    "concentration_min_funds": {
+      "@id": "tickerinside:concentration_min_funds",
+      "@type": "xsd:integer"
+    },
+    "concentration_not_published": {
+      "@id": "tickerinside:concentration_not_published"
+    },
+    "failed": {
+      "@id": "tickerinside:failed",
+      "@type": "xsd:boolean"
+    },
+    "OwnershipIndexHistory": "tickerinside:OwnershipIndexHistory",
+    "flows_method": {
+      "@id": "tickerinside:flows_method",
+      "@type": "xsd:string"
+    },
+    "first_close": {
+      "@id": "tickerinside:first_close",
+      "@type": "xsd:string"
+    },
+    "windows": {
+      "@id": "tickerinside:windows"
+    },
+    "series_columns": {
+      "@id": "tickerinside:series_columns",
+      "@container": "@list"
+    },
+    "stocks_columns": {
+      "@id": "tickerinside:stocks_columns",
+      "@container": "@list"
+    },
+    "not_measured": {
+      "@id": "tickerinside:not_measured"
+    },
+    "null_reasons": {
+      "@id": "tickerinside:null_reasons"
+    },
+    "Manifest": "tickerinside:Manifest",
+    "manifest_version": {
+      "@id": "tickerinside:manifest_version",
+      "@type": "xsd:decimal"
+    },
+    "build_date": {
+      "@id": "tickerinside:build_date",
+      "@type": "xsd:string"
+    },
+    "calculation": {
+      "@id": "tickerinside:calculation"
+    },
+    "families": {
+      "@id": "tickerinside:families"
+    },
+    "methods_url": {
+      "@id": "tickerinside:methods_url",
+      "@type": "xsd:string"
+    },
+    "contract": {
+      "@id": "tickerinside:contract",
+      "@type": "xsd:string"
+    },
+    "Changelog": "tickerinside:Changelog",
+    "newest": {
+      "@id": "tickerinside:newest",
+      "@type": "xsd:string"
+    },
+    "entries": {
+      "@id": "tickerinside:entries",
+      "@container": "@list"
+    },
+    "Deprecations": "tickerinside:Deprecations",
+    "Corrections": "tickerinside:Corrections",
+    "kinds": {
+      "@id": "tickerinside:kinds"
+    },
+    "report": {
+      "@id": "tickerinside:report",
+      "@type": "xsd:string"
+    },
+    "SecurityHoldersOnly": "tickerinside:SecurityHoldersOnly"
+  },
+  "@type": "schema:Dataset",
+  "schema:name": "TickerInside API JSON-LD context",
+  "schema:description": "A JSON-LD @context for the objects TickerInside's own API contract declares: one class per component schema, one property per declared field, typed from the contract. Derived by script (derive-json-ld.py, 2026-10-12) from openapi/tickerinside-openapi.json.",
+  "dcterms:created": "2026-10-12",
+  "dcterms:source": [
+    "openapi/tickerinside-openapi.json"
+  ]
+}

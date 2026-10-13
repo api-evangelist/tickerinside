@@ -1,0 +1,589 @@
+openapi: 3.2.0
+info:
+  title: TickerInside Uptime.json API
+  version: '1'
+  summary: Holdings of 5,433 US ETFs, which ETFs hold a stock, and overlap, as static JSON.
+  description: TickerInside is an open, machine-readable database of US ETF holdings, with the source and date of each holding.
+  termsOfService: https://tickerinside.com/terms/
+  contact:
+    name: TickerInside
+    email: contact@tickerinside.com
+    url: https://tickerinside.com/api/
+  license:
+    name: CC BY 4.0
+    identifier: CC-BY-4.0
+servers:
+- url: https://tickerinside.com/api/v1
+  description: Static JSON files, and five answers computed from them when asked. No key.
+security: []
+tags:
+- name: Uptime.json
+paths:
+  /uptime.json:
+    get:
+      operationId: getUptime
+      summary: Live checks
+      description: Whether the site answers now, and how it has answered. Every five minutes the Worker requests a fund page, the API index and an MCP handshake through the public address, and reads the nightly report. This file gives each check's state, its share of passed checks over 24 hours, 7, 30 and 90 days, 90 days of daily figures, the incidents and the deployments. It is computed when asked and kept one minute at the edge. The checks run on Cloudflare, like the site. An outage of Cloudflare itself stops them too, so it shows as slots with no data, which are never counted as up.
+      externalDocs:
+        url: https://tickerinside.com/api/#uptime-json
+      responses:
+        '200':
+          description: 'The file. The example is a real answer, shortened: long lists and maps keep their first entries.'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Uptime'
+              example:
+                schema: 1
+                generated_at: '2026-09-26T12:26:30.000Z'
+                method: Every five minutes the Worker requests a fund page, the API index and an MCP initialize through the public address, and reads status.json to see whether the nightly build ran. A slot with no check, for example during a Cloudflare incident, counts as no data, never as up, and is left out of the percentages.
+                deployed:
+                  version_id: 3f1d9c0e-6a2b-4e71-8c5d-7b0a9e4f2c36
+                  tag: null
+                components:
+                - id: page
+                  name: Fund pages
+                  check: GET /etf/voo/
+                  state: up
+                  since: null
+                  last_check: '2026-09-26T12:25:00.000Z'
+                  last_ms: 51
+                  uptime_pct:
+                    24h: 100
+                    7d: 100
+                    30d: 100
+                  no_data_pct_90d: 0.228
+                  open_incident: null
+                  ms_24h:
+                    p50: 68
+                    p95: 95
+                - id: api
+                  name: JSON API
+                  check: GET /api/v1/index.json
+                  state: up
+                  since: 2026-09-26T08:35Z
+                  last_check: '2026-09-26T12:25:00.000Z'
+                  last_ms: 60
+                  uptime_pct:
+                    24h: 98.958
+                    7d: 99.314
+                    30d: 99.314
+                  no_data_pct_90d: 0.228
+                  open_incident: null
+                  ms_24h:
+                    p50: 68
+                    p95: 95
+                - id: mcp
+                  name: MCP server
+                  check: POST /mcp initialize
+                  state: up
+                  since: null
+                  last_check: '2026-09-26T12:25:00.000Z'
+                  last_ms: 98
+                  uptime_pct:
+                    24h: 100
+                    7d: 100
+                    30d: 100
+                  no_data_pct_90d: 0.228
+                  open_incident: null
+                  ms_24h:
+                    p50: 98
+                    p95: 126
+                  server_version: 1.3.0
+                today:
+                  date: '2026-09-26'
+                  page:
+                    checks: 150
+                    failed: 0
+                    no_data: 0
+                    up_pct: 100
+                    p50_ms: 69
+                    p95_ms: 96
+                  api:
+                    checks: 150
+                    failed: 3
+                    no_data: 0
+                    up_pct: 98
+                    p50_ms: 68
+                    p95_ms: 95
+                  mcp:
+                    checks: 150
+                    failed: 0
+                    no_data: 0
+                    up_pct: 100
+                    p50_ms: 98
+                    p95_ms: 126
+                  update:
+                    checks: 150
+                    failed: 0
+                    no_data: 0
+                    up_pct: 100
+                days:
+                - date: '2026-09-25'
+                  page:
+                    checks: 287
+                    failed: 0
+                    no_data: 1
+                    up_pct: 100
+                    p50_ms: 68
+                    p95_ms: 95
+                  api:
+                    checks: 287
+                    failed: 0
+                    no_data: 1
+                    up_pct: 100
+                    p50_ms: 68
+                    p95_ms: 96
+                  mcp:
+                    checks: 287
+                    failed: 0
+                    no_data: 1
+                    up_pct: 100
+                    p50_ms: 98
+                    p95_ms: 126
+                  update:
+                    checks: 287
+                    failed: 0
+                    no_data: 1
+                    up_pct: 100
+                incidents:
+                - id: 2026-09-26T08:20Z-api
+                  component: api
+                  kind: down
+                  started: '2026-09-26T08:20:00.000Z'
+                  ended: '2026-09-26T08:35:00.000Z'
+                  minutes: 15
+                  cause: cloudflare_other
+                status: https://tickerinside.com/api/v1/status.json
+                docs: https://tickerinside.com/api/#status
+                license: CC BY 4.0
+      tags:
+      - Uptime.json
+components:
+  schemas:
+    Uptime:
+      type: object
+      properties:
+        schema:
+          type:
+          - integer
+          - 'null'
+          description: 'The version of this file''s shape: 1.'
+        generated_at:
+          type:
+          - string
+          - 'null'
+          description: When this answer was computed. The file is kept a minute at the edge.
+        method:
+          type:
+          - string
+          - 'null'
+          description: How the checks are made, in one paragraph.
+        deployed:
+          type: object
+          properties:
+            version_id:
+              type:
+              - string
+              - 'null'
+            tag: {}
+          additionalProperties: true
+          description: The version of the site serving now, or null before the first check saw it.
+        components:
+          type: array
+          items:
+            type: object
+            properties:
+              id:
+                type:
+                - string
+                - 'null'
+                description: page, api, mcp or update.
+              name:
+                type:
+                - string
+                - 'null'
+                description: The check in words.
+              check:
+                type:
+                - string
+                - 'null'
+                description: The request made.
+              state:
+                type:
+                - string
+                - 'null'
+                description: up or down for page, api and mcp; on time or late for the update; no data when no check has run for 15 minutes; unknown when the record could not be read.
+              since:
+                description: When the current state began, within the last day, or null when it has held all day.
+              last_check:
+                type:
+                - string
+                - 'null'
+                description: When the last check ran, in UTC.
+              last_ms:
+                type:
+                - number
+                - 'null'
+                description: How long its answer took, in milliseconds, measured from the Cloudflare location that ran the check.
+              uptime_pct:
+                type: object
+                properties:
+                  24h:
+                    type:
+                    - number
+                    - 'null'
+                  7d:
+                    type:
+                    - number
+                    - 'null'
+                  30d:
+                    type:
+                    - number
+                    - 'null'
+                  90d:
+                    type:
+                    - number
+                    - 'null'
+                additionalProperties: true
+                description: The share of checks that passed over the last 24 hours, 7, 30 and 90 days. Slots with no check are left out.
+              no_data_pct_90d:
+                type:
+                - number
+                - 'null'
+                description: The share of five-minute slots with no check over the period on record, up to 90 days.
+              open_incident:
+                description: The id of the open incident on this check, or null.
+              ms_24h:
+                type: object
+                properties:
+                  p50:
+                    type:
+                    - number
+                    - 'null'
+                  p95:
+                    type:
+                    - number
+                    - 'null'
+                additionalProperties: true
+                description: The median and 95th percentile answer time over the last 24 hours, in milliseconds.
+              server_version:
+                type:
+                - string
+                - 'null'
+                description: For the MCP server, the version its handshake announced.
+              last_build:
+                type:
+                - string
+                - 'null'
+                description: For the update, the built_at of the last build seen.
+              prices_through:
+                type:
+                - string
+                - 'null'
+                description: For the update, the price date of that build.
+              next_expected_by:
+                type:
+                - string
+                - 'null'
+                description: 'For the update, the deadline of the next nightly build: 02:00 UTC the morning after a weekday.'
+            additionalProperties: true
+          description: One entry per check, with the fields of a component.
+        today:
+          type: object
+          properties:
+            date:
+              type:
+              - string
+              - 'null'
+            page:
+              type: object
+              properties:
+                checks:
+                  type:
+                  - number
+                  - 'null'
+                failed:
+                  type:
+                  - number
+                  - 'null'
+                no_data:
+                  type:
+                  - number
+                  - 'null'
+                up_pct:
+                  type:
+                  - number
+                  - 'null'
+                p50_ms:
+                  type:
+                  - number
+                  - 'null'
+                p95_ms:
+                  type:
+                  - number
+                  - 'null'
+              additionalProperties: true
+            api:
+              type: object
+              properties:
+                checks:
+                  type:
+                  - number
+                  - 'null'
+                failed:
+                  type:
+                  - number
+                  - 'null'
+                no_data:
+                  type:
+                  - number
+                  - 'null'
+                up_pct:
+                  type:
+                  - number
+                  - 'null'
+                p50_ms:
+                  type:
+                  - number
+                  - 'null'
+                p95_ms:
+                  type:
+                  - number
+                  - 'null'
+              additionalProperties: true
+            mcp:
+              type: object
+              properties:
+                checks:
+                  type:
+                  - number
+                  - 'null'
+                failed:
+                  type:
+                  - number
+                  - 'null'
+                no_data:
+                  type:
+                  - number
+                  - 'null'
+                up_pct:
+                  type:
+                  - number
+                  - 'null'
+                p50_ms:
+                  type:
+                  - number
+                  - 'null'
+                p95_ms:
+                  type:
+                  - number
+                  - 'null'
+              additionalProperties: true
+            update:
+              type: object
+              properties:
+                checks:
+                  type:
+                  - number
+                  - 'null'
+                failed:
+                  type:
+                  - number
+                  - 'null'
+                no_data:
+                  type:
+                  - number
+                  - 'null'
+                up_pct:
+                  type:
+                  - number
+                  - 'null'
+              additionalProperties: true
+          additionalProperties: true
+          description: Today's figures so far, per check, in the shape of an entry of days.
+        days:
+          type:
+          - array
+          - 'null'
+          items:
+            type: object
+            properties:
+              date:
+                type:
+                - string
+                - 'null'
+              page:
+                type: object
+                properties:
+                  checks:
+                    type:
+                    - number
+                    - 'null'
+                  failed:
+                    type:
+                    - number
+                    - 'null'
+                  no_data:
+                    type:
+                    - number
+                    - 'null'
+                  up_pct:
+                    type:
+                    - number
+                    - 'null'
+                  p50_ms:
+                    type:
+                    - number
+                    - 'null'
+                  p95_ms:
+                    type:
+                    - number
+                    - 'null'
+                additionalProperties: true
+              api:
+                type: object
+                properties:
+                  checks:
+                    type:
+                    - number
+                    - 'null'
+                  failed:
+                    type:
+                    - number
+                    - 'null'
+                  no_data:
+                    type:
+                    - number
+                    - 'null'
+                  up_pct:
+                    type:
+                    - number
+                    - 'null'
+                  p50_ms:
+                    type:
+                    - number
+                    - 'null'
+                  p95_ms:
+                    type:
+                    - number
+                    - 'null'
+                additionalProperties: true
+              mcp:
+                type: object
+                properties:
+                  checks:
+                    type:
+                    - number
+                    - 'null'
+                  failed:
+                    type:
+                    - number
+                    - 'null'
+                  no_data:
+                    type:
+                    - number
+                    - 'null'
+                  up_pct:
+                    type:
+                    - number
+                    - 'null'
+                  p50_ms:
+                    type:
+                    - number
+                    - 'null'
+                  p95_ms:
+                    type:
+                    - number
+                    - 'null'
+                additionalProperties: true
+              update:
+                type: object
+                properties:
+                  checks:
+                    type:
+                    - number
+                    - 'null'
+                  failed:
+                    type:
+                    - number
+                    - 'null'
+                  no_data:
+                    type:
+                    - number
+                    - 'null'
+                  up_pct:
+                    type:
+                    - number
+                    - 'null'
+                additionalProperties: true
+            additionalProperties: true
+          description: 'Up to 90 days of daily figures, newest first: for each check, checks made, failed, no_data (slots with no check), up_pct and, except for the update, p50_ms and p95_ms. For the update, failed counts the checks that found it late.'
+        incidents:
+          type:
+          - array
+          - 'null'
+          items:
+            type: object
+            properties:
+              id:
+                type:
+                - string
+                - 'null'
+              component:
+                type:
+                - string
+                - 'null'
+              kind:
+                type:
+                - string
+                - 'null'
+              started:
+                type:
+                - string
+                - 'null'
+              ended:
+                type:
+                - string
+                - 'null'
+              minutes:
+                type:
+                - number
+                - 'null'
+              cause:
+                type:
+                - string
+                - 'null'
+            additionalProperties: true
+          description: 'Open incidents first, then those closed in the last 90 days: id, component, kind (down or late), started, ended, minutes and cause. An incident opens after two failed checks in a row and closes after two good ones.'
+        status:
+          type:
+          - string
+          - 'null'
+          description: The nightly report, as served at /api/v1/status.json.
+        docs:
+          type:
+          - string
+          - 'null'
+          description: Where this file is documented.
+        license:
+          type:
+          - string
+          - 'null'
+          description: The licence the data is published under.
+      additionalProperties: true
+      required:
+      - schema
+      - generated_at
+      - method
+      - deployed
+      - components
+      - today
+      - days
+      - incidents
+      - status
+      - docs
+      - license
+externalDocs:
+  description: The reference, with examples and recipes
+  url: https://tickerinside.com/api/

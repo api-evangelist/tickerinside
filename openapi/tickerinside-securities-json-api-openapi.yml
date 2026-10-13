@@ -1,0 +1,155 @@
+openapi: 3.2.0
+info:
+  title: TickerInside Securities.json API
+  version: '1'
+  summary: Holdings of 5,433 US ETFs, which ETFs hold a stock, and overlap, as static JSON.
+  description: TickerInside is an open, machine-readable database of US ETF holdings, with the source and date of each holding.
+  termsOfService: https://tickerinside.com/terms/
+  contact:
+    name: TickerInside
+    email: contact@tickerinside.com
+    url: https://tickerinside.com/api/
+  license:
+    name: CC BY 4.0
+    identifier: CC-BY-4.0
+servers:
+- url: https://tickerinside.com/api/v1
+  description: Static JSON files, and five answers computed from them when asked. No key.
+security: []
+tags:
+- name: Securities.json
+paths:
+  /securities.json:
+    get:
+      operationId: getSecurities
+      summary: Every security, one line each
+      description: 'Every security the funds of the 690 issuer files hold, with how many of them hold it and its largest weight, in one file of 937 KB. The list to walk before asking for stock files: its last place says whether a stock file exists.'
+      externalDocs:
+        url: https://tickerinside.com/api/#securities
+      responses:
+        '200':
+          description: 'The file. The example is a real answer, shortened: long lists and maps keep their first entries.'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Securities'
+              example:
+                as_of: '2026-10-09'
+                count: 18754
+                note: Each entry is [ticker, how many issuer-layer funds hold it, its largest weight in any of them, company name, 1 when it has a written page at /stock/{ticker}/, 1 when it has a stock file at /api/v1/sec/{ticker}.json, where any other key answers with coverage holders_only]. Sorted by holder count.
+                securities:
+                - - MSFT
+                  - 177
+                  - 14.24
+                  - Microsoft
+                  - 1
+                  - 1
+                - - NVDA
+                  - 177
+                  - 19.89
+                  - Nvidia
+                  - 1
+                  - 1
+                - - AAPL
+                  - 168
+                  - 18.65
+                  - Apple Inc.
+                  - 1
+                  - 1
+                license: CC BY 4.0
+                attribution: Credit TickerInside with a link to this file, or to the page that shows the figure, wherever the medium allows a link, and by name where it does not. How you mark the link is up to you.
+        '304':
+          description: 'Not modified: the ETag of your copy, sent in If-None-Match, is still current. Files are cached five minutes.'
+        '503':
+          description: 'The file could not be served just then: retry after a minute. uptime says whether the site fails its own checks.'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Unavailable'
+      tags:
+      - Securities.json
+components:
+  schemas:
+    Securities:
+      type: object
+      properties:
+        as_of:
+          type:
+          - string
+          - 'null'
+          description: The price date.
+        count:
+          type:
+          - integer
+          - 'null'
+          description: How many securities are listed, the length of securities.
+        note:
+          type:
+          - string
+          - 'null'
+          description: How to read the entries.
+        securities:
+          type:
+          - array
+          - 'null'
+          items:
+            type: array
+            prefixItems:
+            - title: ticker
+              type: string
+            - title: funds
+              type: integer
+            - title: weight
+              type: number
+            - title: name
+              type: string
+            - title: page
+              type: integer
+            - title: file
+              type: integer
+            items:
+              type:
+              - number
+              - string
+          description: One entry per security held by the issuer-layer funds, the most widely held first. Each is [ticker, how many of those funds hold it, its largest weight in any of them, company name, 1 when it has a page at /stock/{ticker}/, 1 when /api/v1/sec/{ticker}.json is a stock file, not a holders_only answer].
+        license:
+          type:
+          - string
+          - 'null'
+          description: The licence the data is published under.
+        attribution:
+          type:
+          - string
+          - 'null'
+          description: 'How to credit the data: a link to this file where the medium allows one, the name where it does not.'
+      additionalProperties: true
+      required:
+      - as_of
+      - count
+      - note
+      - securities
+      - license
+      - attribution
+    Unavailable:
+      type: object
+      additionalProperties: true
+      required:
+      - error
+      - message
+      - status
+      - uptime
+      properties:
+        error:
+          type: string
+          const: unavailable
+        message:
+          type: string
+        status:
+          type: string
+          description: The nightly report.
+        uptime:
+          type: string
+          description: 'The live checks: whether the site fails its own checks.'
+externalDocs:
+  description: The reference, with examples and recipes
+  url: https://tickerinside.com/api/

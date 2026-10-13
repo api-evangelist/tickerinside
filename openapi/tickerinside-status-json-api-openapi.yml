@@ -1,0 +1,672 @@
+openapi: 3.2.0
+info:
+  title: TickerInside Status.json API
+  version: '1'
+  summary: Holdings of 5,433 US ETFs, which ETFs hold a stock, and overlap, as static JSON.
+  description: TickerInside is an open, machine-readable database of US ETF holdings, with the source and date of each holding.
+  termsOfService: https://tickerinside.com/terms/
+  contact:
+    name: TickerInside
+    email: contact@tickerinside.com
+    url: https://tickerinside.com/api/
+  license:
+    name: CC BY 4.0
+    identifier: CC-BY-4.0
+servers:
+- url: https://tickerinside.com/api/v1
+  description: Static JSON files, and five answers computed from them when asked. No key.
+security: []
+tags:
+- name: Status.json
+paths:
+  /status.json:
+    get:
+      operationId: getStatus
+      summary: The nightly report
+      description: 'What the last build did: when it ran, the date of each layer of the data, and the funds still served from an older file. It also gives the pages it dated as modified, and the versions of the API and of the MCP server. The build writes it with the data, so it is exactly as current as the files it describes.'
+      externalDocs:
+        url: https://tickerinside.com/api/#status-json
+      responses:
+        '200':
+          description: 'The file. The example is a real answer, shortened: long lists and maps keep their first entries.'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Status'
+              example:
+                schema: 1
+                built_at: '2026-10-12T20:11:17Z'
+                run:
+                  fetch_holdings:
+                    funds_attempted: 725
+                    funds_updated: 686
+                    funds_newer_file: 0
+                    kept_previous:
+                    - ticker: ILCB
+                      issuer: iShares
+                      since: '2026-10-05'
+                      holdings_as_of: '2026-10-01'
+                    - ticker: ISCB
+                      issuer: iShares
+                      since: '2026-10-05'
+                      holdings_as_of: '2026-10-01'
+                    - ticker: QCLR
+                      issuer: Global X
+                      since: '2026-10-10'
+                      holdings_as_of: '2026-10-08'
+                    failed:
+                    - ticker: QCLR
+                      issuer: Global X
+                      reason_class: empty_file
+                    - ticker: XCLR
+                      issuer: Global X
+                      reason_class: empty_file
+                    failed_without_file: 37
+                  fund_figures:
+                    run_date: '2026-10-12'
+                    funds: 689
+                    deadline_hit: false
+                    warnings: 0
+                data:
+                  prices:
+                    through: '2026-10-09'
+                    securities_priced: 5324
+                  issuer_files:
+                    funds: 690
+                    newest: '2026-10-12'
+                    oldest: '2026-08-31'
+                    by_date:
+                    - date: '2026-10-12'
+                      funds: 14
+                    - date: '2026-10-10'
+                      funds: 153
+                    - date: '2026-10-09'
+                      funds: 466
+                  sec_nport:
+                    funds: 1982
+                    dataset: 2026q3
+                    report_dates:
+                      oldest: '2026-01-31'
+                      newest: '2026-08-31'
+                  universe:
+                    etfs: 5717
+                    covered: 5433
+                    pct: 95.0
+                    by_layer:
+                      issuer_files: 688
+                      sec_nport: 1952
+                      sec_nport_derivatives: 1365
+                      sec_nport_bonds: 922
+                      sec_nport_multi_asset: 235
+                      trust_filings: 131
+                      sponsor_files: 140
+                    prospectus: 282
+                    with_file: 5715
+                    with_objective: 282
+                    not_covered:
+                      no_prospectus_found: 2
+                    etns: 53
+                    other_products: 1
+                    outside_universe: 82
+                    file_date: '2026-10-12'
+                    available: true
+                    source: Nasdaq Trader symbol directory (nasdaqtraded.txt)
+                    sentence: 5,433 of the 5,717 US-listed ETFs in Nasdaq Trader's symbol directory of 2026-10-12 have holdings here (95.0%), and 282 more have a file from their prospectus, with the objective it states and no holdings.
+                    all_us_etfs: true
+                    headline: All US ETFs
+                    claim: 'All US ETFs: 5,715 of the 5,717 in Nasdaq Trader''s symbol directory of 2026-10-12 have a file, 5,433 with holdings and 282 with the objective their prospectus states; the 2 listed most recently get theirs on the nights after.'
+                    assets:
+                      net_assets_b: 15961.5
+                      with_holdings_b: 15941.7
+                      pct: 99.9
+                      funds_sized: 5451
+                      funds_unsized: 266
+                      unsized_with_holdings: 124
+                      basis: Net assets of each ETF in US dollars, from the fund's own filing or file where it gives one and from market data otherwise; a fund the market data puts at 0.0 billion (under 50 million dollars) counts at that figure; only the totals are published.
+                      sentence: null
+                  archive:
+                    funds: 697
+                    snapshots: 15720
+                    first: '2026-07-31'
+                    last: '2026-10-12'
+                    since: '2026-09-03'
+                  ownership:
+                    method: ti-ownership/1
+                    stocks: 3592
+                    as_of: '2026-10-12'
+                    held_back: false
+                pages:
+                  published: 1040
+                  redated: 0
+                  redated_paths: []
+                versions:
+                  api: v1
+                  mcp_package:
+                    name: tickerinside-mcp
+                    version: 1.12.0
+                    url: https://www.npmjs.com/package/tickerinside-mcp
+                  mcp_remote:
+                    url: https://tickerinside.com/mcp
+                    version: 1.12.0
+                live: https://tickerinside.com/api/v1/uptime.json
+                docs: https://tickerinside.com/api/#status
+                license: CC BY 4.0
+                attribution: Credit TickerInside with a link to this file, or to the page that shows the figure, wherever the medium allows a link, and by name where it does not. How you mark the link is up to you.
+        '304':
+          description: 'Not modified: the ETag of your copy, sent in If-None-Match, is still current. Files are cached five minutes.'
+        '503':
+          description: 'The file could not be served just then: retry after a minute. uptime says whether the site fails its own checks.'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Unavailable'
+      tags:
+      - Status.json
+components:
+  schemas:
+    Status:
+      type: object
+      properties:
+        schema:
+          type:
+          - integer
+          - 'null'
+          description: 'The version of this file''s shape: 1. Fields are added and never removed or retyped.'
+        built_at:
+          type:
+          - string
+          - 'null'
+          description: When the build that wrote this file started, in UTC. The nightly build starts at 22:00 UTC each weekday and is due by 02:00 UTC. The site can also be rebuilt during the day, from the data already fetched.
+        run:
+          type: object
+          additionalProperties: true
+          properties:
+            fund_figures:
+              type: object
+              additionalProperties: true
+              properties:
+                run_date:
+                  type:
+                  - string
+                  - 'null'
+                  description: The UTC day the capture ran.
+                funds:
+                  type:
+                  - integer
+                  - 'null'
+                  description: How many funds it captured.
+                deadline_hit:
+                  type: boolean
+                  description: True when it ran out of time before every answer was in.
+                warnings:
+                  type:
+                  - integer
+                  - 'null'
+                  description: How many warnings it raised, 0 on a normal night. What they say is not published.
+            fetch_holdings:
+              type: object
+              additionalProperties: true
+              properties:
+                funds_attempted:
+                  type:
+                  - integer
+                  - 'null'
+                  description: How many issuer files the fetch tried to read.
+                funds_updated:
+                  type:
+                  - integer
+                  - 'null'
+                  description: How many of them were read and accepted, so the fund now carries the file read that night, whether or not its date moved. A Vanguard file is dated at the month end and keeps its date for weeks.
+                funds_newer_file:
+                  type:
+                  - integer
+                  - 'null'
+                  description: How many of those carry a file dated later than the one held before.
+                kept_previous:
+                  type: array
+                  description: 'The funds still served from an earlier file, because the new one was refused or missing, or because the issuer no longer lists the fund. Each gives ticker, issuer, since (the first night the fetch found the fund served this way) and holdings_as_of (the date of the file served). The two dates differ: a fund kept since last night can be served from a month end file.'
+                  items:
+                    type: object
+                    required:
+                    - ticker
+                    properties:
+                      ticker:
+                        type: string
+                      issuer:
+                        type:
+                        - string
+                        - 'null'
+                      since:
+                        type:
+                        - string
+                        - 'null'
+                      holdings_as_of:
+                        type:
+                        - string
+                        - 'null'
+                failed:
+                  type: array
+                  description: 'The funds with a file here whose two attempts both failed that night: ticker, issuer and reason_class. reason_class is http_error (the file could not be downloaded), refused (by the site), empty_file (no holdings came back), rejected_by_gate (its weights did not add up to a whole fund, or its date was too old), parse_error (it could not be read) or other. Each is still served from its earlier file, so it is also in kept_previous.'
+                  items:
+                    type: object
+                    required:
+                    - ticker
+                    - reason_class
+                    properties:
+                      ticker:
+                        type: string
+                      issuer:
+                        type:
+                        - string
+                        - 'null'
+                      reason_class:
+                        enum:
+                        - http_error
+                        - empty_file
+                        - rejected_by_gate
+                        - parse_error
+                        - refused
+                        - other
+                failed_without_file:
+                  type: integer
+                  description: 'How many other funds failed that night that have no file here, such as fixed income funds, whose issuer files the fetch tries and does not serve: a fixed income fund is read from its SEC filing. They are counted rather than listed, and with funds_updated and failed they add up to funds_attempted.'
+          description: What the nightly steps reported, when their reports are in the build. run.fetch_holdings, the holdings fetch, publishes only counts, tickers, issuers, dates and a kind of failure. run.fund_figures, the capture of what the issuers state about their funds, which is kept and not served, publishes four totals and nothing else.
+        data:
+          type: object
+          properties:
+            prices:
+              type: object
+              properties:
+                through:
+                  type:
+                  - string
+                  - 'null'
+                securities_priced:
+                  type:
+                  - integer
+                  - 'null'
+              additionalProperties: true
+              description: through, the last close in the price data, which every return and risk figure uses; securities_priced, how many funds and stocks have a weekly series.
+            issuer_files:
+              type: object
+              properties:
+                funds:
+                  type:
+                  - integer
+                  - 'null'
+                newest:
+                  type:
+                  - string
+                  - 'null'
+                oldest:
+                  type:
+                  - string
+                  - 'null'
+                by_date:
+                  type:
+                  - array
+                  - 'null'
+                  items:
+                    type: object
+                    properties:
+                      date:
+                        type:
+                        - string
+                        - 'null'
+                      funds:
+                        type:
+                        - integer
+                        - 'null'
+                    additionalProperties: true
+              additionalProperties: true
+              description: funds, how many funds are read from their issuers' files; newest and oldest file dates; by_date, how many funds carry each of the eight most recent dates.
+            sec_nport:
+              type: object
+              properties:
+                funds:
+                  type:
+                  - integer
+                  - 'null'
+                dataset:
+                  type:
+                  - string
+                  - 'null'
+                report_dates:
+                  type: object
+                  properties:
+                    oldest:
+                      type:
+                      - string
+                      - 'null'
+                    newest:
+                      type:
+                      - string
+                      - 'null'
+                  additionalProperties: true
+              additionalProperties: true
+              description: funds, how many other US stock ETFs are served from SEC filings; dataset, the SEC quarterly data set the layer was last read from (a fund with a newer filing on EDGAR is served from that filing); report_dates, the oldest and newest quarter end the filings describe.
+            universe:
+              type: object
+              properties:
+                etfs:
+                  type:
+                  - number
+                  - 'null'
+                covered:
+                  type:
+                  - number
+                  - 'null'
+                pct:
+                  type:
+                  - number
+                  - 'null'
+                by_layer:
+                  type: object
+                  properties:
+                    issuer_files:
+                      type:
+                      - number
+                      - 'null'
+                    sec_nport:
+                      type:
+                      - number
+                      - 'null'
+                    sec_nport_derivatives:
+                      type:
+                      - number
+                      - 'null'
+                    sec_nport_bonds:
+                      type:
+                      - number
+                      - 'null'
+                    sec_nport_multi_asset:
+                      type:
+                      - number
+                      - 'null'
+                    trust_filings:
+                      type:
+                      - number
+                      - 'null'
+                    sponsor_files:
+                      type:
+                      - number
+                      - 'null'
+                  additionalProperties: true
+                prospectus:
+                  type:
+                  - number
+                  - 'null'
+                with_file:
+                  type:
+                  - number
+                  - 'null'
+                with_objective:
+                  type:
+                  - number
+                  - 'null'
+                not_covered:
+                  type: object
+                  properties:
+                    no_prospectus_found:
+                      type:
+                      - number
+                      - 'null'
+                    no_filing_yet:
+                      type:
+                      - number
+                      - 'null'
+                    not_in_sec_list:
+                      type:
+                      - number
+                      - 'null'
+                    other_fund:
+                      type:
+                      - number
+                      - 'null'
+                    stale_filing:
+                      type:
+                      - number
+                      - 'null'
+                  additionalProperties: true
+                etns:
+                  type:
+                  - number
+                  - 'null'
+                other_products:
+                  type:
+                  - number
+                  - 'null'
+                outside_universe:
+                  type:
+                  - number
+                  - 'null'
+                file_date:
+                  type:
+                  - string
+                  - 'null'
+                available:
+                  type:
+                  - boolean
+                  - 'null'
+                source:
+                  type:
+                  - string
+                  - 'null'
+                sentence:
+                  type:
+                  - string
+                  - 'null'
+                all_us_etfs:
+                  type:
+                  - boolean
+                  - 'null'
+                headline:
+                  type:
+                  - string
+                  - 'null'
+                claim:
+                  type:
+                  - string
+                  - 'null'
+                assets:
+                  type: object
+                  properties:
+                    net_assets_b:
+                      type:
+                      - number
+                      - 'null'
+                    with_holdings_b:
+                      type:
+                      - number
+                      - 'null'
+                    pct:
+                      type:
+                      - number
+                      - 'null'
+                    funds_sized:
+                      type:
+                      - number
+                      - 'null'
+                    funds_unsized:
+                      type:
+                      - number
+                      - 'null'
+                    unsized_with_holdings:
+                      type:
+                      - number
+                      - 'null'
+                    basis:
+                      type:
+                      - string
+                      - 'null'
+                    sentence: {}
+                  additionalProperties: true
+              additionalProperties: true
+              description: The coverage measured against the US-listed ETFs, the block of index.json coverage.universe.
+            archive:
+              type: object
+              properties:
+                funds:
+                  type:
+                  - integer
+                  - 'null'
+                snapshots:
+                  type:
+                  - integer
+                  - 'null'
+                first:
+                  type:
+                  - string
+                  - 'null'
+                last:
+                  type:
+                  - string
+                  - 'null'
+                since:
+                  type:
+                  - string
+                  - 'null'
+              additionalProperties: true
+              description: 'What the archive of issuer files holds: funds; snapshots, one per fund and file date; first and last, the oldest and newest file dates; and since, the day the archive began, which is not the oldest file date. What changed in each fund from one file to the next is served under /api/v1/history/, under the history terms.'
+            ownership:
+              type: object
+              properties:
+                method:
+                  type:
+                  - string
+                  - 'null'
+                stocks:
+                  type:
+                  - integer
+                  - 'null'
+                as_of:
+                  type:
+                  - string
+                  - 'null'
+                held_back:
+                  type:
+                  - boolean
+                  - 'null'
+              additionalProperties: true
+              description: 'The ETF ownership ledger: method; stocks, how many stocks have a figure; as_of, the newest holdings date it counted; held_back. held_back is true on a night whose ledger failed its checks, when the figures served are those of the last ledger that passed. Null when the build had no ledger.'
+          additionalProperties: true
+          description: 'The date of each layer of the data: prices, the issuers'' files and the SEC filings, and of the ownership ledger computed from them.'
+        pages:
+          type: object
+          properties:
+            published:
+              type:
+              - integer
+              - 'null'
+              description: How many pages the site publishes.
+            redated:
+              type:
+              - integer
+              - 'null'
+              description: 'How many of them this build dated as modified. Most nights it is a small number: a page is dated only when a reader would notice the change.'
+            redated_paths:
+              type:
+              - array
+              - 'null'
+              items:
+                type:
+                - 'null'
+                - string
+              description: The first 50 of those pages, sorted.
+          additionalProperties: true
+          description: How many pages the site publishes, and which of them this build dated as modified in the sitemaps.
+        versions:
+          type: object
+          properties:
+            api:
+              type:
+              - string
+              - 'null'
+              description: 'The API version, which is also the path prefix: v1.'
+            mcp_package:
+              type: object
+              properties:
+                name:
+                  type:
+                  - string
+                  - 'null'
+                version:
+                  type:
+                  - string
+                  - 'null'
+                url:
+                  type:
+                  - string
+                  - 'null'
+              additionalProperties: true
+              description: 'The npm package tickerinside-mcp: name, version and its page.'
+            mcp_remote:
+              type: object
+              properties:
+                url:
+                  type:
+                  - string
+                  - 'null'
+                version:
+                  type:
+                  - string
+                  - 'null'
+              additionalProperties: true
+              description: 'The remote MCP server: its URL and the version it announces.'
+          additionalProperties: true
+          description: The API version, and the version of the MCP server as an npm package and at its URL.
+        live:
+          type:
+          - string
+          - 'null'
+          description: 'The live checks of the site, made every five minutes: the file documented next.'
+        docs:
+          type:
+          - string
+          - 'null'
+          description: Where this file is documented.
+        license:
+          type:
+          - string
+          - 'null'
+          description: The licence the data is published under.
+        attribution:
+          type:
+          - string
+          - 'null'
+          description: 'How to credit the data: a link to this file where the medium allows one, the name where it does not.'
+      additionalProperties: true
+      required:
+      - schema
+      - built_at
+      - run
+      - data
+      - pages
+      - versions
+      - live
+      - docs
+      - license
+      - attribution
+    Unavailable:
+      type: object
+      additionalProperties: true
+      required:
+      - error
+      - message
+      - status
+      - uptime
+      properties:
+        error:
+          type: string
+          const: unavailable
+        message:
+          type: string
+        status:
+          type: string
+          description: The nightly report.
+        uptime:
+          type: string
+          description: 'The live checks: whether the site fails its own checks.'
+externalDocs:
+  description: The reference, with examples and recipes
+  url: https://tickerinside.com/api/

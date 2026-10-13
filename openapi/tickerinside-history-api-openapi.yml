@@ -1,0 +1,666 @@
+openapi: 3.2.0
+info:
+  title: TickerInside History API
+  version: '1'
+  summary: Holdings of 5,433 US ETFs, which ETFs hold a stock, and overlap, as static JSON.
+  description: TickerInside is an open, machine-readable database of US ETF holdings, with the source and date of each holding.
+  termsOfService: https://tickerinside.com/terms/
+  contact:
+    name: TickerInside
+    email: contact@tickerinside.com
+    url: https://tickerinside.com/api/
+  license:
+    name: CC BY 4.0
+    identifier: CC-BY-4.0
+servers:
+- url: https://tickerinside.com/api/v1
+  description: Static JSON files, and five answers computed from them when asked. No key.
+security: []
+tags:
+- name: History
+paths:
+  /history/{ticker}.json:
+    get:
+      operationId: getFundHistory
+      summary: One fund's holdings history
+      description: 'Each file date the archive holds for the fund, with its position count and top 10 weight. Then each step from a file to the next: the lines that entered and exited with their weights, the lines whose weight moved by 0.05 points or more, and three measures of the step. Then how its overlap with its ten closest funds moved. Every step names the file it is compared with, so a gap in the archive or a monthly file shows. A step across a change of the keys is restated, not read as trades: it has no entered, exited or moved, so read them with a default. Weights only: no share count, market value or fund size is served. weights_moved_pp is not turnover, since prices move every weight; traded_pp, from share counts, is. Not under CC BY 4.0: the history terms apply (license, terms). Fetch it per request, one fund at a time; fetching many funds'' history on a schedule to store it is not allowed.'
+      externalDocs:
+        url: https://tickerinside.com/api/#fund-history
+      responses:
+        '200':
+          description: 'The file. The example is a real answer, shortened: long lists and maps keep their first entries.'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/FundHistory'
+              example:
+                ticker: SPY
+                name: SPDR S&P 500 ETF Trust
+                source_layer: issuer
+                key_scheme: 2
+                first: '2026-09-02'
+                last: '2026-10-09'
+                file_dates: 27
+                cadence: daily
+                snapshots:
+                  columns:
+                  - holdings_as_of
+                  - positions
+                  - top10_weight
+                  - key_scheme
+                  - unplaced
+                  rows:
+                  - - '2026-09-02'
+                    - 504
+                    - 37.95
+                    - 1
+                    - []
+                  - - '2026-09-03'
+                    - 504
+                    - 38.13
+                    - 1
+                    - []
+                  - - '2026-09-04'
+                    - 504
+                    - 38.0
+                    - 1
+                    - []
+                moved_threshold_pp: 0.05
+                traded_min_pairs: 20
+                traded_pairs: 10
+                traded_pp_from: '2026-09-28'
+                traded_pp_reason: fewer_than_20_pairs_with_share_counts
+                changes:
+                - date: '2026-09-03'
+                  previous: '2026-09-02'
+                  entered: []
+                  exited: []
+                  moved:
+                  - - AVGO
+                    - 2.6319
+                    - 2.5327
+                  - - MSFT
+                    - 5.586
+                    - 5.6753
+                  - - TSLA
+                    - 1.5212
+                    - 1.5869
+                  moved_below_threshold: 475
+                  names_turnover_pp: 0.0
+                  weights_moved_pp: 0.6092
+                  traded_pp: null
+                - date: '2026-09-04'
+                  previous: '2026-09-03'
+                  entered: []
+                  exited: []
+                  moved:
+                  - - AAPL
+                    - 7.2197
+                    - 7.0638
+                  - - MU
+                    - 1.6183
+                    - 1.7232
+                  - - NVDA
+                    - 8.287
+                    - 8.3865
+                  moved_below_threshold: 469
+                  names_turnover_pp: 0.0
+                  weights_moved_pp: 0.786
+                  traded_pp: null
+                - date: '2026-09-08'
+                  previous: '2026-09-04'
+                  entered: []
+                  exited: []
+                  moved:
+                  - - NVDA
+                    - 8.3865
+                    - 8.2659
+                  - - AVGO
+                    - 2.5471
+                    - 2.6383
+                  - - AMD
+                    - 1.1704
+                    - 1.2467
+                  moved_below_threshold: 475
+                  names_turnover_pp: 0.0
+                  weights_moved_pp: 0.7754
+                  traded_pp: null
+                overlap_history:
+                  with_top_funds_by_overlap: 10
+                  series:
+                    IVVW:
+                    - - '2026-09-24'
+                      - 99.7
+                    - - '2026-09-25'
+                      - 99.7
+                    - - '2026-09-28'
+                      - 99.7
+                    IVV:
+                    - - '2026-09-02'
+                      - 98.8
+                    - - '2026-09-03'
+                      - 99.2
+                    - - '2026-09-04'
+                      - 99.2
+                    SPYM:
+                    - - '2026-09-02'
+                      - 99.8
+                    - - '2026-09-03'
+                      - 99.8
+                    - - '2026-09-04'
+                      - 99.8
+                holdings_at: null
+                fund: https://tickerinside.com/api/v1/fund/spy.json
+                ended: null
+                cite_as: TickerInside, SPDR S&P 500 ETF Trust (SPY), holdings history from the issuer's files of 2026-09-02 to 2026-10-09, https://tickerinside.com/api/v1/history/spy.json
+                cite_html: <a href="https://tickerinside.com/api/v1/history/spy.json">TickerInside</a> (https://tickerinside.com/api/v1/history/spy.json)
+                docs: https://tickerinside.com/api/#history
+                license: TickerInside history terms
+                terms: https://tickerinside.com/legal/#history
+                attribution: Credit TickerInside with a link to the page the figure comes from (cite_as gives it) wherever the medium allows a link, and by name where it does not. How you mark the link is up to you. Free per request, commercial use included; republishing the archive as a whole or a substantial part of it, and extracting it systematically, are not allowed.
+        '301':
+          description: 'The address was not written the way the file is: an upper case ticker, a share class written BRK-B or BRK/B, a missing .json, or punctuation at the end. Follow the Location header (curl -L).'
+        '304':
+          description: 'Not modified: the ETag of your copy, sent in If-None-Match, is still current. Files are cached five minutes.'
+        '404':
+          description: 'reason not_in_archive: the fund has no history (see history). A dated address under the fund answers holdings_at_date_not_enabled or invalid_date.'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/NotCovered'
+        '503':
+          description: 'The file could not be served just then: retry after a minute. uptime says whether the site fails its own checks.'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Unavailable'
+      parameters:
+      - name: ticker
+        in: path
+        required: true
+        description: The fund's ticker in lower case, for example spy.
+        schema:
+          type: string
+        example: spy
+      tags:
+      - History
+components:
+  schemas:
+    NotCovered:
+      type: object
+      additionalProperties: true
+      required:
+      - error
+      - ticker
+      - message
+      - docs
+      properties:
+        error:
+          type: string
+          const: not_covered
+          description: 'Always not_covered, whatever the reason: read reason and the next address.'
+        reason:
+          type: string
+          enum:
+          - has_security_file
+          - in_another_layer
+          - is_a_fund
+          - no_written_comparison
+          - not_a_shard
+          - not_held_by_daily_funds
+          - not_held
+          - earlier_key
+          - no_such_endpoint
+          - not_in_directory
+          - no_file
+          - funds_not_covered
+          - etn
+          - other_product
+          - no_filing_yet
+          - not_in_sec_list
+          - other_fund
+          - stale_filing
+          - no_prospectus_found
+          - not_in_archive
+          - holdings_at_date_not_enabled
+          - invalid_date
+          - before_history
+          description: 'Every code is explained on /contract/#reasons. not_in_directory: a fund address with no file, for a ticker not in the directory of US-listed funds; a ticker of the directory with no file gets the code universe.json gives it (etn, no_filing_yet and the others), and no_file when the directory was not read. not_held: under /sec/, no covered fund holds the key; earlier_key: an old key, with reads_as. no_such_endpoint: no endpoint at the address. funds_not_covered: several funds of /overlap or /lookthrough, with reasons. in_another_layer: sent only to the TickerInside clients released before /fund/ answered for a fund of the other layers too (see holdings_kind); etf gives the fund''s file. has_security_file: a ticker asked for as a fund has a stock file (see security). is_a_fund: a ticker asked for as a stock is a covered fund (see fund, and holders for the funds that hold it). no_written_comparison: no comparison file for this pair in either order (see fund_files and written_comparisons). not_a_shard: an address under /api/v1/holders/ that is not a shard (see holders). Under /api/v1/history/: not_in_archive: the fund has no history file (see history). holdings_at_date_not_enabled: holdings at a date are not served yet, and every valid date answers this (see changes). invalid_date: the date is not a calendar date, or is after today. before_history: the date is before the fund''s first file (see first), answered only once holdings at a date are served. Under /api/v1/flows/: reason not_held_by_daily_funds: no fund read daily from its issuer''s files held the key or moved it in the last 20 trading days; summary names the night''s summary.'
+        ticker:
+          type:
+          - string
+          - 'null'
+          description: What was asked for, upper case; null when the address names no single ticker, such as a pair under /compare/.
+        message:
+          type: string
+          description: What happened and where to look next, in words.
+        docs:
+          type: string
+          description: The reference.
+        security:
+          type: string
+          description: 'With has_security_file: the stock file of the ticker, or its holders-only answer.'
+        reads_as:
+          type: array
+          items:
+            type: string
+          description: 'Under /sec/, for an old key written before lines listed abroad carried their market (7203): the keys it reads as now, from the aliases of holders. Absent otherwise.'
+        fund:
+          type: string
+          description: 'With is_a_fund: the fund file of the ticker.'
+        etf:
+          type: string
+          description: 'With in_another_layer: the file of the fund, /api/v1/etf/{ticker}.json.'
+        holders:
+          type: string
+          description: 'The shard of the key''s first character: /api/v1/holders/{c}.json, c a to z, or 0 for any other character (7203.JP is in 0.json). It lists the covered funds that hold the key, from issuer files and from SEC filings, with or without a stock file.'
+        pair:
+          type:
+          - array
+          - 'null'
+          items:
+            type: string
+          description: 'With no_written_comparison: the two tickers asked for, upper case, or null when the address names no pair.'
+        written_comparisons:
+          type: array
+          items:
+            type: object
+            additionalProperties: true
+            properties:
+              pair:
+                type: array
+                items:
+                  type: string
+              url:
+                type: string
+          description: 'With no_written_comparison: the pairs that have a comparison file, as index.json lists them.'
+        fund_files:
+          type: array
+          items:
+            type: string
+          description: 'With no_written_comparison: the fund files of the tickers asked for that are covered funds, to compute the overlap from.'
+        covered:
+          type: string
+          description: 'What is covered: /api/v1/securities.json after a /sec/ address with no reason, /api/v1/index.json otherwise.'
+        not_covered:
+          type: array
+          items:
+            type: string
+          description: 'Under /overlap, /lookthrough and /diversify: the tickers asked for that are not covered.'
+        reasons:
+          type: object
+          additionalProperties:
+            type: string
+          description: 'Under /overlap, /lookthrough and /diversify: the reason code of each ticker of not_covered.'
+        covered_issuers:
+          type: array
+          items:
+            type: string
+          description: 'Under /overlap and /lookthrough: the issuers whose own files are read; the other covered funds are read from SEC filings.'
+        history:
+          type: string
+          description: 'With not_in_archive: the list of the funds that have a history.'
+        changes:
+          type: string
+          description: 'With holdings_at_date_not_enabled: the fund''s changes file, served today.'
+        first:
+          type:
+          - string
+          - 'null'
+          description: 'With before_history: the date of the fund''s oldest file. before_history is answered only once holdings at a date are served.'
+        date:
+          type: string
+          description: 'With invalid_date, holdings_at_date_not_enabled or before_history: the date asked for.'
+        summary:
+          type: string
+          description: 'With not_held_by_daily_funds: the night''s flows, /api/v1/flows.json.'
+    HistoryChange:
+      type: object
+      additionalProperties: true
+      properties:
+        date:
+          type:
+          - string
+          description: The date of the file the step leads to.
+        previous:
+          type:
+          - string
+          description: 'The date of the file it is compared with: the fund''s file before it in the archive, days or a month earlier.'
+        entered:
+          type: array
+          items:
+            type: array
+            prefixItems:
+            - title: key
+              type: string
+            - title: weight
+              type: number
+            items:
+              type:
+              - number
+              - string
+          description: The lines in this file that were not in the previous one, as [key, weight percent], heaviest first. Absent from a restated step, which does not say what entered or exited that day; the snapshots give only its count of positions. Read it with a default, such as step.get("entered", []). A key of digits and a letter is a code the issuer's file gives in place of a ticker. When a ticker exits and such a code enters at about the same weight, and the reverse follows, it is the same security re-keyed, not a trade.
+        exited:
+          type: array
+          items:
+            type: array
+            prefixItems:
+            - title: key
+              type: string
+            - title: weight
+              type: number
+            items:
+              type:
+              - number
+              - string
+          description: The lines in the previous file that are not in this one, as [key, weight percent in the previous file], heaviest first. Absent from a restated step.
+        moved:
+          type: array
+          items:
+            type: array
+            prefixItems:
+            - title: key
+              type: string
+            - title: before
+              type: number
+            - title: after
+              type: number
+            items:
+              type:
+              - number
+              - string
+          description: The lines in both files whose weight moved by moved_threshold_pp or more, as [key, weight before, weight after], largest move first. Absent from a restated step.
+        moved_below_threshold:
+          type:
+          - integer
+          description: How many other lines in both files moved by less. Absent from a restated step.
+        names_turnover_pp:
+          type:
+          - number
+          - 'null'
+          description: 'Half the weight that entered plus the weight that exited, in percentage points: what the change of names carried. Null on a restated step.'
+        weights_moved_pp:
+          type:
+          - number
+          - 'null'
+          description: Half the sum of the absolute changes of weight over every line of either file, in percentage points. It includes price drift, which moves every weight a little each day, so it is not turnover. Null on a restated step.
+        traded_pp:
+          type:
+          - number
+          - 'null'
+          description: What the share counts say was traded, in percentage points of assets, when both files carry them and the fund has traded_min_pairs such steps; null otherwise. A line held in both counts its weight times the change of its quantity beyond the fund's own growth, a line that entered or exited its weight, and the sum is halved.
+        splits_seen:
+          type: array
+          items:
+            type: string
+          description: The lines whose quantity moved by a split ratio while their weight did not, left out of traded_pp. Present when there is one.
+        reverted:
+          type: array
+          items:
+            type: string
+          description: The entered lines the fund held two files earlier, most often a line the issuer's file left out for a day. That exit and this entry are a glitch in the file, not trades, and so is a key of digits and a letter that stood in for the line in the file between. Present when there is one.
+        restated:
+          type:
+          - boolean
+          description: true on a step that is a change of the keys or of the reading of the files, not a trade; absent otherwise. A restated step has no entered, exited, moved or moved_below_threshold, so read them with a default. It is set on the step to a file of the current key scheme, where the parser also reads lines the old one dropped. It is set on the first file of a fund of funds that lists the funds it holds apart from their look-through, and on two files whose weights add up to totals 50 points or more apart. It is also set on the first file that keys apart the preferred shares a file writes under their issuer's common ticker (JPM.PFD rather than JPM), and on a date listed after a fix of the reading.
+        reason:
+          type:
+          - string
+          description: 'Why the step is restated. key_scheme_2: the first file in keys with a market. own_lines_separated: a fund of funds whose earlier files listed the funds it holds beside their look-through, about 200% in all. weight_total_changed: the two totals are 50 points or more apart. weights_from_market_values: weights from market values, or the reverse. preferred_keyed_apart: the preferred shares the file writes under their issuer''s common ticker are keyed as that ticker and .PFD, at the weight the common ticker carried. Otherwise, the reason given with a listed date.'
+        rekeyed:
+          type: array
+          items:
+            type: array
+            prefixItems:
+            - title: old_key
+              type: string
+            - title: keys
+              type: array
+              items:
+                type: string
+            items:
+              type:
+              - array
+              - string
+          description: On a restated step, the old keys that read as other keys today, as [old key, [new keys]]. It covers a spelling brought together (A005930 is 005930.KR), a Toronto code under its New York ticker, and a key that stood for several lines, with the lines the new file holds. It also covers a common ticker whose preferred shares took a key of their own (JPM as [JPM.PFD], or [WFC, WFC.PFD] where the fund holds both).
+        market_added:
+          type:
+          - integer
+          description: On a restated step, how many old keys only took their market (7203 became 7203.JP). Each is in the aliases of the holders shard of its first character.
+        coverage_added_pp:
+          type:
+          - number
+          - 'null'
+          description: 'On a restated step, the weight the new file covers beyond the previous one, in percentage points: lines the old reading dropped, or, below zero, weight the old reading counted twice.'
+      required:
+      - date
+      - previous
+      - names_turnover_pp
+      - weights_moved_pp
+      - traded_pp
+    FundHistory:
+      type: object
+      additionalProperties: true
+      properties:
+        ticker:
+          type:
+          - string
+          description: The fund's ticker.
+        name:
+          type:
+          - string
+          - 'null'
+          description: The fund's name.
+        source_layer:
+          type: string
+          const: issuer
+          description: 'Always issuer: the history is read from the issuers'' own files. The other funds known from SEC filings have none.'
+        key_scheme:
+          type:
+          - integer
+          description: 'The keys the holdings are given in: 2, the scheme of today''s files, where a line listed abroad carries its market (7203.JP). Older files are read in these keys.'
+        first:
+          type:
+          - string
+          description: The date of the oldest file of the fund in the archive.
+        last:
+          type:
+          - string
+          description: The date of the newest.
+        file_dates:
+          type:
+          - integer
+          description: How many file dates the archive holds for the fund.
+        cadence:
+          type:
+          - string
+          - 'null'
+          enum:
+          - daily
+          - monthly
+          - irregular
+          - null
+          description: daily, monthly or irregular, from the gaps between the file dates; null with a single file.
+        snapshots:
+          type: object
+          additionalProperties: true
+          properties:
+            columns:
+              type: array
+              items:
+                type: string
+              description: 'The names of the columns of each row. holdings_as_of: the file date. positions: the lines in the file. top10_weight: the weight of its ten largest lines, in percent; null for the files of a fund of funds before its file kept the funds it holds apart from its own lines. key_scheme: the keys the file was written in, 1 or 2. Scheme 1 is for files read before the switch to keys with a market, late in September 2026. The switch date varies by fund (SPY''s first scheme 2 file is dated 2026-09-25), and the first scheme 2 step is restated. unplaced: for a file of scheme 1, the old keys that cannot be read as one line today because they stood for two companies in that file (SAN for Santander and Sanofi); null for a file of scheme 2.'
+            rows:
+              type: array
+              items:
+                type: array
+                items:
+                  type:
+                  - string
+                  - number
+                  - array
+                  - 'null'
+              description: The rows, oldest first.
+          required:
+          - columns
+          - rows
+          description: One row per file date, oldest first, with the columns named in columns.
+        moved_threshold_pp:
+          type:
+          - number
+          description: 'How far a weight has to move, in percentage points, for its line to be listed under moved: 0.05.'
+        traded_min_pairs:
+          type:
+          - integer
+          description: 'How many steps with share counts on both sides a fund needs before traded_pp is published: 20.'
+        traded_pairs:
+          type:
+          - integer
+          description: How many of the fund's steps have share counts on both sides.
+        traded_pp_from:
+          type:
+          - string
+          - 'null'
+          description: The date of the first of those steps; null when there is none.
+        traded_pp_reason:
+          type:
+          - string
+          - 'null'
+          description: 'Why traded_pp is null in every step: fewer_than_20_pairs_with_share_counts. Null once it is published.'
+        changes:
+          type: array
+          items:
+            $ref: '#/components/schemas/HistoryChange'
+          description: One entry per step from a file to the next, oldest first; its fields are described below.
+        overlap_history:
+          type: object
+          additionalProperties: true
+          properties:
+            with_top_funds_by_overlap:
+              type:
+              - integer
+              description: 'How many funds are followed: the funds whose overlap by weight with this one is highest on the latest files, up to ten.'
+            series:
+              type: object
+              additionalProperties:
+                type: array
+                items:
+                  type: array
+                  prefixItems:
+                  - title: date
+                    type: string
+                  - title: overlap
+                    type: number
+                  items:
+                    type:
+                    - number
+                    - string
+              description: For each followed fund, most overlapping first, [date, overlap by weight in percent] on every file date of either fund from the first date both have a file. Each fund is taken at its latest file on or before the date. It is the overlap by weight the comparisons print, computed here from the archived files. A file of the old key scheme is read in today's keys, so a point can differ from what a comparison printed on the day. A series can step where either fund's history is restated.
+          required:
+          - with_top_funds_by_overlap
+          - series
+          description: How the fund's overlap by weight with its ten closest funds moved; its fields are described below.
+        holdings_at:
+          type:
+          - string
+          - 'null'
+          description: The address of the fund's holdings at any date, with {date} to fill, once it is served; null until then.
+        fund:
+          type:
+          - string
+          - 'null'
+          description: The fund's current file, with its holdings today, cost, returns and risk.
+        ended:
+          type:
+          - object
+          - 'null'
+          additionalProperties: true
+          required:
+          - last_file
+          - source_layer
+          - note
+          properties:
+            last_file:
+              type:
+              - string
+            source_layer:
+              type:
+              - string
+              - 'null'
+            note:
+              type:
+              - string
+          description: Null while read; once not, last_file, source_layer and note.
+        cite_as:
+          type:
+          - string
+          description: 'A citation line: the fund, the dates of its oldest and newest files, and this file''s address.'
+        cite_html:
+          type:
+          - string
+          description: 'The credit as HTML: a link to this file, then its address.'
+        docs:
+          type:
+          - string
+          description: Where the file is documented.
+        license:
+          type:
+          - string
+          description: 'The terms the history is published under: TickerInside''s history terms, not CC BY 4.0.'
+        terms:
+          type:
+          - string
+          description: The terms in full, on the legal notice.
+        attribution:
+          type:
+          - string
+          description: How to credit it, a link to the file where the medium allows one and the name where it does not, then what the history terms allow.
+      required:
+      - ticker
+      - name
+      - source_layer
+      - key_scheme
+      - first
+      - last
+      - file_dates
+      - cadence
+      - snapshots
+      - moved_threshold_pp
+      - traded_min_pairs
+      - traded_pairs
+      - traded_pp_from
+      - traded_pp_reason
+      - changes
+      - overlap_history
+      - holdings_at
+      - fund
+      - ended
+      - cite_as
+      - cite_html
+      - docs
+      - license
+      - terms
+      - attribution
+    Unavailable:
+      type: object
+      additionalProperties: true
+      required:
+      - error
+      - message
+      - status
+      - uptime
+      properties:
+        error:
+          type: string
+          const: unavailable
+        message:
+          type: string
+        status:
+          type: string
+          description: The nightly report.
+        uptime:
+          type: string
+          description: 'The live checks: whether the site fails its own checks.'
+externalDocs:
+  description: The reference, with examples and recipes
+  url: https://tickerinside.com/api/

@@ -1,0 +1,1047 @@
+openapi: 3.2.0
+info:
+  title: TickerInside Batch API
+  version: '1'
+  summary: Holdings of 5,433 US ETFs, which ETFs hold a stock, and overlap, as static JSON.
+  description: TickerInside is an open, machine-readable database of US ETF holdings, with the source and date of each holding.
+  termsOfService: https://tickerinside.com/terms/
+  contact:
+    name: TickerInside
+    email: contact@tickerinside.com
+    url: https://tickerinside.com/api/
+  license:
+    name: CC BY 4.0
+    identifier: CC-BY-4.0
+servers:
+- url: https://tickerinside.com/api/v1
+  description: Static JSON files, and five answers computed from them when asked. No key.
+security: []
+tags:
+- name: Batch
+paths:
+  /batch:
+    get:
+      operationId: getBatch
+      summary: Several fund files, computed
+      description: Each fund as /fund/{ticker}.json answers it, keyed by ticker, with the tickers not covered and why. 1 to 10 funds. The files of the other layers composed in one call add up to at most 55 KB; the first is always composed.
+      externalDocs:
+        url: https://tickerinside.com/api/#batch
+      parameters:
+      - name: funds
+        in: query
+        required: true
+        description: Tickers separated by commas, 1 to 10; case does not matter and a ticker given twice counts once.
+        schema:
+          type: string
+        example: VOO,QQQ
+      - name: format
+        in: query
+        required: false
+        description: 'json only: batch has no CSV twin.'
+        schema:
+          type: string
+          enum:
+          - json
+      responses:
+        '200':
+          description: The answer, computed when asked and kept in the edge cache for up to a day. The example is a real answer, shortened.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Batch'
+              example:
+                asked:
+                - VOO
+                - QQQ
+                - NVDA
+                found: 2
+                not_covered:
+                - error: not_covered
+                  reason: has_security_file
+                  ticker: NVDA
+                  message: 'NVDA is not a fund we cover, but it has a security file: /api/v1/sec/nvda.json lists the covered funds that hold it, if any, with the weight and the date of each file.'
+                  security: https://tickerinside.com/api/v1/sec/nvda.json
+                funds:
+                  VOO:
+                    ticker: VOO
+                    name: Vanguard S&P 500 ETF
+                    page_url: https://tickerinside.com/etf/voo/
+                    cite_as: TickerInside, Vanguard S&P 500 ETF (VOO), holdings from the issuer's file of 2026-08-31, https://tickerinside.com/etf/voo/, CC BY 4.0
+                    cite_html: <a href="https://tickerinside.com/etf/voo/">TickerInside</a> (https://tickerinside.com/etf/voo/)
+                    identifiers:
+                      asset_type: etf
+                      exchange: NYSE Arca
+                      composite_figi: BBG0015VYNT4
+                      share_class_figi: BBG001TC6MC1
+                      cik: '0000036405'
+                      series_id: S000002839
+                      class_id: C000092055
+                    source_layer: issuer
+                    category:
+                      id: us-large-blend
+                      label: US Large Blend
+                      group: us-equity
+                      group_label: US stocks
+                      asset_class: equity
+                      rule: 'In its file of 2026-08-31, 100% of its stocks are US companies; weighted by holding, they sit where 45% of their market''s value is in larger companies (large: up to 78%); growth index funds hold 53% of their value against 55% for companies of the same sizes in the whole market (blend: within 10 points).'
+                      basis: holdings
+                      as_of: '2026-08-31'
+                      facets:
+                        region: us
+                        country: US
+                        size: large
+                        style: blend
+                        top_sectors:
+                        - technology
+                        - financials
+                      measured:
+                        us_share: 1
+                        emerging_share: 0
+                        size_place: 0.445
+                        growth_share: 0.535
+                        growth_share_market: 0.55
+                        top_sector_share: 0.379
+                        country_cover: 1
+                        sector_cover: 1
+                        stocks: 503
+                      method: https://tickerinside.com/etf/category/
+                    as_of: '2026-10-09'
+                    holdings_as_of: '2026-08-31'
+                    expense_ratio: 0.03
+                    expense_ratio_gross: 0.03
+                    expense_ratio_source: sec_filing
+                    expense_ratio_as_of: '2026-04-28'
+                    expense_ratio_filing_url: https://www.sec.gov/Archives/edgar/data/36405/000003640526000181/
+                    yield: 1.06
+                    aum_b: 1729.3
+                    aum_source: market_data
+                    aum_date: '2026-10-10'
+                    etf_class_net_assets_b: 1000
+                    etf_class_net_assets_as_of: '2026-08-31'
+                    positions: 503
+                    breakdown:
+                      sectors_pct:
+                        technology: 37.8939
+                        financials: 12.2468
+                        communication_services: 9.5052
+                        health_care: 9.2852
+                        consumer_discretionary: 9.1491
+                        industrials: 8.3165
+                        consumer_staples: 4.5039
+                        energy: 3.4822
+                        utilities: 1.9853
+                        materials: 1.8283
+                        real_estate: 1.8029
+                      no_sector_pct: 0
+                      sector_coverage_pct: 100
+                      sectors_stated: true
+                      other_funds_pct: 0
+                      mega_cap_tech_pct: 36.2227
+                      top10_us_companies_pct: 37.8591
+                      countries_pct:
+                        US: 99.9993
+                      no_country_pct: 0
+                      answer: In its Vanguard file of 2026-08-31, VOO is 37.9% technology, 12.2% financials and 9.5% communication services by sector, with 36.2% in mega-cap tech and 37.9% in the ten largest US companies by market value.
+                      method: https://tickerinside.com/how-the-numbers-are-produced/#sectors
+                    vol: 14.2
+                    beta: 0.99
+                    mdd3: -16.7
+                    r1: 20.5
+                    r3: 87.5
+                    r5: 87.2
+                    last_close: 715.59
+                    last_close_date: '2026-10-09'
+                    day_change_pct: 0.61
+                    high_52w: 716.2
+                    low_52w: 580.93
+                    currency: USD
+                    holdings:
+                      NVDA: 8.0927
+                      AAPL: 7.0432
+                      MSFT: 5.7033
+                    weekly:
+                    - -0.0238
+                    - -0.025
+                    - 0.0586
+                    weeks_end: '2026-10-09'
+                    license: CC BY 4.0
+                    attribution: Credit TickerInside with a link to the page the figure comes from (cite_as gives it) wherever the medium allows a link, and by name where it does not. How you mark the link is up to you.
+                    source: https://tickerinside.com/how-the-numbers-are-produced/
+                  QQQ:
+                    ticker: QQQ
+                    name: Invesco QQQ Trust
+                    page_url: https://tickerinside.com/etf/qqq/
+                    cite_as: TickerInside, Invesco QQQ Trust (QQQ), holdings from the issuer's file of 2026-10-08, https://tickerinside.com/etf/qqq/, CC BY 4.0
+                    cite_html: <a href="https://tickerinside.com/etf/qqq/">TickerInside</a> (https://tickerinside.com/etf/qqq/)
+                    identifiers:
+                      asset_type: etf
+                      exchange: Nasdaq
+                      composite_figi: BBG000BSWKH7
+                      share_class_figi: BBG001S9GN63
+                      cik: 0001067839
+                      series_id: S000101292
+                      class_id: C000271435
+                    source_layer: issuer
+                    category:
+                      id: us-large-growth
+                      label: US Large Growth
+                      group: us-equity
+                      group_label: US stocks
+                      asset_class: equity
+                      rule: 'In its file of 2026-10-08, 97% of its stocks are US companies; weighted by holding, they sit where 39% of their market''s value is in larger companies (large: up to 78%); growth index funds hold 72% of their value against 60% for companies of the same sizes in the whole market (growth: 10 points or more above); technology companies are 60% of its stocks whose sector is known, within 2.5 points of the 60% line for a sector fund, and it keeps the side of that line it had the night before.'
+                      basis: holdings
+                      as_of: '2026-10-08'
+                      facets:
+                        region: us
+                        country: US
+                        size: large
+                        style: growth
+                        top_sectors:
+                        - technology
+                        - communication_services
+                      measured:
+                        us_share: 0.967
+                        emerging_share: 0.006
+                        size_place: 0.395
+                        growth_share: 0.716
+                        growth_share_market: 0.599
+                        top_sector_share: 0.596
+                        country_cover: 1
+                        sector_cover: 1
+                        stocks: 100
+                      method: https://tickerinside.com/etf/category/
+                    as_of: '2026-10-09'
+                    holdings_as_of: '2026-10-08'
+                    expense_ratio: 0.18
+                    expense_ratio_gross: 0.18
+                    expense_ratio_source: sec_filing
+                    expense_ratio_as_of: '2025-12-19'
+                    expense_ratio_filing_url: https://www.sec.gov/Archives/edgar/data/1067839/000110465925123273/
+                    yield: 0.42
+                    aum_b: 498.9
+                    aum_source: market_data
+                    aum_date: '2026-10-10'
+                    etf_class_net_assets_b: null
+                    etf_class_net_assets_as_of: null
+                    positions: 100
+                    breakdown:
+                      sectors_pct:
+                        technology: 59.3495
+                        communication_services: 14.8228
+                        consumer_discretionary: 10.198
+                        consumer_staples: 5.7355
+                        health_care: 3.6579
+                        industrials: 3.1301
+                        utilities: 1.0639
+                        materials: 0.9198
+                        energy: 0.4538
+                        financials: 0.1949
+                      no_sector_pct: 0
+                      sector_coverage_pct: 100
+                      sectors_stated: true
+                      other_funds_pct: 0
+                      mega_cap_tech_pct: 40.3926
+                      top10_us_companies_pct: 48.0918
+                      countries_pct:
+                        US: 96.1955
+                        NL: 1.2448
+                        CA: 0.9823
+                      no_country_pct: 0
+                      answer: In its Invesco file of 2026-10-08, QQQ is 59.3% technology, 14.8% communication services and 10.2% consumer discretionary by sector, with 40.4% in mega-cap tech and 48.1% in the ten largest US companies by market value. By country, 96.2% of QQQ is in the United States, 1.2% in the Netherlands and 1.0% in Canada.
+                      method: https://tickerinside.com/how-the-numbers-are-produced/#sectors
+                    vol: 19.5
+                    beta: 1.29
+                    mdd3: -21.3
+                    r1: 28
+                    r3: 109.2
+                    r5: 109.8
+                    last_close: 751.27
+                    last_close_date: '2026-10-09'
+                    day_change_pct: 0.49
+                    high_52w: 759.66
+                    low_52w: 558.28
+                    currency: USD
+                    holdings:
+                      NVDA: 8.3343
+                      AAPL: 7.4544
+                      MSFT: 5.8227
+                    weekly:
+                    - -0.0292
+                    - -0.0262
+                    - 0.0649
+                    weeks_end: '2026-10-09'
+                    license: CC BY 4.0
+                    attribution: Credit TickerInside with a link to the page the figure comes from (cite_as gives it) wherever the medium allows a link, and by name where it does not. How you mark the link is up to you.
+                    source: https://tickerinside.com/how-the-numbers-are-produced/
+                license: CC BY 4.0
+                attribution: Credit TickerInside with a link to the page each fund file's cite_as names wherever the medium allows a link, and by name where it does not. How you mark the link is up to you.
+                docs: https://tickerinside.com/api/#batch
+        '304':
+          description: 'Not modified: the ETag of your copy, sent in If-None-Match, is still current.'
+        '400':
+          description: 'The query was refused: reason and parameter say what to fix, and limit and asked give the figures of a call past the limits.'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/BadRequest'
+              example:
+                error: bad_request
+                reason: too_few_funds
+                message: funds must name at least 2 different funds.
+                parameter: funds
+                min: 2
+                docs: https://tickerinside.com/api/#overlap
+        '405':
+          description: Another method than GET or HEAD.
+          content:
+            application/json:
+              schema:
+                type: object
+                additionalProperties: true
+                required:
+                - error
+                - message
+                properties:
+                  error:
+                    type: string
+                    const: method_not_allowed
+                  message:
+                    type: string
+                  docs:
+                    type: string
+        '503':
+          description: 'The answer could not be computed just then: retry after a minute.'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Unavailable'
+      tags:
+      - Batch
+components:
+  schemas:
+    Fund:
+      type: object
+      properties:
+        ticker:
+          type:
+          - string
+          - 'null'
+          description: The fund's ticker, upper case.
+        name:
+          type:
+          - string
+          - 'null'
+          description: The fund's name.
+        page_url:
+          type:
+          - string
+          - 'null'
+          description: The fund's page on the site, or null when it has none yet. Link it when you quote a figure.
+        cite_as:
+          type:
+          - string
+          - 'null'
+          description: 'A citation line for a quoted figure: the fund, its source file and that file''s date, a URL to check it, and the licence.'
+        cite_html:
+          type:
+          - string
+          - 'null'
+          description: 'The credit as HTML: a link to the page cite_as names, then its address.'
+        identifiers:
+          type: object
+          additionalProperties: true
+          required:
+          - asset_type
+          - exchange
+          - composite_figi
+          - share_class_figi
+          - cik
+          - series_id
+          - class_id
+          properties:
+            asset_type:
+              type: string
+              enum:
+              - etf
+              - etn
+              - stock
+              description: 'etf for a fund; etn for an exchange-traded note, a bank''s debt with no holdings; stock for any other listed share: a company''s stock, a depositary receipt, a closed-end fund.'
+            exchange:
+              type:
+              - string
+              - 'null'
+              enum:
+              - Cboe BYX
+              - Cboe BZX
+              - Cboe EDGA
+              - Cboe EDGX
+              - IEX
+              - NYSE
+              - NYSE American
+              - NYSE Arca
+              - NYSE Texas
+              - Nasdaq
+              - Nasdaq BX
+              - TXSE
+              - null
+              description: 'The exchange the security is listed on, as Nasdaq Trader''s directory names it: Nasdaq, NYSE, NYSE Arca, Cboe BZX and the others its codes stand for. Null when the directory does not list it. Unlike the identifiers, it changes when the listing moves.'
+            composite_figi:
+              type:
+              - string
+              - 'null'
+              pattern: ^BBG[0-9BCDFGHJKLMNPQRSTVWXYZ]{8}[0-9]$
+              description: The Financial Instrument Global Identifier of the US listing (the composite FIGI of exchange code US), from OpenFIGI, asked by ticker. FIGIs are in the public domain. Null until OpenFIGI answers for the ticker with one security of this asset type.
+            share_class_figi:
+              type:
+              - string
+              - 'null'
+              pattern: ^BBG[0-9BCDFGHJKLMNPQRSTVWXYZ]{8}[0-9]$
+              description: The FIGI of the share class, the same on every market it trades in. Null with composite_figi.
+            cik:
+              type:
+              - string
+              - 'null'
+              pattern: ^[0-9]{10}$
+              description: 'The SEC''s Central Index Key, ten digits as EDGAR writes it, from the SEC''s ticker files: the company''s, or for a fund the registrant''s, the trust that files for it and for its other funds. Several securities can share one, so key records on composite_figi or class_id instead. Null when the SEC''s files do not list the ticker.'
+            series_id:
+              type:
+              - string
+              - 'null'
+              pattern: ^S[0-9]{9}$
+              description: 'For a fund, the SEC''s id of its series (S and nine digits), which tells it apart from the other funds of its registrant: from the SEC''s fund ticker file, or from the Form N-PORT its holdings are read from where the two differ. Null for a stock, and for a trust that files as a company.'
+            class_id:
+              type:
+              - string
+              - 'null'
+              pattern: ^C[0-9]{9}$
+              description: For a fund, the SEC's id of its share class (C and nine digits). Null when series_id is, or when it comes from the Form N-PORT and the fund ticker file lists the ticker under another series.
+          description: 'FIGI and SEC ids: /api/v1/identifiers.json.'
+        source_layer:
+          type:
+          - string
+          - 'null'
+          description: 'Where the holdings come from. issuer: the issuer''s own file (the issuer layer). sec_nport: the fund''s latest public SEC Form N-PORT filing (the SEC layer), whose holdings are the portfolio at the quarter end it describes (report_date), not on the day you read them; index.json coverage.sec_nport_age says how old the layer''s holdings are on the day of the build. sec_nport_derivatives: a derivative-based fund, with its contracts apart from its holdings. sec_nport_bonds: a fixed income fund. sec_nport_multi_asset: a fund of funds or of several asset classes. trust_filings: a trust or commodity pool that files no Form N-PORT, from its own SEC filing. sponsor_files, prospectus: see /api/#sponsor-files.'
+          enum:
+          - issuer
+          - sec_nport
+          - sec_nport_derivatives
+          - sec_nport_bonds
+          - sec_nport_multi_asset
+          - trust_filings
+          - sponsor_files
+          - prospectus
+        category:
+          type: object
+          properties:
+            id:
+              type:
+              - string
+              - 'null'
+            label:
+              type:
+              - string
+              - 'null'
+            group:
+              type:
+              - string
+              - 'null'
+            group_label:
+              type:
+              - string
+              - 'null'
+            asset_class:
+              type:
+              - string
+              - 'null'
+            rule:
+              type:
+              - string
+              - 'null'
+            basis:
+              type:
+              - string
+              - 'null'
+            as_of:
+              type:
+              - string
+              - 'null'
+            facets:
+              type: object
+              properties:
+                region:
+                  type:
+                  - string
+                  - 'null'
+                country:
+                  type:
+                  - string
+                  - 'null'
+                size:
+                  type:
+                  - string
+                  - 'null'
+                style:
+                  type:
+                  - string
+                  - 'null'
+                top_sectors:
+                  type:
+                  - array
+                  - 'null'
+                  items:
+                    type:
+                    - 'null'
+                    - string
+              additionalProperties: true
+            measured:
+              type: object
+              properties:
+                us_share:
+                  type:
+                  - number
+                  - 'null'
+                emerging_share:
+                  type:
+                  - number
+                  - 'null'
+                size_place:
+                  type:
+                  - number
+                  - 'null'
+                growth_share:
+                  type:
+                  - number
+                  - 'null'
+                growth_share_market:
+                  type:
+                  - number
+                  - 'null'
+                top_sector_share:
+                  type:
+                  - number
+                  - 'null'
+                country_cover:
+                  type:
+                  - number
+                  - 'null'
+                sector_cover:
+                  type:
+                  - number
+                  - 'null'
+                stocks:
+                  type:
+                  - number
+                  - 'null'
+              additionalProperties: true
+            method:
+              type:
+              - string
+              - 'null'
+          additionalProperties: true
+          description: 'TickerInside''s category (id, label, group, rule, measures): https://tickerinside.com/etf/category/'
+        as_of:
+          type:
+          - string
+          - 'null'
+          description: 'The price date: the date of the price data behind every return and risk figure here. Null for an SEC-layer fund whose weekly is null.'
+        holdings_as_of:
+          type:
+          - string
+          - 'null'
+          description: 'The date of the holdings: the date of the issuer''s file, or for an SEC-layer fund the quarter end its filing describes. It is often weeks older than as_of, and often differs from the other fund''s in a comparison, so quote it with any holdings figure. It can also be later than as_of, since some issuers date their file with the next business day.'
+        expense_ratio:
+          type:
+          - number
+          - 'null'
+          description: 'Annual cost as a percentage of assets: 0.03 means three basis points, or $3 a year on $10,000. From the fund''s newest SEC filing that states it, after any fee waiver when the filing gives both figures, else from the market data. Null when neither gives one. Never read a null as zero.'
+        expense_ratio_gross:
+          type:
+          - number
+          - 'null'
+          description: The total of the filing's fee table before any waiver, in percent, which counts the fees of the funds it holds; expense_ratio when there is no waiver. Null unless expense_ratio is from a filing.
+        expense_ratio_source:
+          type:
+          - string
+          - 'null'
+          description: 'Where expense_ratio comes from. sec_filing: the fee table the filing tags by share class, from the SEC''s risk/return data sets or the filing itself. sec_filing_text: the fee table''s text, read in a newer prospectus, where no other figure exists or one agrees with it. market_data: undated, also where the filing read is over a year old and differs, or is not matched to the fund. Null when expense_ratio is null.'
+          enum:
+          - sec_filing
+          - sec_filing_text
+          - market_data
+          - null
+        expense_ratio_as_of:
+          type:
+          - string
+          - 'null'
+          description: The day that filing reached the SEC, or null.
+        expense_ratio_filing_url:
+          type:
+          - string
+          - 'null'
+          description: That filing on EDGAR, or null.
+        yield:
+          type:
+          - number
+          - 'null'
+          description: Trailing twelve month distribution yield, as a percentage.
+        aum_b:
+          type:
+          - number
+          - 'null'
+          description: Assets under management, in billions of US dollars, rounded to 0.1, from the market data, read on aum_date. For a Vanguard fund it is the whole fund, every share class together; etf_class_net_assets_b is the ETF's own class. Null when the market data gives no size, the usual case for an SEC-layer fund, whose size is then net_assets on report_date.
+        aum_source:
+          type:
+          - string
+          - 'null'
+          description: 'Where aum_b comes from. market_data: read on aum_date. market_data_kept: the latest read gave no size, so the last size known is kept, with the day it was read, for 30 days at most. Null when aum_b is null.'
+          enum:
+          - market_data
+          - market_data_kept
+          - null
+        aum_date:
+          type:
+          - string
+          - 'null'
+          description: The day aum_b was read from the market data. Null when aum_b is null, or for a size read before the day was recorded.
+        etf_class_net_assets_b:
+          type:
+          - number
+          - 'null'
+          description: For a Vanguard fund, the net assets of its ETF share class alone, in billions of US dollars, as Vanguard states them. Such a fund's ETF is one class of a fund that also has mutual fund classes. Every value held in /api/v1/sec/{ticker}.json is computed from it for such a fund. Null for any other fund.
+        etf_class_net_assets_as_of:
+          type:
+          - string
+          - 'null'
+          description: The date Vanguard gives for etf_class_net_assets_b. Null when it is.
+        positions:
+          type:
+          - integer
+          - 'null'
+          description: How many positions the holdings map lists; filing_lines or file_lines count every line of a fund of another layer.
+        breakdown:
+          type:
+          - object
+          - 'null'
+          additionalProperties: true
+          required:
+          - sectors_pct
+          - no_sector_pct
+          - sector_coverage_pct
+          - sectors_stated
+          - other_funds_pct
+          - mega_cap_tech_pct
+          - top10_us_companies_pct
+          - countries_pct
+          - no_country_pct
+          - answer
+          - method
+          properties:
+            sectors_pct:
+              type: object
+              additionalProperties:
+                type: number
+            no_sector_pct:
+              type: number
+            sector_coverage_pct:
+              type:
+              - number
+              - 'null'
+            sectors_stated:
+              type: boolean
+            other_funds_pct:
+              type: number
+            mega_cap_tech_pct:
+              type: number
+            top10_us_companies_pct:
+              type: number
+            countries_pct:
+              type: object
+              additionalProperties:
+                type: number
+            no_country_pct:
+              type: number
+            answer:
+              type: string
+            method:
+              type: string
+          description: 'In percent of the fund, to four decimals: sectors_pct, no_sector_pct, sector_coverage_pct, sectors_stated (true from 50%), other_funds_pct, mega_cap_tech_pct (Apple, Microsoft, Nvidia, Alphabet, Amazon, Meta Platforms, Broadcom and Tesla), top10_us_companies_pct, countries_pct, no_country_pct (lines of no known country), answer, method. Null for another layer.'
+        vol:
+          type:
+          - number
+          - 'null'
+          description: Annualised standard deviation of weekly total returns over three years, as a percentage.
+        beta:
+          type:
+          - number
+          - 'null'
+          description: Sensitivity to the S&P 500, from three years of weekly returns. 1.00 means it has moved with the index.
+        mdd3:
+          type:
+          - number
+          - 'null'
+          description: Largest peak to trough decline over three years, measured on weekly closes. Negative.
+        r1:
+          type:
+          - number
+          - 'null'
+          description: Cumulative total return over one year, as a percentage. Not annualised.
+        r3:
+          type:
+          - number
+          - 'null'
+          description: Cumulative total return over three years, as a percentage. Not annualised.
+        r5:
+          type:
+          - number
+          - 'null'
+          description: Cumulative total return over five years, as a percentage. Not annualised.
+        last_close:
+          type:
+          - number
+          - 'null'
+          description: The last closing price, raw, in the fund's trading currency. Returns use dividend-adjusted closes; this figure is the market close as traded.
+        last_close_date:
+          type:
+          - string
+          - 'null'
+          description: The date of that close.
+        day_change_pct:
+          type:
+          - number
+          - 'null'
+          description: The move from the previous close to the last, as a percentage.
+        high_52w:
+          type:
+          - number
+          - 'null'
+          description: The highest raw close over the last 252 trading days.
+        low_52w:
+          type:
+          - number
+          - 'null'
+          description: The lowest raw close over the last 252 trading days.
+        currency:
+          type:
+          - string
+          - 'null'
+          description: The trading currency of the price fields.
+        holdings:
+          type:
+          - object
+          - 'null'
+          additionalProperties:
+            type:
+            - number
+            - 'null'
+          description: 'The positions, as a map of key to percentage weight. For the issuer layer, the positions as the issuer publishes them. For an SEC-layer fund, every position the filing lets us key to a ticker; the rest is counted in unmapped_pct. A key is the ticker of a US line (a share class keeps its dot, BRK.B), or a local code and its market for a line listed abroad (7203.JP). Preferred shares filed under their issuer''s common ticker are keyed as that ticker and .PFD (JPM.PFD), apart from the common stock. A key of digits and a letter is a code the issuer''s file gives in place of a ticker, usually for a line whose ticker changed or was delisted. The overlap between two stock funds is computed from this field. For a fund of another layer, tickers, then other lines in lower case: a bond as issuer, coupon and maturity, else its name; never an identifier or a contract.'
+        weekly:
+          type:
+          - array
+          - 'null'
+          items:
+            type:
+            - 'null'
+            - number
+          description: 156 weekly total returns as decimals, oldest first, ending at as_of. The weeks are the same in every fund and stock file, so any basket of them can be correlated without matching dates. A week is null when its return cannot be computed, because the fund's prices begin later or a weekly close is missing. An empty list for an issuer-layer fund with fewer than 110 weekly returns in those weeks, and null for a fund of another layer with fewer.
+        weeks_end:
+          type:
+          - string
+          - 'null'
+          description: The date the weekly series ends, always as_of. It is set even when weekly is an empty list, and null, like as_of, when weekly is null.
+        license:
+          type:
+          - string
+          - 'null'
+          description: The licence the data is published under.
+        attribution:
+          type:
+          - string
+          - 'null'
+          description: 'How to credit the data: a link to the page cite_as names where the medium allows one, the name where it does not.'
+        source:
+          type:
+          - string
+          - 'null'
+          description: Where the method behind these figures is written down.
+        report_date:
+          type:
+          - string
+          - 'null'
+          description: The quarter end the filing describes, the end of one of the fund's fiscal quarters. The holdings are the portfolio on that day, not on the day you read them; index.json coverage.sec_nport_age says how old the layer's holdings are on the day of the build. Quote this date with any figure from these holdings.
+        filed:
+          type:
+          - string
+          - 'null'
+          description: The day the filing reached the SEC, usually about 60 days after report_date.
+        filing_url:
+          type:
+          - string
+          - 'null'
+          description: The filing itself on SEC EDGAR, to check any figure against the source.
+        net_assets:
+          type:
+          - integer
+          - 'null'
+          description: The fund's net assets on report_date, in US dollars, as filed. For an ETF that is one share class of a larger fund, it covers every class.
+        multi_class:
+          type:
+          - boolean
+          - 'null'
+          description: True when the ETF is one share class of a fund that also has mutual fund classes. The holdings and weights are then the whole fund's, which is the same portfolio, and so is net_assets.
+        stock_pct:
+          type:
+          - number
+          - 'null'
+          description: How much of net assets the filing lists as common or preferred stock, long positions only. Cash, bonds, derivatives and collateral make up the rest and are not in holdings.
+        unmapped_pct:
+          type:
+          - number
+          - 'null'
+          description: The part of stock_pct that could not be tied to a ticker and is left out of holdings, usually private companies, warrants and thinly traded foreign lines. The holdings add up to stock_pct minus this.
+        abroad:
+          type:
+          - array
+          - 'null'
+          description: Tickers in holdings that are a foreign company's local code, where the US list gives the same ticker to another company. Such a position is the foreign company, so the fund is not listed among the US company's holders in /api/v1/sec/. Lines listed abroad now carry their market (ALV.DE is Allianz, ALV is Autoliv), so this list is normally empty.
+        holdings_kind:
+          type:
+          - string
+          - 'null'
+          description: 'What the map of a fund of another layer holds: bond, multi-asset, stock, derivative (stocks held outright, never contracts), commodity (a trust''s asset) or prospectus (none yet).'
+          enum:
+          - stock
+          - bond
+          - derivative
+          - commodity
+          - multi-asset
+          - prospectus
+        listed_pct:
+          type:
+          - number
+          - 'null'
+          description: The share of net assets the map shows, in percent. Not listed is not the same as not held.
+        etf_file:
+          type:
+          - string
+          - 'null'
+          description: The /etf/ file this answer is built from, whose fields follow.
+      additionalProperties: true
+      required:
+      - ticker
+      - name
+      - page_url
+      - cite_as
+      - cite_html
+      - identifiers
+      - source_layer
+      - category
+      - as_of
+      - holdings_as_of
+      - expense_ratio
+      - expense_ratio_gross
+      - expense_ratio_source
+      - expense_ratio_as_of
+      - expense_ratio_filing_url
+      - yield
+      - aum_b
+      - aum_source
+      - aum_date
+      - etf_class_net_assets_b
+      - etf_class_net_assets_as_of
+      - positions
+      - breakdown
+      - vol
+      - beta
+      - mdd3
+      - r1
+      - r3
+      - r5
+      - last_close
+      - last_close_date
+      - day_change_pct
+      - high_52w
+      - low_52w
+      - currency
+      - holdings
+      - weekly
+      - weeks_end
+      - license
+      - attribution
+      - source
+    Batch:
+      type: object
+      additionalProperties: true
+      properties:
+        asked:
+          type: array
+          items:
+            type: string
+          description: The tickers asked for, upper case, each once, in the order asked.
+        found:
+          type: integer
+          description: How many of them are in funds.
+        not_covered:
+          type: array
+          items:
+            type: object
+            additionalProperties: true
+            required:
+            - error
+            - ticker
+            - message
+            properties:
+              error:
+                type: string
+                const: not_covered
+              ticker:
+                type: string
+              reason:
+                type: string
+                enum:
+                - has_security_file
+                - no_file
+              message:
+                type: string
+              security:
+                type: string
+              fund:
+                type: string
+              covered:
+                type: string
+          description: 'The tickers with no fund file, each with error not_covered, ticker and message: reason has_security_file and security for one with a stock file, else reason no_file and fund, its own address, which gives the specific reason, and covered.'
+        not_included:
+          type: array
+          items:
+            type: object
+            additionalProperties: true
+            required:
+            - ticker
+            - fund
+            - reason
+            properties:
+              ticker:
+                type: string
+              fund:
+                type: string
+              reason:
+                type: string
+                enum:
+                - over_budget
+          description: Funds of the other layers past what one call composes, each with ticker, fund, its own address, and reason over_budget. Absent when there is none.
+        not_included_note:
+          type: string
+          description: Why not_included is there.
+        renamed:
+          type: object
+          additionalProperties:
+            type: string
+          description: Each ticker of a fund renamed, with the ticker of the file served under it. Absent when there is none.
+        funds:
+          type: object
+          additionalProperties:
+            $ref: '#/components/schemas/Fund'
+          description: 'Each fund found, by ticker as asked: what /api/v1/fund/{ticker}.json answers, a fund file of the stock layers byte for byte, or the answer composed for a fund of another layer.'
+        license:
+          type: string
+          description: The licence the data is published under.
+        attribution:
+          type: string
+          description: 'How to credit the data: a link to the page each fund file''s cite_as names where the medium allows one, the name where it does not.'
+        docs:
+          type: string
+          description: The reference of this endpoint.
+      required:
+      - asked
+      - found
+      - not_covered
+      - funds
+      - license
+      - attribution
+      - docs
+    BadRequest:
+      type: object
+      additionalProperties: true
+      properties:
+        error:
+          type: string
+          const: bad_request
+          description: Always bad_request.
+        reason:
+          type: string
+          enum:
+          - missing_parameter
+          - unknown_parameter
+          - repeated_parameter
+          - invalid_value
+          - too_few_funds
+          - too_many_funds
+          - too_large
+          - no_price_history
+          description: missing_parameter, unknown_parameter, repeated_parameter, invalid_value, too_few_funds, too_many_funds, too_large, a call past the limits of its endpoint (see limit and asked), or no_price_history, Find with no fund held that has weekly returns here.
+        message:
+          type: string
+          description: What to fix, in words.
+        parameter:
+          type: string
+          description: The parameter to fix. Absent with too_large.
+        min:
+          type: integer
+          description: 'With too_few_funds: the fewest funds the parameter takes.'
+        max:
+          type: integer
+          description: 'With too_many_funds: the most funds the parameter takes.'
+        limit:
+          type: object
+          additionalProperties:
+            type: integer
+          description: 'With too_large: the limit the call passed, as chars (the size of the files read, in bytes, a file of the other layers for a third of it), pairs (the holdings overlap compares), holdings (those a look-through or diversify reads), comparisons (those of diversify''s overlaps) or subrequests (the reads of files and of the edge cache one call makes).'
+        asked:
+          type: object
+          additionalProperties:
+            type: integer
+          description: 'With too_large: the call''s own figure for that limit.'
+        files:
+          type: object
+          additionalProperties:
+            type: integer
+          description: 'With too_large past limit.chars: what each fund''s file weighed, by ticker, in the units of chars (diversify''s asked.chars adds the reference file''s), so that a client can drop the largest.'
+        holdings_by_fund:
+          type: object
+          additionalProperties:
+            type: integer
+          description: 'With too_large on diversify past limit.holdings or limit.comparisons: the lines of each fund counted, by ticker (before any fund is read, those with a compact file).'
+        answered_by:
+          type: object
+          additionalProperties: true
+          description: 'With too_large from overlap or lookthrough, what answers the same question, as the message names it: mcp, the MCP server''s tool (url, tool, arguments); for two funds diversify answers, diversify and page; for a portfolio whose x-ray the site writes, page.'
+        docs:
+          type: string
+          description: The reference of this endpoint.
+      required:
+      - error
+      - reason
+      - message
+      - docs
+    Unavailable:
+      type: object
+      additionalProperties: true
+      required:
+      - error
+      - message
+      - status
+      - uptime
+      properties:
+        error:
+          type: string
+          const: unavailable
+        message:
+          type: string
+        status:
+          type: string
+          description: The nightly report.
+        uptime:
+          type: string
+          description: 'The live checks: whether the site fails its own checks.'
+externalDocs:
+  description: The reference, with examples and recipes
+  url: https://tickerinside.com/api/

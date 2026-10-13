@@ -23,6 +23,22 @@ maintainers:
 - FN: APIs.json
   email: info@apis.io
 common:
+- type: AgenticAccess
+  url: agentic-access/tickerinside-agentic-access.yml
+- type: Spectral
+  url: rules/tickerinside-rules.yml
+- type: JSONLD
+  url: json-ld/tickerinside-context.jsonld
+- type: Vocabulary
+  url: vocabulary/tickerinside-vocabulary.yml
+- type: DataModel
+  url: data-model/tickerinside-data-model.yml
+- type: ErrorCatalog
+  url: errors/tickerinside-problem-types.yml
+- type: Overlay
+  url: overlays/tickerinside-openapi-overlay.yaml
+- type: MCPServer
+  url: mcp/tickerinside-mcp.yml
 - type: CLI
   url: cli/tickerinside-cli.yml
 - type: Security
@@ -54,7 +70,7 @@ common:
 - type: DomainSecurity
   url: security/tickerinside-domain-security.yml
 - type: Website
-  url: https://tickerinside.com/apis.json
+  url: https://tickerinside.com/
 - type: Documentation
   url: https://tickerinside.com/api
 - type: OpenAPI
@@ -69,6 +85,307 @@ apis:
   humanURL: https://tickerinside.com/api
   baseURL: https://tickerinside.com/api/v1
   aid: tickerinside:tickerinside-api
+- aid: tickerinside:tickerinside-batch-api
+  name: TickerInside Batch API
+  description: The Batch API from TickerInside — 1 operation(s) for batch.
+  humanURL: https://tickerinside.com/api
+  baseURL: https://tickerinside.com/api/v1
+  tags:
+  - Batch
+  properties:
+  - type: OpenAPI
+    url: openapi/tickerinside-batch-api-openapi.yml
+- aid: tickerinside:tickerinside-changelog-json-api
+  name: TickerInside Changelog.json API
+  description: The Changelog.json API from TickerInside — 1 operation(s) for changelog.json.
+  humanURL: https://tickerinside.com/api
+  baseURL: https://tickerinside.com/api/v1
+  tags:
+  - Changelog.json
+  properties:
+  - type: OpenAPI
+    url: openapi/tickerinside-changelog-json-api-openapi.yml
+- aid: tickerinside:tickerinside-compare-api
+  name: TickerInside Compare API
+  description: The Compare API from TickerInside — 1 operation(s) for compare.
+  humanURL: https://tickerinside.com/api
+  baseURL: https://tickerinside.com/api/v1
+  tags:
+  - Compare
+  properties:
+  - type: OpenAPI
+    url: openapi/tickerinside-compare-api-openapi.yml
+- aid: tickerinside:tickerinside-corrections-json-api
+  name: TickerInside Corrections.json API
+  description: The Corrections.json API from TickerInside — 1 operation(s) for corrections.json.
+  humanURL: https://tickerinside.com/api
+  baseURL: https://tickerinside.com/api/v1
+  tags:
+  - Corrections.json
+  properties:
+  - type: OpenAPI
+    url: openapi/tickerinside-corrections-json-api-openapi.yml
+- aid: tickerinside:tickerinside-deprecations-json-api
+  name: TickerInside Deprecations.json API
+  description: The Deprecations.json API from TickerInside — 1 operation(s) for deprecations.json.
+  humanURL: https://tickerinside.com/api
+  baseURL: https://tickerinside.com/api/v1
+  tags:
+  - Deprecations.json
+  properties:
+  - type: OpenAPI
+    url: openapi/tickerinside-deprecations-json-api-openapi.yml
+- aid: tickerinside:tickerinside-diversify-api
+  name: TickerInside Diversify API
+  description: The Diversify API from TickerInside — 3 operation(s) for diversify.
+  humanURL: https://tickerinside.com/api
+  baseURL: https://tickerinside.com/api/v1
+  tags:
+  - Diversify
+  properties:
+  - type: OpenAPI
+    url: openapi/tickerinside-diversify-api-openapi.yml
+- aid: tickerinside:tickerinside-etf-api
+  name: TickerInside Etf API
+  description: The Etf API from TickerInside — 1 operation(s) for etf.
+  humanURL: https://tickerinside.com/api
+  baseURL: https://tickerinside.com/api/v1
+  tags:
+  - Etf
+  properties:
+  - type: OpenAPI
+    url: openapi/tickerinside-etf-api-openapi.yml
+- aid: tickerinside:tickerinside-flows-api
+  name: TickerInside Flows API
+  description: The Flows API from TickerInside — 1 operation(s) for flows.
+  humanURL: https://tickerinside.com/api
+  baseURL: https://tickerinside.com/api/v1
+  tags:
+  - Flows
+  properties:
+  - type: OpenAPI
+    url: openapi/tickerinside-flows-api-openapi.yml
+- aid: tickerinside:tickerinside-flows-json-api
+  name: TickerInside Flows.json API
+  description: The Flows.json API from TickerInside — 1 operation(s) for flows.json.
+  humanURL: https://tickerinside.com/api
+  baseURL: https://tickerinside.com/api/v1
+  tags:
+  - Flows.json
+  properties:
+  - type: OpenAPI
+    url: openapi/tickerinside-flows-json-api-openapi.yml
+- aid: tickerinside:tickerinside-fund-api
+  name: TickerInside Fund API
+  description: The Fund API from TickerInside — 1 operation(s) for fund.
+  humanURL: https://tickerinside.com/api
+  baseURL: https://tickerinside.com/api/v1
+  tags:
+  - Fund
+  properties:
+  - type: OpenAPI
+    url: openapi/tickerinside-fund-api-openapi.yml
+- aid: tickerinside:tickerinside-funds-json-api
+  name: TickerInside Funds.json API
+  description: The Funds.json API from TickerInside — 1 operation(s) for funds.json.
+  humanURL: https://tickerinside.com/api
+  baseURL: https://tickerinside.com/api/v1
+  tags:
+  - Funds.json
+  properties:
+  - type: OpenAPI
+    url: openapi/tickerinside-funds-json-api-openapi.yml
+- aid: tickerinside:tickerinside-history-api
+  name: TickerInside History API
+  description: The History API from TickerInside — 1 operation(s) for history.
+  humanURL: https://tickerinside.com/api
+  baseURL: https://tickerinside.com/api/v1
+  tags:
+  - History
+  properties:
+  - type: OpenAPI
+    url: openapi/tickerinside-history-api-openapi.yml
+- aid: tickerinside:tickerinside-history-json-api
+  name: TickerInside History.json API
+  description: The History.json API from TickerInside — 1 operation(s) for history.json.
+  humanURL: https://tickerinside.com/api
+  baseURL: https://tickerinside.com/api/v1
+  tags:
+  - History.json
+  properties:
+  - type: OpenAPI
+    url: openapi/tickerinside-history-json-api-openapi.yml
+- aid: tickerinside:tickerinside-holders-api
+  name: TickerInside Holders API
+  description: The Holders API from TickerInside — 1 operation(s) for holders.
+  humanURL: https://tickerinside.com/api
+  baseURL: https://tickerinside.com/api/v1
+  tags:
+  - Holders
+  properties:
+  - type: OpenAPI
+    url: openapi/tickerinside-holders-api-openapi.yml
+- aid: tickerinside:tickerinside-holders-json-api
+  name: TickerInside Holders.json API
+  description: The Holders.json API from TickerInside — 1 operation(s) for holders.json.
+  humanURL: https://tickerinside.com/api
+  baseURL: https://tickerinside.com/api/v1
+  tags:
+  - Holders.json
+  properties:
+  - type: OpenAPI
+    url: openapi/tickerinside-holders-json-api-openapi.yml
+- aid: tickerinside:tickerinside-identifiers-json-api
+  name: TickerInside Identifiers.json API
+  description: The Identifiers.json API from TickerInside — 1 operation(s) for identifiers.json.
+  humanURL: https://tickerinside.com/api
+  baseURL: https://tickerinside.com/api/v1
+  tags:
+  - Identifiers.json
+  properties:
+  - type: OpenAPI
+    url: openapi/tickerinside-identifiers-json-api-openapi.yml
+- aid: tickerinside:tickerinside-index-json-api
+  name: TickerInside Index.json API
+  description: The Index.json API from TickerInside — 1 operation(s) for index.json.
+  humanURL: https://tickerinside.com/api
+  baseURL: https://tickerinside.com/api/v1
+  tags:
+  - Index.json
+  properties:
+  - type: OpenAPI
+    url: openapi/tickerinside-index-json-api-openapi.yml
+- aid: tickerinside:tickerinside-lookthrough-api
+  name: TickerInside Lookthrough API
+  description: The Lookthrough API from TickerInside — 1 operation(s) for lookthrough.
+  humanURL: https://tickerinside.com/api
+  baseURL: https://tickerinside.com/api/v1
+  tags:
+  - Lookthrough
+  properties:
+  - type: OpenAPI
+    url: openapi/tickerinside-lookthrough-api-openapi.yml
+- aid: tickerinside:tickerinside-manifest-json-api
+  name: TickerInside Manifest.json API
+  description: The Manifest.json API from TickerInside — 1 operation(s) for manifest.json.
+  humanURL: https://tickerinside.com/api
+  baseURL: https://tickerinside.com/api/v1
+  tags:
+  - Manifest.json
+  properties:
+  - type: OpenAPI
+    url: openapi/tickerinside-manifest-json-api-openapi.yml
+- aid: tickerinside:tickerinside-methods-json-api
+  name: TickerInside Methods.json API
+  description: The Methods.json API from TickerInside — 1 operation(s) for methods.json.
+  humanURL: https://tickerinside.com/api
+  baseURL: https://tickerinside.com/api/v1
+  tags:
+  - Methods.json
+  properties:
+  - type: OpenAPI
+    url: openapi/tickerinside-methods-json-api-openapi.yml
+- aid: tickerinside:tickerinside-overlap-api
+  name: TickerInside Overlap API
+  description: The Overlap API from TickerInside — 1 operation(s) for overlap.
+  humanURL: https://tickerinside.com/api
+  baseURL: https://tickerinside.com/api/v1
+  tags:
+  - Overlap
+  properties:
+  - type: OpenAPI
+    url: openapi/tickerinside-overlap-api-openapi.yml
+- aid: tickerinside:tickerinside-ownership-index-api
+  name: TickerInside Ownership Index API
+  description: The Ownership Index API from TickerInside — 1 operation(s) for ownership index.
+  humanURL: https://tickerinside.com/api
+  baseURL: https://tickerinside.com/api/v1
+  tags:
+  - Ownership Index
+  properties:
+  - type: OpenAPI
+    url: openapi/tickerinside-ownership-index-api-openapi.yml
+- aid: tickerinside:tickerinside-ownership-index-json-api
+  name: TickerInside Ownership Index.json API
+  description: >-
+    The Ownership Index.json API from TickerInside — 1 operation(s) for ownership index.json.
+  humanURL: https://tickerinside.com/api
+  baseURL: https://tickerinside.com/api/v1
+  tags:
+  - Ownership Index.json
+  properties:
+  - type: OpenAPI
+    url: openapi/tickerinside-ownership-index-json-api-openapi.yml
+- aid: tickerinside:tickerinside-ownership-json-api
+  name: TickerInside Ownership.json API
+  description: The Ownership.json API from TickerInside — 1 operation(s) for ownership.json.
+  humanURL: https://tickerinside.com/api
+  baseURL: https://tickerinside.com/api/v1
+  tags:
+  - Ownership.json
+  properties:
+  - type: OpenAPI
+    url: openapi/tickerinside-ownership-json-api-openapi.yml
+- aid: tickerinside:tickerinside-screen-api
+  name: TickerInside Screen API
+  description: The Screen API from TickerInside — 1 operation(s) for screen.
+  humanURL: https://tickerinside.com/api
+  baseURL: https://tickerinside.com/api/v1
+  tags:
+  - Screen
+  properties:
+  - type: OpenAPI
+    url: openapi/tickerinside-screen-api-openapi.yml
+- aid: tickerinside:tickerinside-sec-api
+  name: TickerInside Sec API
+  description: The Sec API from TickerInside — 1 operation(s) for sec.
+  humanURL: https://tickerinside.com/api
+  baseURL: https://tickerinside.com/api/v1
+  tags:
+  - Sec
+  properties:
+  - type: OpenAPI
+    url: openapi/tickerinside-sec-api-openapi.yml
+- aid: tickerinside:tickerinside-securities-json-api
+  name: TickerInside Securities.json API
+  description: The Securities.json API from TickerInside — 1 operation(s) for securities.json.
+  humanURL: https://tickerinside.com/api
+  baseURL: https://tickerinside.com/api/v1
+  tags:
+  - Securities.json
+  properties:
+  - type: OpenAPI
+    url: openapi/tickerinside-securities-json-api-openapi.yml
+- aid: tickerinside:tickerinside-status-json-api
+  name: TickerInside Status.json API
+  description: The Status.json API from TickerInside — 1 operation(s) for status.json.
+  humanURL: https://tickerinside.com/api
+  baseURL: https://tickerinside.com/api/v1
+  tags:
+  - Status.json
+  properties:
+  - type: OpenAPI
+    url: openapi/tickerinside-status-json-api-openapi.yml
+- aid: tickerinside:tickerinside-universe-json-api
+  name: TickerInside Universe.json API
+  description: The Universe.json API from TickerInside — 1 operation(s) for universe.json.
+  humanURL: https://tickerinside.com/api
+  baseURL: https://tickerinside.com/api/v1
+  tags:
+  - Universe.json
+  properties:
+  - type: OpenAPI
+    url: openapi/tickerinside-universe-json-api-openapi.yml
+- aid: tickerinside:tickerinside-uptime-json-api
+  name: TickerInside Uptime.json API
+  description: The Uptime.json API from TickerInside — 1 operation(s) for uptime.json.
+  humanURL: https://tickerinside.com/api
+  baseURL: https://tickerinside.com/api/v1
+  tags:
+  - Uptime.json
+  properties:
+  - type: OpenAPI
+    url: openapi/tickerinside-uptime-json-api-openapi.yml
 x-submission-notes: 'relist check: clear: not on the delisting registry. Data sourced from issuer files / SEC filings (CC BY 4.0, holdings history
   separate terms) -- public-data republishing, not platform scraping. Submitter asks for the whole /api/v1/ API.'
 x-submission-probe: root 200; /apis.json 200 application/apis+json (0.19); /api/openapi.json 200, 16 paths, server https://tickerinside.com/api/v1,
@@ -88,8 +405,8 @@ x-coverage:
   - url: https://tickerinside.com/apis.json
     status: 200
 x-enrichment:
-  date: '2026-10-06'
+  date: '2026-10-12'
   status: enriched
-  artifacts_added: 15
+  artifacts_added: 11
   pass: modular-v1
   engine: identity=local,contract=local,surfaces=local,docs=local,regulatory=local

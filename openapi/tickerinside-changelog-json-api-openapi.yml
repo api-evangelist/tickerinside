@@ -1,0 +1,173 @@
+openapi: 3.2.0
+info:
+  title: TickerInside Changelog.json API
+  version: '1'
+  summary: Holdings of 5,433 US ETFs, which ETFs hold a stock, and overlap, as static JSON.
+  description: TickerInside is an open, machine-readable database of US ETF holdings, with the source and date of each holding.
+  termsOfService: https://tickerinside.com/terms/
+  contact:
+    name: TickerInside
+    email: contact@tickerinside.com
+    url: https://tickerinside.com/api/
+  license:
+    name: CC BY 4.0
+    identifier: CC-BY-4.0
+servers:
+- url: https://tickerinside.com/api/v1
+  description: Static JSON files, and five answers computed from them when asked. No key.
+security: []
+tags:
+- name: Changelog.json
+paths:
+  /changelog.json:
+    get:
+      operationId: getChangelog
+      summary: Every dated change
+      description: Every entry of /changes/, newest first, each with an id that does not change.
+      externalDocs:
+        url: https://tickerinside.com/api/#changelog
+      responses:
+        '200':
+          description: 'The file. The example is a real answer, shortened: long lists and maps keep their first entries.'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Changelog'
+              example:
+                count: 29
+                newest: '2026-10-12'
+                entries:
+                - id: 2026-10-12-a-page-for-every-large-etf-issuer
+                  date: '2026-10-12'
+                  title: A page for every large ETF issuer
+                  body: 'Every issuer with ten listed US ETFs or more has a page at https://tickerinside.com/etf/issuer/{name}/, 85 of them tonight, from iShares (481 ETFs) and First Trust to Avantis, ARK Invest and DoubleLine: how many ETFs it lists, how many have their holdings here, its groups and categories, what its ETFs cost, and every one of them with its category, expense ratio and the source and date of its holdings, linked to its page or its data file. An ETF''s issuer is the brand its name opens on. The five issuer pages the site had keep their addresses and now list every listed ETF of the issuer, not only those with a page. US ETFs in numbers lists them all under Who issues US ETFs.'
+                  url: https://tickerinside.com/changes/
+                - id: 2026-10-12-which-etfs-hold-them-pages-for-150-more-companies
+                  date: '2026-10-12'
+                  title: 'Which ETFs hold them: pages for 150 more companies'
+                  body: '150 more companies get their page, the list of the covered US ETFs that hold each one with its weight, rank, source and date: the companies without a page held by the most covered funds, from Honeywell (333 ETFs) to Dominion Energy (251), among them General Motors, UPS, Vistra, Exelon, Zoetis and Schlumberger.'
+                  url: https://tickerinside.com/changes/
+                - id: 2026-10-12-us-etfs-in-numbers-and-pages-for-18-of-the-largest-bond-etfs
+                  date: '2026-10-12'
+                  title: US ETFs in numbers, and pages for 18 of the largest bond ETFs
+                  body: 'A new page, https://tickerinside.com/us-etfs/, gives the US ETF market in figures, rebuilt every night from universe.json and funds.json: how many ETFs are listed in the US by Nasdaq Trader''s symbol directory, how many fall in each group of categories (US stocks, bonds, option strategies, leveraged and inverse and the others), the categories with the most ETFs, how their expense ratios are spread and the lowest in each group, the newest ETFs by the date of their prospectus, and where the holdings of each come from and how old they are. Eighteen of the 100 largest US ETFs had no page, all of them bond ETFs (BNDX, SGOV, VTIP, VCIT, BSV, BIV, VCSH, VTEB, VGIT, IEF, BIL, MUB, GOVT, IUSB, VGSH, MBB, JPST and LQD): they get the bond page, with their holdings by issuer, coupon and maturity from their latest SEC Form N-PORT filing.'
+                  url: https://tickerinside.com/changes/
+                contract: https://tickerinside.com/contract/
+                docs: https://tickerinside.com/api/#versions
+                license: CC BY 4.0
+                attribution: Credit TickerInside with a link to this file, or to the page that shows the figure, wherever the medium allows a link, and by name where it does not. How you mark the link is up to you.
+        '304':
+          description: 'Not modified: the ETag of your copy, sent in If-None-Match, is still current. Files are cached five minutes.'
+        '503':
+          description: 'The file could not be served just then: retry after a minute. uptime says whether the site fails its own checks.'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Unavailable'
+      tags:
+      - Changelog.json
+components:
+  schemas:
+    Changelog:
+      type: object
+      properties:
+        count:
+          type:
+          - number
+          - 'null'
+          description: How many entries.
+        newest:
+          type:
+          - string
+          - 'null'
+          description: The date of the newest entry.
+        entries:
+          type: array
+          items:
+            type: object
+            properties:
+              id:
+                type:
+                - string
+                - 'null'
+                description: 'The entry''s id: its date and title in lower case words joined by hyphens. It does not change.'
+              date:
+                type:
+                - string
+                - 'null'
+                description: The day the change reached the site.
+              title:
+                type:
+                - string
+                - 'null'
+                description: What changed, in one line.
+              body:
+                type:
+                - string
+                - 'null'
+                description: What changed and what a program reading the files should do, in words.
+              url:
+                type:
+                - string
+                - 'null'
+                description: 'The page that prints the entries: /changes/.'
+            additionalProperties: true
+            required:
+            - id
+            - date
+            - title
+            - body
+            - url
+          description: Every dated change, newest first; their fields are described below.
+        contract:
+          type:
+          - string
+          - 'null'
+          description: 'The data contract this file belongs to: /contract/.'
+        docs:
+          type:
+          - string
+          - 'null'
+          description: Where this file is documented.
+        license:
+          type:
+          - string
+          - 'null'
+          description: The licence the file is published under.
+        attribution:
+          type:
+          - string
+          - 'null'
+          description: 'How to credit the data: a link to this file where the medium allows one, the name where it does not.'
+      additionalProperties: true
+      required:
+      - count
+      - newest
+      - entries
+      - contract
+      - docs
+      - license
+      - attribution
+    Unavailable:
+      type: object
+      additionalProperties: true
+      required:
+      - error
+      - message
+      - status
+      - uptime
+      properties:
+        error:
+          type: string
+          const: unavailable
+        message:
+          type: string
+        status:
+          type: string
+          description: The nightly report.
+        uptime:
+          type: string
+          description: 'The live checks: whether the site fails its own checks.'
+externalDocs:
+  description: The reference, with examples and recipes
+  url: https://tickerinside.com/api/

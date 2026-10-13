@@ -1,0 +1,776 @@
+openapi: 3.2.0
+info:
+  title: TickerInside Methods.json API
+  version: '1'
+  summary: Holdings of 5,433 US ETFs, which ETFs hold a stock, and overlap, as static JSON.
+  description: TickerInside is an open, machine-readable database of US ETF holdings, with the source and date of each holding.
+  termsOfService: https://tickerinside.com/terms/
+  contact:
+    name: TickerInside
+    email: contact@tickerinside.com
+    url: https://tickerinside.com/api/
+  license:
+    name: CC BY 4.0
+    identifier: CC-BY-4.0
+servers:
+- url: https://tickerinside.com/api/v1
+  description: Static JSON files, and five answers computed from them when asked. No key.
+security: []
+tags:
+- name: Methods.json
+paths:
+  /methods.json:
+    get:
+      operationId: getMethods
+      summary: Methods and test vectors
+      description: 'Each method a published figure names in its method field, with its version, formula, rules and test vectors: inputs with the output the method gives, to check an implementation against. It holds ti-ownership/1, the ETF ownership ledger, ti-ownership-index/1 and ti-overlap/1. A change to what a method computes from inputs it already accepted is a new version, never an edit of the one published. A rule for an input it did not accept before is added to the version with its own test vector, and changes gives the day it was first published.'
+      externalDocs:
+        url: https://tickerinside.com/api/#methods
+      responses:
+        '200':
+          description: 'The file. The example is a real answer, shortened: long lists and maps keep their first entries.'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Methods'
+              example:
+                note: Each method is named by an id and a version. A published figure names the method that produced it. A change to what a method computes from inputs it already accepted is a new version, never an edit of this one. A rule for an input it did not accept before is added to this version with its own test vector, and changes gives the day it was first published, so every earlier vector keeps its output. The test vectors are inputs with the output the method gives for them, to check an implementation against.
+                methods:
+                - id: ti-ownership/1
+                  name: ETF ownership ledger
+                  version: 1
+                  since: '2026-09-28'
+                  changes:
+                  - since: '2026-10-03'
+                    rule: before_first_close
+                    what: A row dated before the stock's first close in the price data is not counted, with the input first_close and a vector for it. The rule applies only to a stock whose file has an empty weekly series, which had no figure under this version before, so no earlier figure or vector changes.
+                  measures: 'For one US company, the share of its shares outstanding held by the covered US ETFs, as a lower bound: at least this percent, from this many funds.'
+                  formula: pct_lower_bound = floor(100 * shares_held / shares_outstanding, 2 decimals)
+                  definitions:
+                    shares_held: The sum, over the covered funds counted, of the shares each holds of every listed class of the company, each class counted at its weight. An issuer file gives the count of its row; a fund from SEC filings the share balance of its common stock rows in its latest Form N-PORT filing. A Vanguard ETF's file counts the whole fund, so its count is multiplied by the ETF class's net assets over the whole fund's, as Vanguard prints them, the first taken at the low end of its rounding and the second at the high end.
+                    shares_outstanding: 'The count of the company''s shares outstanding on the cover of a periodic report (a 10-K, 10-Q, 20-F or 40-F, amendments and transition reports included), tagged dei:EntityCommonStockSharesOutstanding in the SEC''s XBRL data: the most recent one read, published with the date the cover counts the shares on and the filing it comes from. One figure, or one per class rolled up to the company, each class at its weight (one unless the charter says otherwise: a Berkshire class A share is 1,500 class B shares). A count the cover gives for another security, such as preferred stock, warrants, notes, the units of a partnership beside a class of shares or a fully diluted total, is no class and is left out. When the roll-up does not check out and the stock''s own class does, the figure is the class''s own count, and basis says so; one count read from a filing that names no other class of stock is the company''s.'
+                    lower_bound: Funds not covered are not counted, nor covered funds whose count cannot be used, and the percent is rounded down. Holdings and the count carry their own dates, which differ; both are published with the figure. The count is used only when it is at most 2% below a current independent count of the same shares, so the count can put a figure at most about 2% of itself above what the current count would give.
+                  rules:
+                  - A fund is counted once. A fund in both layers is counted from its issuer file. A fund that holds another covered fund is read from its own book, so the shares it holds through that fund are counted there, once.
+                  - 'Only the rows under the stock''s own ticker are counted, each the US line: a line listed abroad has a key of its own, its code and its market (7203.JP beside TM, Toyota''s ADR), and is another security, never counted for a US stock. A Toronto line of a company whose shares trade in New York is the same shares, of the same class, and is counted under the US ticker (RY).'
+                  - 'A row that is another security under the stock''s ticker is not counted: the rows of a preferred stock fund, a row whose name in the issuer''s file is a preferred or depositary share of the company, and a row whose value per share is more than 25% above or 20% below the stock''s close on the row''s date.'
+                  not_counted:
+                    no_share_count: its file gives no share count for the row
+                    through_fund: it holds the stock through another covered fund, which is counted instead
+                    preferred_fund: a preferred stock fund, whose row is a preferred share
+                    preferred_row: the row's name in the issuer's file is a preferred or depositary share of the company, filed under the common's ticker
+                    price_mismatch: the row's value per share is more than 25% above or 20% below the stock's close on its date, so the row is another security or a count in other shares
+                    value_mismatch: 'the file does not match its weights times the fund''s stated net assets, so its counts are wrong or in other shares: for a file without market values, the row''s count at the stock''s close by more than 25% above or 20% below, or the fund''s rows by more than 10% either way in their median; for a file with them, the fund''s rows'' values by more than 10% either way in their median'
+                    no_value_check: the file gives no market values and the fund states no net assets, so its share count cannot be checked
+                    no_class_size: a Vanguard file without the ETF class's share of the fund
+                    whole_series: an SEC filing that covers mutual fund classes too
+                    before_split: the row is dated before a split of the stock, so its count is in the old shares
+                    before_first_close: the row is dated before the stock's first close in the price data, so it is not counted against this listing
+                    single_issuer_file: the only issuer file counted, whose count is never published alone
+                  refusals:
+                    no_sec_count: the SEC data gives no count of the company's shares
+                    class_unknown: the company's filing does not say which class this ticker is
+                    count_too_old: the company's count is more than 400 days older than the holdings
+                    count_date_invalid: the company's count is dated after the newest holdings, a slip in the filing's data
+                    no_independent_count: no independent count to check the SEC's count against
+                    split_between_dates: a split of the stock falls after the date of the SEC's count, which is in the old shares
+                    count_below_independent: the SEC's count is more than 2% below a current independent count of the same shares, so the percent would be too high
+                    count_mismatch: the SEC's count is far above an independent count of the same shares, so it counts other shares
+                    no_fund_counted: no covered fund's share count could be used
+                    under_0_01_pct: the counted funds hold less than 0.01% of the shares, below the two decimals of the figure
+                    above_100: the count comes to more than 100% of the shares
+                    held_back: tonight's ledger failed its checks, and the last one that passed, served in its place, has no line for this stock, or there is none
+                  vector_format: 'input: ticker; shares_outstanding {as_of, classes [{class, tickers, shares}]}; independent {ticker: {class, company}}; funds [{fund, layer, as_of, shares {ticker: n}, and where they apply issuer, value_usd, weights {ticker: percent}, net_assets, class_net_assets, fund_net_assets, own_book, multi_class, series_id, series_tickers}]; close, the stock''s close for the value check, and beside it first_close, the date of the stock''s first close; splits {ticker: [[date, numerator, denominator]]}. output: the published fields, or refused with its reason.'
+                  vectors:
+                  - name: two issuer files and one SEC filing
+                    input:
+                      ticker: AAA
+                      shares_outstanding:
+                        as_of: '2026-08-01'
+                        classes:
+                        - class: null
+                          tickers:
+                          - AAA
+                          shares: 1000000
+                      independent:
+                        AAA:
+                          class: 1000000
+                          company: 1000000
+                      funds:
+                      - fund: F1
+                        layer: issuer_files
+                        as_of: '2026-09-24'
+                        shares:
+                          AAA: 30000
+                      - fund: F2
+                        layer: issuer_files
+                        as_of: '2026-09-23'
+                        shares:
+                          AAA: 20000
+                      - fund: S1
+                        layer: sec_nport
+                        as_of: '2026-06-30'
+                        shares:
+                          AAA: 5555
+                    output:
+                      pct_lower_bound: 5.55
+                      basis: company
+                      shares_held: 55555
+                      shares_outstanding: 1000000
+                      funds_counted:
+                        issuer_files: 2
+                        sec_nport: 1
+                      not_counted: {}
+                  - name: a Vanguard file pro-rated to its ETF class, at the ends of the rounding
+                    input:
+                      ticker: AAA
+                      shares_outstanding:
+                        as_of: '2026-08-01'
+                        classes:
+                        - class: null
+                          tickers:
+                          - AAA
+                          shares: 1000000
+                      independent:
+                        AAA:
+                          class: 1000000
+                          company: 1000000
+                      funds:
+                      - fund: V1
+                        layer: issuer_files
+                        as_of: '2026-08-31'
+                        issuer: Vanguard
+                        shares:
+                          AAA: 185000
+                        class_net_assets: 1000000000000
+                        fund_net_assets: 1800000000000
+                      - fund: F1
+                        layer: issuer_files
+                        as_of: '2026-09-24'
+                        shares:
+                          AAA: 5000
+                    output:
+                      pct_lower_bound: 10.0
+                      basis: company
+                      shares_held: 100000
+                      shares_outstanding: 1000000
+                      funds_counted:
+                        issuer_files: 2
+                        sec_nport: 0
+                      not_counted: {}
+                  - name: two listed classes and an unlisted one, rolled up to the company
+                    input:
+                      ticker: AAA
+                      shares_outstanding:
+                        as_of: '2026-07-15'
+                        classes:
+                        - class: Class A
+                          tickers:
+                          - AAA
+                          shares: 600000
+                        - class: Class B
+                          tickers: []
+                          shares: 100000
+                        - class: Class C
+                          tickers:
+                          - AAC
+                          shares: 300000
+                      independent:
+                        AAA:
+                          class: 600000
+                          company: 1000000
+                        AAC:
+                          class: 300000
+                          company: 1000000
+                      funds:
+                      - fund: F1
+                        layer: issuer_files
+                        as_of: '2026-09-24'
+                        shares:
+                          AAA: 40000
+                          AAC: 20000
+                      - fund: F2
+                        layer: issuer_files
+                        as_of: '2026-09-24'
+                        shares:
+                          AAA: 10000
+                          AAC: 5000
+                    output:
+                      pct_lower_bound: 7.5
+                      basis: company
+                      shares_held: 75000
+                      shares_outstanding: 1000000
+                      funds_counted:
+                        issuer_files: 2
+                        sec_nport: 0
+                      not_counted: {}
+                - id: ti-ownership-index/1
+                  name: ETF Ownership Index
+                  version: 1
+                  since: '2026-10-09'
+                  changes: []
+                  measures: For each US company, the share of its shares outstanding held by the covered US ETFs (the ledger's figure, a lower bound), how concentrated that ownership is in the three funds holding the most, and how it changed over the last 5 and 20 market closes in the funds read daily from their issuers' files; and the same over the market and by sector, weighted by market cap.
+                  formula: pct = ledger pct_lower_bound; top3_share = round(100 * sum of the 3 largest fund holdings / shares_held, 1 decimal); change_nd_pp = round(100 * sum over the last n closes of net_shares / shares_outstanding, 4 decimals); cap_weighted_pct = floor(sum(pct * cap) / sum(cap), 2 decimals)
+                  definitions:
+                    pct: 'The figure of the ETF ownership ledger (ti-ownership/1): at least this percent of the company''s shares outstanding, from the SEC''s count, is held by the covered US ETFs. Its rules, refusals and test vectors are those of that method.'
+                    top3_share: The shares held by the three counted funds holding the most, over the shares held by every counted fund, in percent. A fund holding two classes of the company is one fund, each class at its weight. Published when at least 6 funds are counted and no sum the stock file publishes gives back one fund's count by difference with it.
+                    net_shares: 'What the funds read daily from their issuers'' files bought less what they sold of the stock on one market close, as the ETF flows (ti-flows/1) publish it: a sum over three funds or more, no fund more than 80% of it, the lines a split, a merger or a spin-off moved left out.'
+                    change_nd_pp: The sum of net_shares over the last n market closes, every listed class at its weight on a company basis, over the ledger's count of shares outstanding, in percentage points. The funds known from SEC filings are not in it.
+                    cap_weighted_pct: 'Over one company line per company on a company basis: the sum of pct times market cap over the sum of market caps, a lower bound of the share of those companies'' combined market value held by the covered US ETFs.'
+                  rules:
+                  - A figure of one class alone (basis class) is in the stock rows and left out of the market and sector lines, since a class's percent is not the company's.
+                  - A company with several listed classes is one line, under the ticker with the largest market cap.
+                  - 'top3_share is null under 6 funds counted. The stock file publishes the shares held by layer and by class, and the counts of the funds known from SEC filings are on EDGAR, so the funds read from issuer files among the three largest, and those beside them, fall into groups whose sums can be had by difference: each layer''s, and each class''s whose shares held are published, the other classes together. Each group must be empty or a sum over 3 funds or more, no fund above 80% of it, or top3_share is null.'
+                  - A change is null when a daily sum of its window is withheld, when the flows name a corporate action of the stock within the window or 3 closes before it, when a close of the window is not a complete close of the flows, and when no fund read daily held or moved the stock in the flows' window.
+                  - A line's change is the cap-weighted mean of the changes of its companies that have one, with the share of the line's cap they make up.
+                  - A sector has a line when it has at least 5 companies. The sector is the price data's, which covers the companies of its S&P 500 list.
+                  - 'The daily history keeps one line per market close, written on the first night that close is published and never rewritten. The closes before the first night are rebuilt from the flows of that night: their changes only.'
+                  not_counted:
+                    window_not_covered: A close of the window is not a complete close of the flows, or the window starts before the first close they publish.
+                    withheld: A daily sum of the window is withheld by the flows' rules, so the change would give it back.
+                    corporate_action: The flows name a corporate action of the stock within the window or just before it.
+                    not_in_flows: No fund read daily from its issuer's files held or moved the stock in the flows' window.
+                  refusals:
+                    fewer_than_6_funds: Fewer than 6 funds are counted, so the three largest or the rest would be a sum over fewer than three funds.
+                    split_under_3_funds: With the shares held by layer or by class that the stock file publishes, the share of the three largest would leave one or two funds read from issuer files in a group whose sum can be had by difference.
+                    one_fund_dominant: With the shares held by layer or by class that the stock file publishes, the share of the three largest would leave a group of funds read from issuer files in which one fund holds more than 80%.
+                    not_in_ledger: The ledger served tonight was made before the concentration was measured.
+                  vector_format: 'input: kind, then for concentration funds_held [shares of each counted fund], layers [issuer_files or sec_nport, for each] and parts [{class: shares} for each, null for a single part]; for change scope [[ticker, weight]], series {ticker: [[close, net_shares or null]] or null}, actions {ticker: [dates]}, closes, complete, since, shares_out (the ledger''s count of shares outstanding); for line companies [{pct, cap_b, change {n: pp}}], windows and fields. output: the figure, or refused with its reason.'
+                  vectors:
+                  - name: the three largest of seven funds
+                    input:
+                      kind: concentration
+                      funds_held:
+                      - 400000
+                      - 250000
+                      - 150000
+                      - 100000
+                      - 50000
+                      - 30000
+                      - 20000
+                      layers:
+                      - issuer_files
+                      - issuer_files
+                      - issuer_files
+                      - issuer_files
+                      - issuer_files
+                      - issuer_files
+                      - issuer_files
+                    output:
+                      top3_share: 80.0
+                  - name: five funds are too few for a concentration
+                    input:
+                      kind: concentration
+                      funds_held:
+                      - 400000
+                      - 250000
+                      - 150000
+                      - 100000
+                      - 50000
+                      layers:
+                      - issuer_files
+                      - issuer_files
+                      - issuer_files
+                      - issuer_files
+                      - issuer_files
+                    output:
+                      refused: fewer_than_6_funds
+                  - name: a fund known from SEC filings among the three largest leaves two issuer files there
+                    input:
+                      kind: concentration
+                      funds_held:
+                      - 400000
+                      - 250000
+                      - 150000
+                      - 100000
+                      - 50000
+                      - 30000
+                      - 20000
+                      layers:
+                      - issuer_files
+                      - sec_nport
+                      - issuer_files
+                      - issuer_files
+                      - issuer_files
+                      - issuer_files
+                      - issuer_files
+                    output:
+                      refused: split_under_3_funds
+                - id: ti-overlap/1
+                  name: Holdings overlap of two funds
+                  version: 1
+                  since: '2026-10-09'
+                  changes: []
+                  measures: 'How much two funds hold of the same securities, by weight: one figure that is the same from either side, and the share of each fund''s own weight that sits in the securities both hold.'
+                  formula: by_weight = round(sum over shared keys k of min(w_a[k], w_b[k]), 1); share_of_a = round(100 * sum over shared k of w_a[k] / sum over every k of w_a[k], 1); share_of_b the same from b's side
+                  definitions:
+                    w_a, w_b: 'Each fund''s holdings map, {key: weight in percent}, as its fund file gives it under holdings.'
+                    shared keys: The keys both maps hold, compared exactly as written.
+                    n_shared: How many keys both maps hold.
+                    n_a, n_b: How many keys each map holds.
+                  rules:
+                  - 'Keys are compared as written: GOOG and GOOGL are two keys, and so are 7203.JP and 7203.SA.'
+                  - share_of_a is over the first fund's listed total weight, which can differ a little from 100; by_weight is not rescaled.
+                  - A figure is rounded once, at the end, to one decimal.
+                  not_counted: {}
+                  refusals:
+                    not_shares: 'A fund whose holdings are not shares of companies: a derivative-based fund, a trust or pool, a multi-asset fund, a fund read from its sponsor''s file, or a prospectus file.'
+                    fixed_income: Two fixed income funds, which are compared by issuer instead (issuer_overlap), not by this method.
+                  vector_format: 'input: a and b, each {key: weight percent}; output: by_weight, share_of_a, share_of_b, n_shared, n_a, n_b'
+                  vectors:
+                  - name: two shared keys
+                    input:
+                      a:
+                        AAA: 50.0
+                        BBB: 30.0
+                        CCC: 20.0
+                      b:
+                        AAA: 40.0
+                        BBB: 10.0
+                        DDD: 50.0
+                    output:
+                      by_weight: 50.0
+                      share_of_a: 80.0
+                      share_of_b: 50.0
+                      n_shared: 2
+                      n_a: 3
+                      n_b: 3
+                  - name: nothing in common
+                    input:
+                      a:
+                        AAA: 60.0
+                        BBB: 40.0
+                      b:
+                        CCC: 70.0
+                        DDD: 30.0
+                    output:
+                      by_weight: 0.0
+                      share_of_a: 0.0
+                      share_of_b: 0.0
+                      n_shared: 0
+                      n_a: 2
+                      n_b: 2
+                  - name: two classes are two keys, and totals that are not 100
+                    input:
+                      a:
+                        GOOG: 2.0
+                        GOOGL: 2.5
+                        MSFT: 6.0
+                      b:
+                        GOOGL: 3.0
+                        MSFT: 4.0
+                        NVDA: 5.0
+                    output:
+                      by_weight: 6.5
+                      share_of_a: 81.0
+                      share_of_b: 58.3
+                      n_shared: 2
+                      n_a: 3
+                      n_b: 3
+                docs: https://tickerinside.com/api/#methods
+                license: CC BY 4.0
+                attribution: Credit TickerInside with a link to this file, or to the page that shows the figure, wherever the medium allows a link, and by name where it does not. How you mark the link is up to you.
+        '304':
+          description: 'Not modified: the ETag of your copy, sent in If-None-Match, is still current. Files are cached five minutes.'
+        '503':
+          description: 'The file could not be served just then: retry after a minute. uptime says whether the site fails its own checks.'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Unavailable'
+      tags:
+      - Methods.json
+components:
+  schemas:
+    Methods:
+      type: object
+      properties:
+        note:
+          type:
+          - string
+          - 'null'
+          description: How methods are named and versioned.
+        methods:
+          type: array
+          items:
+            type: object
+            properties:
+              id:
+                type:
+                - string
+                - 'null'
+                description: The name and version a published figure gives in its method field.
+              name:
+                type:
+                - string
+                - 'null'
+                description: The method in words.
+              version:
+                type:
+                - number
+                - 'null'
+                description: The version number. Fields are added; a change to what the method computes from inputs it already accepted is a new id, and a rule for an input it did not accept before is listed under changes.
+              since:
+                type:
+                - string
+                - 'null'
+                description: The first day figures were published under this version.
+              changes:
+                type:
+                - array
+                - 'null'
+                items:
+                  type: object
+                  properties:
+                    since:
+                      type:
+                      - string
+                      - 'null'
+                    rule:
+                      type:
+                      - string
+                      - 'null'
+                    what:
+                      type:
+                      - string
+                      - 'null'
+                  additionalProperties: true
+                description: The rules added to this version for an input it did not accept before, each with since, the first day it was published, rule, its code under not_counted, and what, the change in words. Every earlier test vector keeps its output.
+              measures:
+                type:
+                - string
+                - 'null'
+                description: What the figure is, in one sentence.
+              formula:
+                type:
+                - string
+                - 'null'
+                description: The figure as a formula.
+              definitions:
+                type: object
+                properties:
+                  shares_held:
+                    type:
+                    - string
+                    - 'null'
+                  shares_outstanding:
+                    type:
+                    - string
+                    - 'null'
+                  lower_bound:
+                    type:
+                    - string
+                    - 'null'
+                additionalProperties: true
+                description: What each term of the formula is.
+              rules:
+                type:
+                - array
+                - 'null'
+                items:
+                  type:
+                  - 'null'
+                  - string
+                description: The rules of the method, in words.
+              not_counted:
+                type: object
+                properties:
+                  no_share_count:
+                    type:
+                    - string
+                    - 'null'
+                  through_fund:
+                    type:
+                    - string
+                    - 'null'
+                  preferred_fund:
+                    type:
+                    - string
+                    - 'null'
+                  preferred_row:
+                    type:
+                    - string
+                    - 'null'
+                  price_mismatch:
+                    type:
+                    - string
+                    - 'null'
+                  value_mismatch:
+                    type:
+                    - string
+                    - 'null'
+                  no_value_check:
+                    type:
+                    - string
+                    - 'null'
+                  no_class_size:
+                    type:
+                    - string
+                    - 'null'
+                  whole_series:
+                    type:
+                    - string
+                    - 'null'
+                  before_split:
+                    type:
+                    - string
+                    - 'null'
+                  before_first_close:
+                    type:
+                    - string
+                    - 'null'
+                  single_issuer_file:
+                    type:
+                    - string
+                    - 'null'
+                additionalProperties: true
+                description: Each reason an input is left out, as a code and in words.
+              refusals:
+                type: object
+                properties:
+                  no_sec_count:
+                    type:
+                    - string
+                    - 'null'
+                  class_unknown:
+                    type:
+                    - string
+                    - 'null'
+                  count_too_old:
+                    type:
+                    - string
+                    - 'null'
+                  count_date_invalid:
+                    type:
+                    - string
+                    - 'null'
+                  no_independent_count:
+                    type:
+                    - string
+                    - 'null'
+                  split_between_dates:
+                    type:
+                    - string
+                    - 'null'
+                  count_below_independent:
+                    type:
+                    - string
+                    - 'null'
+                  count_mismatch:
+                    type:
+                    - string
+                    - 'null'
+                  no_fund_counted:
+                    type:
+                    - string
+                    - 'null'
+                  under_0_01_pct:
+                    type:
+                    - string
+                    - 'null'
+                  above_100:
+                    type:
+                    - string
+                    - 'null'
+                  held_back:
+                    type:
+                    - string
+                    - 'null'
+                additionalProperties: true
+                description: Each reason no figure is given, as a code and in words.
+              vector_format:
+                type:
+                - string
+                - 'null'
+                description: The shape of a test vector's input and output.
+              vectors:
+                type:
+                - array
+                - 'null'
+                items:
+                  type: object
+                  properties:
+                    name:
+                      type:
+                      - string
+                      - 'null'
+                    input:
+                      type: object
+                      properties:
+                        ticker:
+                          type:
+                          - string
+                          - 'null'
+                        shares_outstanding:
+                          type: object
+                          properties:
+                            as_of:
+                              type:
+                              - string
+                              - 'null'
+                            classes:
+                              type:
+                              - array
+                              - 'null'
+                              items:
+                                type: object
+                                properties:
+                                  class: {}
+                                  tickers:
+                                    type:
+                                    - array
+                                    - 'null'
+                                    items:
+                                      type:
+                                      - 'null'
+                                      - string
+                                  shares:
+                                    type:
+                                    - number
+                                    - 'null'
+                                additionalProperties: true
+                          additionalProperties: true
+                        independent:
+                          type:
+                          - object
+                          - 'null'
+                          additionalProperties:
+                            type: object
+                            properties:
+                              class:
+                                type:
+                                - number
+                                - 'null'
+                              company:
+                                type:
+                                - number
+                                - 'null'
+                            additionalProperties: true
+                        funds:
+                          type:
+                          - array
+                          - 'null'
+                          items:
+                            type: object
+                            properties:
+                              fund:
+                                type:
+                                - string
+                                - 'null'
+                              layer:
+                                type:
+                                - string
+                                - 'null'
+                              as_of:
+                                type:
+                                - string
+                                - 'null'
+                              shares:
+                                type:
+                                - object
+                                - 'null'
+                                additionalProperties:
+                                  type:
+                                  - number
+                                  - 'null'
+                            additionalProperties: true
+                      additionalProperties: true
+                    output:
+                      type: object
+                      properties:
+                        pct_lower_bound:
+                          type:
+                          - number
+                          - 'null'
+                        basis:
+                          type:
+                          - string
+                          - 'null'
+                        shares_held:
+                          type:
+                          - number
+                          - 'null'
+                        shares_outstanding:
+                          type:
+                          - number
+                          - 'null'
+                        funds_counted:
+                          type: object
+                          properties:
+                            issuer_files:
+                              type:
+                              - number
+                              - 'null'
+                            sec_nport:
+                              type:
+                              - number
+                              - 'null'
+                          additionalProperties: true
+                        not_counted:
+                          type: object
+                          properties: {}
+                          additionalProperties: true
+                      additionalProperties: true
+                  additionalProperties: true
+                description: Inputs with the output the method gives for them, to check an implementation against.
+            additionalProperties: true
+            required:
+            - id
+            - name
+            - version
+            - since
+            - changes
+            - measures
+            - formula
+            - definitions
+            - rules
+            - not_counted
+            - refusals
+            - vector_format
+            - vectors
+          description: One entry per method; its fields are described below.
+        docs:
+          type:
+          - string
+          - 'null'
+          description: Where this file is documented.
+        license:
+          type:
+          - string
+          - 'null'
+          description: The licence the data is published under.
+        attribution:
+          type:
+          - string
+          - 'null'
+          description: 'How to credit the data: a link to this file where the medium allows one, the name where it does not.'
+      additionalProperties: true
+      required:
+      - note
+      - methods
+      - docs
+      - license
+      - attribution
+    Unavailable:
+      type: object
+      additionalProperties: true
+      required:
+      - error
+      - message
+      - status
+      - uptime
+      properties:
+        error:
+          type: string
+          const: unavailable
+        message:
+          type: string
+        status:
+          type: string
+          description: The nightly report.
+        uptime:
+          type: string
+          description: 'The live checks: whether the site fails its own checks.'
+externalDocs:
+  description: The reference, with examples and recipes
+  url: https://tickerinside.com/api/
