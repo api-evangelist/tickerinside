@@ -376,6 +376,26 @@ paths:
       - Sec
 components:
   schemas:
+    Unavailable:
+      type: object
+      additionalProperties: true
+      required:
+      - error
+      - message
+      - status
+      - uptime
+      properties:
+        error:
+          type: string
+          const: unavailable
+        message:
+          type: string
+        status:
+          type: string
+          description: The nightly report.
+        uptime:
+          type: string
+          description: 'The live checks: whether the site fails its own checks.'
     NotCovered:
       type: object
       additionalProperties: true
@@ -504,6 +524,363 @@ components:
         summary:
           type: string
           description: 'With not_held_by_daily_funds: the night''s flows, /api/v1/flows.json.'
+    SecurityHoldersOnly:
+      type: object
+      additionalProperties: true
+      description: 'The answer for a security covered funds hold that has no stock file: a stock the price data does not list or has too few weekly returns for, or a line listed abroad (7203.JP). It is composed from the holders shard of its first character: its holders in both layers, each dated by its issuer file or SEC filing, the price and return fields null, and none of the fields the shard cannot give (synthetic_exposure, etf_ownership, holders_all, rank_summary, top_by_value, membership, by_issuer, fee_per_1000, name_collision, answer).'
+      required:
+      - coverage
+      - note
+      - ticker
+      - name
+      - page_url
+      - cite_as
+      - cite_html
+      - sector
+      - industry
+      - as_of
+      - page
+      - cap_b
+      - pe
+      - yield
+      - vol
+      - beta
+      - mdd3
+      - r1
+      - r3
+      - r5
+      - last_close
+      - last_close_date
+      - day_change_pct
+      - high_52w
+      - low_52w
+      - currency
+      - calendar
+      - held_by
+      - heaviest
+      - held_by_sec_nport
+      - holders
+      - holders_sec_nport
+      - left_out
+      - same_code_abroad
+      - earlier_key_reads_as
+      - least_correlated
+      - most_correlated
+      - weekly
+      - weeks_end
+      - license
+      - attribution
+      - source
+      properties:
+        coverage:
+          type: string
+          const: holders_only
+          description: 'Always holders_only: read it before any other field.'
+        note:
+          type: string
+          description: Why the answer lists holders only, in one sentence.
+        ticker:
+          type:
+          - string
+          - 'null'
+          description: The stock's ticker, upper case.
+        name:
+          type:
+          - string
+          - 'null'
+          description: The company's name.
+        page_url:
+          type:
+          - string
+          - 'null'
+          description: The stock's page on the site, or null when it has none. Link this when quoting the figures.
+        cite_as:
+          type:
+          - string
+          - 'null'
+          description: 'A citation line for a quoted figure: company, sources and date, a URL to check it, licence.'
+        cite_html:
+          type:
+          - string
+          - 'null'
+          description: 'The credit as HTML: a link to the page cite_as names, then its address.'
+        sector:
+          type:
+          - string
+          - 'null'
+          description: The company's sector where the data classifies it, or "US Listed" when it does not, which is the case for most stocks.
+        industry:
+          type:
+          - string
+          - 'null'
+          description: The finest level of that classification under the sector, such as Semiconductors or Regional Banks; null when sector is "US Listed".
+        as_of:
+          type:
+          - string
+          - 'null'
+          description: 'The price date: the date of the price data behind every figure here.'
+        page:
+          type:
+          - boolean
+          - 'null'
+          description: True when the stock has a written page at /stock/{ticker}/. Every stock here has this file whether or not it has a page.
+        cap_b:
+          type:
+          - number
+          - 'null'
+          description: Market capitalisation, in billions of US dollars.
+        pe:
+          type:
+          - number
+          - 'null'
+          description: Trailing price to earnings ratio.
+        yield:
+          type:
+          - number
+          - 'null'
+          description: Trailing twelve month dividend yield, as a percentage.
+        vol:
+          type:
+          - number
+          - 'null'
+          description: Annualised standard deviation of weekly total returns over three years, as a percentage.
+        beta:
+          type:
+          - number
+          - 'null'
+          description: Sensitivity to the S&P 500, from three years of weekly returns.
+        mdd3:
+          type:
+          - number
+          - 'null'
+          description: Largest peak to trough decline over three years, measured on weekly closes. Negative.
+        r1:
+          type:
+          - number
+          - 'null'
+          description: Cumulative total return over one year, as a percentage. Not annualised.
+        r3:
+          type:
+          - number
+          - 'null'
+          description: Cumulative total return over three years, as a percentage. Not annualised.
+        r5:
+          type:
+          - number
+          - 'null'
+          description: Cumulative total return over five years, as a percentage. Not annualised.
+        last_close:
+          type:
+          - number
+          - 'null'
+          description: The last closing price, raw, in the trading currency. Returns use dividend-adjusted closes; this is the close as traded.
+        last_close_date:
+          type:
+          - string
+          - 'null'
+          description: The date of that close.
+        day_change_pct:
+          type:
+          - number
+          - 'null'
+          description: The move from the previous close to the last, as a percentage.
+        high_52w:
+          type:
+          - number
+          - 'null'
+          description: The highest raw close over the last 252 trading days, or since the listing for a stock listed less than a year ago.
+        low_52w:
+          type:
+          - number
+          - 'null'
+          description: The lowest raw close over the last 252 trading days, or since the listing for a stock listed less than a year ago.
+        currency:
+          type:
+          - string
+          - 'null'
+          description: The trading currency of the price fields.
+        calendar:
+          type:
+          - object
+          - 'null'
+          additionalProperties:
+            type:
+            - number
+            - 'null'
+          description: Total return by calendar year, as a percentage, the current year to date.
+        held_by:
+          type:
+          - integer
+          - 'null'
+          description: How many issuer-layer funds hold it, the rows of holders. The stock's page counts these less left_out, with the SEC-layer funds of held_by_sec_nport, as holders_all lists them.
+        heaviest:
+          type:
+          - array
+          - 'null'
+          prefixItems:
+          - title: fund
+            type: string
+          - title: weight
+            type: number
+          items:
+            type:
+            - number
+            - string
+          description: The issuer-layer fund that gives it the largest weight, as [fund ticker, weight percent]. Null when none of them holds it.
+        held_by_sec_nport:
+          type:
+          - integer
+          - 'null'
+          description: How many SEC-layer funds hold it, the rows of holders_sec_nport. The stock's page counts them with the issuer-layer funds and lists them in a table of their own, each linked to its filing.
+        holders:
+          type:
+          - array
+          - 'null'
+          items:
+            type: array
+            prefixItems:
+            - title: fund
+              type: string
+            - title: weight
+              type: number
+            - title: date
+              type:
+              - string
+              - 'null'
+            items:
+              type:
+              - 'null'
+              - number
+              - string
+          description: Every issuer-layer fund that holds it, heaviest first, as [fund ticker, weight percent, date of that fund's holdings file]. The same rows as the holders index, in the stock's own file.
+        holders_sec_nport:
+          type:
+          - array
+          - 'null'
+          items:
+            type: array
+            prefixItems:
+            - title: fund
+              type: string
+            - title: weight
+              type: number
+            - title: date
+              type:
+              - string
+              - 'null'
+            items:
+              type:
+              - 'null'
+              - number
+              - string
+          description: The SEC-layer funds that hold it, heaviest first, as [fund ticker, weight percent, the quarter end the filing describes]. They are months older than holders, so they are kept apart. A fund whose row under this ticker is a foreign company's local code is not listed. A filing names a security by its ISIN, which does not say where the fund bought it. So shares that trade in New York and abroad on one ISIN (AstraZeneca, TotalEnergies, Ferrari) are listed here for the funds whose stocks are mostly on US ISINs, and under the line abroad (AZN.GB) for the others. A preferred share is keyed by its issuer's common ticker, as the filings key it, so a preferred stock fund can appear here. For a stock whose weekly is empty, a row can be dated before its first close in the price data. Such a row can be another security that had the ticker, or the company's shares abroad before it listed in New York, and etf_ownership does not count it (before_first_close).
+        left_out:
+          type:
+          - array
+          - 'null'
+          description: An empty list for a stock with a page, and null without one; kept for compatibility. Before lines listed abroad were keyed with their market (7203.JP), it named the issuer-layer funds whose row under the ticker was most likely a company listed abroad under the same code. Today a row stays under a US ticker when its issuer's file places it in New York, by its exchange, its currency or its identifiers, with the US list for a line nothing else places. The Toronto line of the same shares as a New York line also stays under the US ticker (RY). A row in dollars that nothing places abroad counts as a US line, as a few depositary receipts traded in London do (SBID, the GDR of State Bank of India).
+          items:
+            type:
+            - string
+            - 'null'
+        same_code_abroad:
+          type:
+          - array
+          - 'null'
+          items:
+            type: array
+            prefixItems:
+            - title: key
+              type: string
+            - title: name
+              type:
+              - string
+              - 'null'
+            items:
+              type:
+              - 'null'
+              - string
+          description: 'The lines listed outside the United States under the same local code, as [key, company name], most widely held first. Each is another security, and often another company: SAN.ES is Banco Santander in Madrid and SAN.FR Sanofi in Paris, beside SAN, the Santander ADR. Their issuer-layer holders are under those keys in the holders index. Their SEC-layer holders are in holders_sec_nport of the shard of their first character (/api/v1/holders/a.json for AZN.GB). An empty list when there is none.'
+        earlier_key_reads_as:
+          type:
+          - array
+          - 'null'
+          items:
+            type:
+            - 'null'
+            - string
+          description: The keys this ticker reads as now, this ticker among them, when it was also the key of other lines before lines listed abroad were keyed with their market. CCO, Clear Channel Outdoor, was also Cameco's Toronto code, so it reads as CCO and CCJ; SAN reads as SAN, SAN.ES and SAN.FR. The same list as the aliases of the holders index. Null when the ticker was only ever this line.
+        least_correlated:
+          type:
+          - array
+          - 'null'
+          items:
+            type: array
+            prefixItems:
+            - title: ticker
+              type: string
+            - title: correlation
+              type: number
+            - title: name
+              type:
+              - string
+              - 'null'
+            items:
+              type:
+              - 'null'
+              - number
+              - string
+          description: The eight stocks least correlated with this one over the last 104 of the same weekly returns, as [ticker, correlation, name]. The candidates are stocks held by ten or more covered funds, so every neighbour is reachable through ETFs. A measurement of co-movement, not a recommendation.
+        most_correlated:
+          type:
+          - array
+          - 'null'
+          items:
+            type: array
+            prefixItems:
+            - title: ticker
+              type: string
+            - title: correlation
+              type: number
+            - title: name
+              type:
+              - string
+              - 'null'
+            items:
+              type:
+              - 'null'
+              - number
+              - string
+          description: The eight most correlated, same shape and same candidate set.
+        weekly:
+          type:
+          - array
+          - 'null'
+          items:
+            type:
+            - 'null'
+            - number
+          description: '156 weekly total returns as decimals, oldest first, ending at as_of: the same weeks as the fund files, so a stock and a fund correlate with the same arithmetic as two funds. A week is null when its return cannot be computed, because the stock''s prices begin later or a weekly close is missing. At least 110 of the 156 are numbers. It is an empty list for a stock with fewer that has a file by the rule of this endpoint: its vol, beta, mdd3, r3 and r5 are then null and its correlated stocks empty lists.'
+        weeks_end:
+          type:
+          - string
+          - 'null'
+          description: The last date covered by the weekly series.
+        license:
+          type:
+          - string
+          - 'null'
+          description: The licence the data is published under.
+        attribution:
+          type:
+          - string
+          - 'null'
+          description: 'How to credit the data: a link to the page cite_as names where the medium allows one, the name where it does not.'
+        source:
+          type:
+          - string
+          - 'null'
+          description: Where the method behind these figures is written down.
     Security:
       type: object
       properties:
@@ -1652,383 +2029,6 @@ components:
       - license
       - attribution
       - source
-    SecurityHoldersOnly:
-      type: object
-      additionalProperties: true
-      description: 'The answer for a security covered funds hold that has no stock file: a stock the price data does not list or has too few weekly returns for, or a line listed abroad (7203.JP). It is composed from the holders shard of its first character: its holders in both layers, each dated by its issuer file or SEC filing, the price and return fields null, and none of the fields the shard cannot give (synthetic_exposure, etf_ownership, holders_all, rank_summary, top_by_value, membership, by_issuer, fee_per_1000, name_collision, answer).'
-      required:
-      - coverage
-      - note
-      - ticker
-      - name
-      - page_url
-      - cite_as
-      - cite_html
-      - sector
-      - industry
-      - as_of
-      - page
-      - cap_b
-      - pe
-      - yield
-      - vol
-      - beta
-      - mdd3
-      - r1
-      - r3
-      - r5
-      - last_close
-      - last_close_date
-      - day_change_pct
-      - high_52w
-      - low_52w
-      - currency
-      - calendar
-      - held_by
-      - heaviest
-      - held_by_sec_nport
-      - holders
-      - holders_sec_nport
-      - left_out
-      - same_code_abroad
-      - earlier_key_reads_as
-      - least_correlated
-      - most_correlated
-      - weekly
-      - weeks_end
-      - license
-      - attribution
-      - source
-      properties:
-        coverage:
-          type: string
-          const: holders_only
-          description: 'Always holders_only: read it before any other field.'
-        note:
-          type: string
-          description: Why the answer lists holders only, in one sentence.
-        ticker:
-          type:
-          - string
-          - 'null'
-          description: The stock's ticker, upper case.
-        name:
-          type:
-          - string
-          - 'null'
-          description: The company's name.
-        page_url:
-          type:
-          - string
-          - 'null'
-          description: The stock's page on the site, or null when it has none. Link this when quoting the figures.
-        cite_as:
-          type:
-          - string
-          - 'null'
-          description: 'A citation line for a quoted figure: company, sources and date, a URL to check it, licence.'
-        cite_html:
-          type:
-          - string
-          - 'null'
-          description: 'The credit as HTML: a link to the page cite_as names, then its address.'
-        sector:
-          type:
-          - string
-          - 'null'
-          description: The company's sector where the data classifies it, or "US Listed" when it does not, which is the case for most stocks.
-        industry:
-          type:
-          - string
-          - 'null'
-          description: The finest level of that classification under the sector, such as Semiconductors or Regional Banks; null when sector is "US Listed".
-        as_of:
-          type:
-          - string
-          - 'null'
-          description: 'The price date: the date of the price data behind every figure here.'
-        page:
-          type:
-          - boolean
-          - 'null'
-          description: True when the stock has a written page at /stock/{ticker}/. Every stock here has this file whether or not it has a page.
-        cap_b:
-          type:
-          - number
-          - 'null'
-          description: Market capitalisation, in billions of US dollars.
-        pe:
-          type:
-          - number
-          - 'null'
-          description: Trailing price to earnings ratio.
-        yield:
-          type:
-          - number
-          - 'null'
-          description: Trailing twelve month dividend yield, as a percentage.
-        vol:
-          type:
-          - number
-          - 'null'
-          description: Annualised standard deviation of weekly total returns over three years, as a percentage.
-        beta:
-          type:
-          - number
-          - 'null'
-          description: Sensitivity to the S&P 500, from three years of weekly returns.
-        mdd3:
-          type:
-          - number
-          - 'null'
-          description: Largest peak to trough decline over three years, measured on weekly closes. Negative.
-        r1:
-          type:
-          - number
-          - 'null'
-          description: Cumulative total return over one year, as a percentage. Not annualised.
-        r3:
-          type:
-          - number
-          - 'null'
-          description: Cumulative total return over three years, as a percentage. Not annualised.
-        r5:
-          type:
-          - number
-          - 'null'
-          description: Cumulative total return over five years, as a percentage. Not annualised.
-        last_close:
-          type:
-          - number
-          - 'null'
-          description: The last closing price, raw, in the trading currency. Returns use dividend-adjusted closes; this is the close as traded.
-        last_close_date:
-          type:
-          - string
-          - 'null'
-          description: The date of that close.
-        day_change_pct:
-          type:
-          - number
-          - 'null'
-          description: The move from the previous close to the last, as a percentage.
-        high_52w:
-          type:
-          - number
-          - 'null'
-          description: The highest raw close over the last 252 trading days, or since the listing for a stock listed less than a year ago.
-        low_52w:
-          type:
-          - number
-          - 'null'
-          description: The lowest raw close over the last 252 trading days, or since the listing for a stock listed less than a year ago.
-        currency:
-          type:
-          - string
-          - 'null'
-          description: The trading currency of the price fields.
-        calendar:
-          type:
-          - object
-          - 'null'
-          additionalProperties:
-            type:
-            - number
-            - 'null'
-          description: Total return by calendar year, as a percentage, the current year to date.
-        held_by:
-          type:
-          - integer
-          - 'null'
-          description: How many issuer-layer funds hold it, the rows of holders. The stock's page counts these less left_out, with the SEC-layer funds of held_by_sec_nport, as holders_all lists them.
-        heaviest:
-          type:
-          - array
-          - 'null'
-          prefixItems:
-          - title: fund
-            type: string
-          - title: weight
-            type: number
-          items:
-            type:
-            - number
-            - string
-          description: The issuer-layer fund that gives it the largest weight, as [fund ticker, weight percent]. Null when none of them holds it.
-        held_by_sec_nport:
-          type:
-          - integer
-          - 'null'
-          description: How many SEC-layer funds hold it, the rows of holders_sec_nport. The stock's page counts them with the issuer-layer funds and lists them in a table of their own, each linked to its filing.
-        holders:
-          type:
-          - array
-          - 'null'
-          items:
-            type: array
-            prefixItems:
-            - title: fund
-              type: string
-            - title: weight
-              type: number
-            - title: date
-              type:
-              - string
-              - 'null'
-            items:
-              type:
-              - 'null'
-              - number
-              - string
-          description: Every issuer-layer fund that holds it, heaviest first, as [fund ticker, weight percent, date of that fund's holdings file]. The same rows as the holders index, in the stock's own file.
-        holders_sec_nport:
-          type:
-          - array
-          - 'null'
-          items:
-            type: array
-            prefixItems:
-            - title: fund
-              type: string
-            - title: weight
-              type: number
-            - title: date
-              type:
-              - string
-              - 'null'
-            items:
-              type:
-              - 'null'
-              - number
-              - string
-          description: The SEC-layer funds that hold it, heaviest first, as [fund ticker, weight percent, the quarter end the filing describes]. They are months older than holders, so they are kept apart. A fund whose row under this ticker is a foreign company's local code is not listed. A filing names a security by its ISIN, which does not say where the fund bought it. So shares that trade in New York and abroad on one ISIN (AstraZeneca, TotalEnergies, Ferrari) are listed here for the funds whose stocks are mostly on US ISINs, and under the line abroad (AZN.GB) for the others. A preferred share is keyed by its issuer's common ticker, as the filings key it, so a preferred stock fund can appear here. For a stock whose weekly is empty, a row can be dated before its first close in the price data. Such a row can be another security that had the ticker, or the company's shares abroad before it listed in New York, and etf_ownership does not count it (before_first_close).
-        left_out:
-          type:
-          - array
-          - 'null'
-          description: An empty list for a stock with a page, and null without one; kept for compatibility. Before lines listed abroad were keyed with their market (7203.JP), it named the issuer-layer funds whose row under the ticker was most likely a company listed abroad under the same code. Today a row stays under a US ticker when its issuer's file places it in New York, by its exchange, its currency or its identifiers, with the US list for a line nothing else places. The Toronto line of the same shares as a New York line also stays under the US ticker (RY). A row in dollars that nothing places abroad counts as a US line, as a few depositary receipts traded in London do (SBID, the GDR of State Bank of India).
-          items:
-            type:
-            - string
-            - 'null'
-        same_code_abroad:
-          type:
-          - array
-          - 'null'
-          items:
-            type: array
-            prefixItems:
-            - title: key
-              type: string
-            - title: name
-              type:
-              - string
-              - 'null'
-            items:
-              type:
-              - 'null'
-              - string
-          description: 'The lines listed outside the United States under the same local code, as [key, company name], most widely held first. Each is another security, and often another company: SAN.ES is Banco Santander in Madrid and SAN.FR Sanofi in Paris, beside SAN, the Santander ADR. Their issuer-layer holders are under those keys in the holders index. Their SEC-layer holders are in holders_sec_nport of the shard of their first character (/api/v1/holders/a.json for AZN.GB). An empty list when there is none.'
-        earlier_key_reads_as:
-          type:
-          - array
-          - 'null'
-          items:
-            type:
-            - 'null'
-            - string
-          description: The keys this ticker reads as now, this ticker among them, when it was also the key of other lines before lines listed abroad were keyed with their market. CCO, Clear Channel Outdoor, was also Cameco's Toronto code, so it reads as CCO and CCJ; SAN reads as SAN, SAN.ES and SAN.FR. The same list as the aliases of the holders index. Null when the ticker was only ever this line.
-        least_correlated:
-          type:
-          - array
-          - 'null'
-          items:
-            type: array
-            prefixItems:
-            - title: ticker
-              type: string
-            - title: correlation
-              type: number
-            - title: name
-              type:
-              - string
-              - 'null'
-            items:
-              type:
-              - 'null'
-              - number
-              - string
-          description: The eight stocks least correlated with this one over the last 104 of the same weekly returns, as [ticker, correlation, name]. The candidates are stocks held by ten or more covered funds, so every neighbour is reachable through ETFs. A measurement of co-movement, not a recommendation.
-        most_correlated:
-          type:
-          - array
-          - 'null'
-          items:
-            type: array
-            prefixItems:
-            - title: ticker
-              type: string
-            - title: correlation
-              type: number
-            - title: name
-              type:
-              - string
-              - 'null'
-            items:
-              type:
-              - 'null'
-              - number
-              - string
-          description: The eight most correlated, same shape and same candidate set.
-        weekly:
-          type:
-          - array
-          - 'null'
-          items:
-            type:
-            - 'null'
-            - number
-          description: '156 weekly total returns as decimals, oldest first, ending at as_of: the same weeks as the fund files, so a stock and a fund correlate with the same arithmetic as two funds. A week is null when its return cannot be computed, because the stock''s prices begin later or a weekly close is missing. At least 110 of the 156 are numbers. It is an empty list for a stock with fewer that has a file by the rule of this endpoint: its vol, beta, mdd3, r3 and r5 are then null and its correlated stocks empty lists.'
-        weeks_end:
-          type:
-          - string
-          - 'null'
-          description: The last date covered by the weekly series.
-        license:
-          type:
-          - string
-          - 'null'
-          description: The licence the data is published under.
-        attribution:
-          type:
-          - string
-          - 'null'
-          description: 'How to credit the data: a link to the page cite_as names where the medium allows one, the name where it does not.'
-        source:
-          type:
-          - string
-          - 'null'
-          description: Where the method behind these figures is written down.
-    Unavailable:
-      type: object
-      additionalProperties: true
-      required:
-      - error
-      - message
-      - status
-      - uptime
-      properties:
-        error:
-          type: string
-          const: unavailable
-        message:
-          type: string
-        status:
-          type: string
-          description: The nightly report.
-        uptime:
-          type: string
-          description: 'The live checks: whether the site fails its own checks.'
 externalDocs:
   description: The reference, with examples and recipes
   url: https://tickerinside.com/api/

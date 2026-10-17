@@ -96,6 +96,26 @@ paths:
       - Identifiers.json
 components:
   schemas:
+    Unavailable:
+      type: object
+      additionalProperties: true
+      required:
+      - error
+      - message
+      - status
+      - uptime
+      properties:
+        error:
+          type: string
+          const: unavailable
+        message:
+          type: string
+        status:
+          type: string
+          description: The nightly report.
+        uptime:
+          type: string
+          description: 'The live checks: whether the site fails its own checks.'
     Identifiers:
       type: object
       properties:
@@ -266,26 +286,6 @@ components:
       - securities
       - license
       - attribution
-    Unavailable:
-      type: object
-      additionalProperties: true
-      required:
-      - error
-      - message
-      - status
-      - uptime
-      properties:
-        error:
-          type: string
-          const: unavailable
-        message:
-          type: string
-        status:
-          type: string
-          description: The nightly report.
-        uptime:
-          type: string
-          description: 'The live checks: whether the site fails its own checks.'
 externalDocs:
   description: The reference, with examples and recipes
   url: https://tickerinside.com/api/

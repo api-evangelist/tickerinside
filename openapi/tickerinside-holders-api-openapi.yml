@@ -144,6 +144,146 @@ paths:
       - Holders
 components:
   schemas:
+    HoldersShard:
+      type: object
+      properties:
+        as_of:
+          type:
+          - string
+          - 'null'
+          description: The price date.
+        holdings_as_of:
+          type:
+          - object
+          - 'null'
+          additionalProperties:
+            type:
+            - string
+            - 'null'
+          description: The date of each issuer-layer fund's holdings file, keyed by ticker, for every issuer-layer fund.
+        funds:
+          type:
+          - object
+          - 'null'
+          additionalProperties:
+            type:
+            - string
+            - 'null'
+          description: Ticker to fund name for the issuer-layer funds. The names of SEC-layer funds are in /api/v1/funds.json, under sec_funds.
+        facts:
+          type: object
+          additionalProperties:
+            type: object
+            additionalProperties: true
+            properties:
+              n:
+                type:
+                - string
+                - 'null'
+              r1:
+                type:
+                - number
+                - 'null'
+              r3:
+                type:
+                - number
+                - 'null'
+              vol:
+                type:
+                - number
+                - 'null'
+              mdd3:
+                type:
+                - number
+                - 'null'
+              cap_b:
+                type:
+                - number
+                - 'null'
+              pe:
+                type:
+                - number
+                - 'null'
+              yield:
+                type:
+                - number
+                - 'null'
+              page:
+                type: boolean
+          description: 'For each key of this shard the data can describe: n, the name, and where known r1, r3, vol, mdd3, cap_b, pe and yield, in the units of a stock file. page is true when the stock has a page.'
+        holders:
+          type:
+          - object
+          - 'null'
+          additionalProperties:
+            type: array
+            items:
+              type: array
+              prefixItems:
+              - title: fund
+                type: string
+              - title: weight
+                type: number
+              items:
+                type:
+                - number
+                - string
+          description: 'The part of holders.json for the keys of this shard: each key to the issuer-layer funds that hold it, as [fund ticker, weight percent], heaviest first. Each row''s date is in holdings_as_of.'
+        holders_sec_nport:
+          type:
+          - object
+          - 'null'
+          additionalProperties:
+            type: array
+            items:
+              type: array
+              prefixItems:
+              - title: fund
+                type: string
+              - title: weight
+                type: number
+              items:
+                type:
+                - number
+                - string
+          description: Each key of this shard that has no stock file, such as a line listed abroad, to the SEC-layer funds that hold it, as [fund ticker, weight percent], heaviest first. Each row's date is in sec_nport_as_of. A key with a stock file has its SEC-layer holders in that file.
+        sec_nport_as_of:
+          type:
+          - object
+          - 'null'
+          additionalProperties:
+            type:
+            - string
+            - 'null'
+          description: Each SEC-layer fund listed in holders_sec_nport, to the quarter end its filing describes.
+        aliases:
+          type: object
+          additionalProperties:
+            type: array
+            items:
+              type: string
+          description: 'The old keys whose first character is this shard''s, each with the keys it reads as now: 7203 reads as 7203.JP and 7203.SA. Unlike holders.json, it also lists a key that reads only as itself with its market (NESN as NESN.CH). Absent from a shard with no old key.'
+        license:
+          type:
+          - string
+          - 'null'
+          description: The licence the data is published under.
+        attribution:
+          type:
+          - string
+          - 'null'
+          description: 'How to credit the data: a link to this file where the medium allows one, the name where it does not.'
+      additionalProperties: true
+      required:
+      - as_of
+      - holdings_as_of
+      - funds
+      - facts
+      - holders
+      - holders_sec_nport
+      - sec_nport_as_of
+      - license
+      - attribution
     NotCovered:
       type: object
       additionalProperties: true
@@ -292,146 +432,6 @@ components:
         uptime:
           type: string
           description: 'The live checks: whether the site fails its own checks.'
-    HoldersShard:
-      type: object
-      properties:
-        as_of:
-          type:
-          - string
-          - 'null'
-          description: The price date.
-        holdings_as_of:
-          type:
-          - object
-          - 'null'
-          additionalProperties:
-            type:
-            - string
-            - 'null'
-          description: The date of each issuer-layer fund's holdings file, keyed by ticker, for every issuer-layer fund.
-        funds:
-          type:
-          - object
-          - 'null'
-          additionalProperties:
-            type:
-            - string
-            - 'null'
-          description: Ticker to fund name for the issuer-layer funds. The names of SEC-layer funds are in /api/v1/funds.json, under sec_funds.
-        facts:
-          type: object
-          additionalProperties:
-            type: object
-            additionalProperties: true
-            properties:
-              n:
-                type:
-                - string
-                - 'null'
-              r1:
-                type:
-                - number
-                - 'null'
-              r3:
-                type:
-                - number
-                - 'null'
-              vol:
-                type:
-                - number
-                - 'null'
-              mdd3:
-                type:
-                - number
-                - 'null'
-              cap_b:
-                type:
-                - number
-                - 'null'
-              pe:
-                type:
-                - number
-                - 'null'
-              yield:
-                type:
-                - number
-                - 'null'
-              page:
-                type: boolean
-          description: 'For each key of this shard the data can describe: n, the name, and where known r1, r3, vol, mdd3, cap_b, pe and yield, in the units of a stock file. page is true when the stock has a page.'
-        holders:
-          type:
-          - object
-          - 'null'
-          additionalProperties:
-            type: array
-            items:
-              type: array
-              prefixItems:
-              - title: fund
-                type: string
-              - title: weight
-                type: number
-              items:
-                type:
-                - number
-                - string
-          description: 'The part of holders.json for the keys of this shard: each key to the issuer-layer funds that hold it, as [fund ticker, weight percent], heaviest first. Each row''s date is in holdings_as_of.'
-        holders_sec_nport:
-          type:
-          - object
-          - 'null'
-          additionalProperties:
-            type: array
-            items:
-              type: array
-              prefixItems:
-              - title: fund
-                type: string
-              - title: weight
-                type: number
-              items:
-                type:
-                - number
-                - string
-          description: Each key of this shard that has no stock file, such as a line listed abroad, to the SEC-layer funds that hold it, as [fund ticker, weight percent], heaviest first. Each row's date is in sec_nport_as_of. A key with a stock file has its SEC-layer holders in that file.
-        sec_nport_as_of:
-          type:
-          - object
-          - 'null'
-          additionalProperties:
-            type:
-            - string
-            - 'null'
-          description: Each SEC-layer fund listed in holders_sec_nport, to the quarter end its filing describes.
-        aliases:
-          type: object
-          additionalProperties:
-            type: array
-            items:
-              type: string
-          description: 'The old keys whose first character is this shard''s, each with the keys it reads as now: 7203 reads as 7203.JP and 7203.SA. Unlike holders.json, it also lists a key that reads only as itself with its market (NESN as NESN.CH). Absent from a shard with no old key.'
-        license:
-          type:
-          - string
-          - 'null'
-          description: The licence the data is published under.
-        attribution:
-          type:
-          - string
-          - 'null'
-          description: 'How to credit the data: a link to this file where the medium allows one, the name where it does not.'
-      additionalProperties: true
-      required:
-      - as_of
-      - holdings_as_of
-      - funds
-      - facts
-      - holders
-      - holders_sec_nport
-      - sec_nport_as_of
-      - license
-      - attribution
 externalDocs:
   description: The reference, with examples and recipes
   url: https://tickerinside.com/api/

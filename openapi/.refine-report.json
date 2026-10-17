@@ -1,7 +1,7 @@
 {
   "provider": "tickerinside",
   "sources": [
-    "tickerinside-openapi.json"
+    "_original/tickerinside-openapi.json"
   ],
   "outputs": [
     "tickerinside-batch-api-openapi.yml",
@@ -35,12 +35,11 @@
     "tickerinside-universe-json-api-openapi.yml",
     "tickerinside-uptime-json-api-openapi.yml"
   ],
-  "archived": [
-    "archived openapi/tickerinside-openapi.json"
-  ],
+  "archived": [],
   "errors": [],
   "warnings": [],
   "notes": [
+    "sourced from openapi/_original/ (1 archived document(s)); previously refined output at the top level was skipped rather than re-split",
     "tickerinside-openapi.json: upgraded openapi 3.1.0 -> OpenAPI 3.2.0",
     "tickerinside-openapi.json: tagged paths GET /index.json -> Index.json",
     "tickerinside-openapi.json: tagged paths GET /funds.json -> Funds.json",
@@ -104,7 +103,38 @@
     "tickerinside-openapi.json: declared missing tag: Status.json",
     "tickerinside-openapi.json: declared missing tag: Universe.json",
     "tickerinside-openapi.json: declared missing tag: Uptime.json",
-    "apis.yml register: written (+30 apis, 31 total)"
+    "apis.yml register: already-registered"
   ],
-  "skipped": []
+  "skipped": [
+    "tickerinside-batch-api-openapi.yml: previously refined output, superseded by openapi/_original/",
+    "tickerinside-changelog-json-api-openapi.yml: previously refined output, superseded by openapi/_original/",
+    "tickerinside-compare-api-openapi.yml: previously refined output, superseded by openapi/_original/",
+    "tickerinside-corrections-json-api-openapi.yml: previously refined output, superseded by openapi/_original/",
+    "tickerinside-deprecations-json-api-openapi.yml: previously refined output, superseded by openapi/_original/",
+    "tickerinside-diversify-api-openapi.yml: previously refined output, superseded by openapi/_original/",
+    "tickerinside-etf-api-openapi.yml: previously refined output, superseded by openapi/_original/",
+    "tickerinside-flows-api-openapi.yml: previously refined output, superseded by openapi/_original/",
+    "tickerinside-flows-json-api-openapi.yml: previously refined output, superseded by openapi/_original/",
+    "tickerinside-fund-api-openapi.yml: previously refined output, superseded by openapi/_original/",
+    "tickerinside-funds-json-api-openapi.yml: previously refined output, superseded by openapi/_original/",
+    "tickerinside-history-api-openapi.yml: previously refined output, superseded by openapi/_original/",
+    "tickerinside-history-json-api-openapi.yml: previously refined output, superseded by openapi/_original/",
+    "tickerinside-holders-api-openapi.yml: previously refined output, superseded by openapi/_original/",
+    "tickerinside-holders-json-api-openapi.yml: previously refined output, superseded by openapi/_original/",
+    "tickerinside-identifiers-json-api-openapi.yml: previously refined output, superseded by openapi/_original/",
+    "tickerinside-index-json-api-openapi.yml: previously refined output, superseded by openapi/_original/",
+    "tickerinside-lookthrough-api-openapi.yml: previously refined output, superseded by openapi/_original/",
+    "tickerinside-manifest-json-api-openapi.yml: previously refined output, superseded by openapi/_original/",
+    "tickerinside-methods-json-api-openapi.yml: previously refined output, superseded by openapi/_original/",
+    "tickerinside-overlap-api-openapi.yml: previously refined output, superseded by openapi/_original/",
+    "tickerinside-ownership-index-api-openapi.yml: previously refined output, superseded by openapi/_original/",
+    "tickerinside-ownership-index-json-api-openapi.yml: previously refined output, superseded by openapi/_original/",
+    "tickerinside-ownership-json-api-openapi.yml: previously refined output, superseded by openapi/_original/",
+    "tickerinside-screen-api-openapi.yml: previously refined output, superseded by openapi/_original/",
+    "tickerinside-sec-api-openapi.yml: previously refined output, superseded by openapi/_original/",
+    "tickerinside-securities-json-api-openapi.yml: previously refined output, superseded by openapi/_original/",
+    "tickerinside-status-json-api-openapi.yml: previously refined output, superseded by openapi/_original/",
+    "tickerinside-universe-json-api-openapi.yml: previously refined output, superseded by openapi/_original/",
+    "tickerinside-uptime-json-api-openapi.yml: previously refined output, superseded by openapi/_original/"
+  ]
 }

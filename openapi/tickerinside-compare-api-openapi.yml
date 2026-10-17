@@ -204,134 +204,6 @@ paths:
       - Compare
 components:
   schemas:
-    NotCovered:
-      type: object
-      additionalProperties: true
-      required:
-      - error
-      - ticker
-      - message
-      - docs
-      properties:
-        error:
-          type: string
-          const: not_covered
-          description: 'Always not_covered, whatever the reason: read reason and the next address.'
-        reason:
-          type: string
-          enum:
-          - has_security_file
-          - in_another_layer
-          - is_a_fund
-          - no_written_comparison
-          - not_a_shard
-          - not_held_by_daily_funds
-          - not_held
-          - earlier_key
-          - no_such_endpoint
-          - not_in_directory
-          - no_file
-          - funds_not_covered
-          - etn
-          - other_product
-          - no_filing_yet
-          - not_in_sec_list
-          - other_fund
-          - stale_filing
-          - no_prospectus_found
-          - not_in_archive
-          - holdings_at_date_not_enabled
-          - invalid_date
-          - before_history
-          description: 'Every code is explained on /contract/#reasons. not_in_directory: a fund address with no file, for a ticker not in the directory of US-listed funds; a ticker of the directory with no file gets the code universe.json gives it (etn, no_filing_yet and the others), and no_file when the directory was not read. not_held: under /sec/, no covered fund holds the key; earlier_key: an old key, with reads_as. no_such_endpoint: no endpoint at the address. funds_not_covered: several funds of /overlap or /lookthrough, with reasons. in_another_layer: sent only to the TickerInside clients released before /fund/ answered for a fund of the other layers too (see holdings_kind); etf gives the fund''s file. has_security_file: a ticker asked for as a fund has a stock file (see security). is_a_fund: a ticker asked for as a stock is a covered fund (see fund, and holders for the funds that hold it). no_written_comparison: no comparison file for this pair in either order (see fund_files and written_comparisons). not_a_shard: an address under /api/v1/holders/ that is not a shard (see holders). Under /api/v1/history/: not_in_archive: the fund has no history file (see history). holdings_at_date_not_enabled: holdings at a date are not served yet, and every valid date answers this (see changes). invalid_date: the date is not a calendar date, or is after today. before_history: the date is before the fund''s first file (see first), answered only once holdings at a date are served. Under /api/v1/flows/: reason not_held_by_daily_funds: no fund read daily from its issuer''s files held the key or moved it in the last 20 trading days; summary names the night''s summary.'
-        ticker:
-          type:
-          - string
-          - 'null'
-          description: What was asked for, upper case; null when the address names no single ticker, such as a pair under /compare/.
-        message:
-          type: string
-          description: What happened and where to look next, in words.
-        docs:
-          type: string
-          description: The reference.
-        security:
-          type: string
-          description: 'With has_security_file: the stock file of the ticker, or its holders-only answer.'
-        reads_as:
-          type: array
-          items:
-            type: string
-          description: 'Under /sec/, for an old key written before lines listed abroad carried their market (7203): the keys it reads as now, from the aliases of holders. Absent otherwise.'
-        fund:
-          type: string
-          description: 'With is_a_fund: the fund file of the ticker.'
-        etf:
-          type: string
-          description: 'With in_another_layer: the file of the fund, /api/v1/etf/{ticker}.json.'
-        holders:
-          type: string
-          description: 'The shard of the key''s first character: /api/v1/holders/{c}.json, c a to z, or 0 for any other character (7203.JP is in 0.json). It lists the covered funds that hold the key, from issuer files and from SEC filings, with or without a stock file.'
-        pair:
-          type:
-          - array
-          - 'null'
-          items:
-            type: string
-          description: 'With no_written_comparison: the two tickers asked for, upper case, or null when the address names no pair.'
-        written_comparisons:
-          type: array
-          items:
-            type: object
-            additionalProperties: true
-            properties:
-              pair:
-                type: array
-                items:
-                  type: string
-              url:
-                type: string
-          description: 'With no_written_comparison: the pairs that have a comparison file, as index.json lists them.'
-        fund_files:
-          type: array
-          items:
-            type: string
-          description: 'With no_written_comparison: the fund files of the tickers asked for that are covered funds, to compute the overlap from.'
-        covered:
-          type: string
-          description: 'What is covered: /api/v1/securities.json after a /sec/ address with no reason, /api/v1/index.json otherwise.'
-        not_covered:
-          type: array
-          items:
-            type: string
-          description: 'Under /overlap, /lookthrough and /diversify: the tickers asked for that are not covered.'
-        reasons:
-          type: object
-          additionalProperties:
-            type: string
-          description: 'Under /overlap, /lookthrough and /diversify: the reason code of each ticker of not_covered.'
-        covered_issuers:
-          type: array
-          items:
-            type: string
-          description: 'Under /overlap and /lookthrough: the issuers whose own files are read; the other covered funds are read from SEC filings.'
-        history:
-          type: string
-          description: 'With not_in_archive: the list of the funds that have a history.'
-        changes:
-          type: string
-          description: 'With holdings_at_date_not_enabled: the fund''s changes file, served today.'
-        first:
-          type:
-          - string
-          - 'null'
-          description: 'With before_history: the date of the fund''s oldest file. before_history is answered only once holdings at a date are served.'
-        date:
-          type: string
-          description: 'With invalid_date, holdings_at_date_not_enabled or before_history: the date asked for.'
-        summary:
-          type: string
-          description: 'With not_held_by_daily_funds: the night''s flows, /api/v1/flows.json.'
     Compare:
       type: object
       properties:
@@ -696,6 +568,134 @@ components:
       - source
       - license
       - attribution
+    NotCovered:
+      type: object
+      additionalProperties: true
+      required:
+      - error
+      - ticker
+      - message
+      - docs
+      properties:
+        error:
+          type: string
+          const: not_covered
+          description: 'Always not_covered, whatever the reason: read reason and the next address.'
+        reason:
+          type: string
+          enum:
+          - has_security_file
+          - in_another_layer
+          - is_a_fund
+          - no_written_comparison
+          - not_a_shard
+          - not_held_by_daily_funds
+          - not_held
+          - earlier_key
+          - no_such_endpoint
+          - not_in_directory
+          - no_file
+          - funds_not_covered
+          - etn
+          - other_product
+          - no_filing_yet
+          - not_in_sec_list
+          - other_fund
+          - stale_filing
+          - no_prospectus_found
+          - not_in_archive
+          - holdings_at_date_not_enabled
+          - invalid_date
+          - before_history
+          description: 'Every code is explained on /contract/#reasons. not_in_directory: a fund address with no file, for a ticker not in the directory of US-listed funds; a ticker of the directory with no file gets the code universe.json gives it (etn, no_filing_yet and the others), and no_file when the directory was not read. not_held: under /sec/, no covered fund holds the key; earlier_key: an old key, with reads_as. no_such_endpoint: no endpoint at the address. funds_not_covered: several funds of /overlap or /lookthrough, with reasons. in_another_layer: sent only to the TickerInside clients released before /fund/ answered for a fund of the other layers too (see holdings_kind); etf gives the fund''s file. has_security_file: a ticker asked for as a fund has a stock file (see security). is_a_fund: a ticker asked for as a stock is a covered fund (see fund, and holders for the funds that hold it). no_written_comparison: no comparison file for this pair in either order (see fund_files and written_comparisons). not_a_shard: an address under /api/v1/holders/ that is not a shard (see holders). Under /api/v1/history/: not_in_archive: the fund has no history file (see history). holdings_at_date_not_enabled: holdings at a date are not served yet, and every valid date answers this (see changes). invalid_date: the date is not a calendar date, or is after today. before_history: the date is before the fund''s first file (see first), answered only once holdings at a date are served. Under /api/v1/flows/: reason not_held_by_daily_funds: no fund read daily from its issuer''s files held the key or moved it in the last 20 trading days; summary names the night''s summary.'
+        ticker:
+          type:
+          - string
+          - 'null'
+          description: What was asked for, upper case; null when the address names no single ticker, such as a pair under /compare/.
+        message:
+          type: string
+          description: What happened and where to look next, in words.
+        docs:
+          type: string
+          description: The reference.
+        security:
+          type: string
+          description: 'With has_security_file: the stock file of the ticker, or its holders-only answer.'
+        reads_as:
+          type: array
+          items:
+            type: string
+          description: 'Under /sec/, for an old key written before lines listed abroad carried their market (7203): the keys it reads as now, from the aliases of holders. Absent otherwise.'
+        fund:
+          type: string
+          description: 'With is_a_fund: the fund file of the ticker.'
+        etf:
+          type: string
+          description: 'With in_another_layer: the file of the fund, /api/v1/etf/{ticker}.json.'
+        holders:
+          type: string
+          description: 'The shard of the key''s first character: /api/v1/holders/{c}.json, c a to z, or 0 for any other character (7203.JP is in 0.json). It lists the covered funds that hold the key, from issuer files and from SEC filings, with or without a stock file.'
+        pair:
+          type:
+          - array
+          - 'null'
+          items:
+            type: string
+          description: 'With no_written_comparison: the two tickers asked for, upper case, or null when the address names no pair.'
+        written_comparisons:
+          type: array
+          items:
+            type: object
+            additionalProperties: true
+            properties:
+              pair:
+                type: array
+                items:
+                  type: string
+              url:
+                type: string
+          description: 'With no_written_comparison: the pairs that have a comparison file, as index.json lists them.'
+        fund_files:
+          type: array
+          items:
+            type: string
+          description: 'With no_written_comparison: the fund files of the tickers asked for that are covered funds, to compute the overlap from.'
+        covered:
+          type: string
+          description: 'What is covered: /api/v1/securities.json after a /sec/ address with no reason, /api/v1/index.json otherwise.'
+        not_covered:
+          type: array
+          items:
+            type: string
+          description: 'Under /overlap, /lookthrough and /diversify: the tickers asked for that are not covered.'
+        reasons:
+          type: object
+          additionalProperties:
+            type: string
+          description: 'Under /overlap, /lookthrough and /diversify: the reason code of each ticker of not_covered.'
+        covered_issuers:
+          type: array
+          items:
+            type: string
+          description: 'Under /overlap and /lookthrough: the issuers whose own files are read; the other covered funds are read from SEC filings.'
+        history:
+          type: string
+          description: 'With not_in_archive: the list of the funds that have a history.'
+        changes:
+          type: string
+          description: 'With holdings_at_date_not_enabled: the fund''s changes file, served today.'
+        first:
+          type:
+          - string
+          - 'null'
+          description: 'With before_history: the date of the fund''s oldest file. before_history is answered only once holdings at a date are served.'
+        date:
+          type: string
+          description: 'With invalid_date, holdings_at_date_not_enabled or before_history: the date asked for.'
+        summary:
+          type: string
+          description: 'With not_held_by_daily_funds: the night''s flows, /api/v1/flows.json.'
     Unavailable:
       type: object
       additionalProperties: true

@@ -186,6 +186,130 @@ paths:
       - History
 components:
   schemas:
+    HistoryChange:
+      type: object
+      additionalProperties: true
+      properties:
+        date:
+          type:
+          - string
+          description: The date of the file the step leads to.
+        previous:
+          type:
+          - string
+          description: 'The date of the file it is compared with: the fund''s file before it in the archive, days or a month earlier.'
+        entered:
+          type: array
+          items:
+            type: array
+            prefixItems:
+            - title: key
+              type: string
+            - title: weight
+              type: number
+            items:
+              type:
+              - number
+              - string
+          description: The lines in this file that were not in the previous one, as [key, weight percent], heaviest first. Absent from a restated step, which does not say what entered or exited that day; the snapshots give only its count of positions. Read it with a default, such as step.get("entered", []). A key of digits and a letter is a code the issuer's file gives in place of a ticker. When a ticker exits and such a code enters at about the same weight, and the reverse follows, it is the same security re-keyed, not a trade.
+        exited:
+          type: array
+          items:
+            type: array
+            prefixItems:
+            - title: key
+              type: string
+            - title: weight
+              type: number
+            items:
+              type:
+              - number
+              - string
+          description: The lines in the previous file that are not in this one, as [key, weight percent in the previous file], heaviest first. Absent from a restated step.
+        moved:
+          type: array
+          items:
+            type: array
+            prefixItems:
+            - title: key
+              type: string
+            - title: before
+              type: number
+            - title: after
+              type: number
+            items:
+              type:
+              - number
+              - string
+          description: The lines in both files whose weight moved by moved_threshold_pp or more, as [key, weight before, weight after], largest move first. Absent from a restated step.
+        moved_below_threshold:
+          type:
+          - integer
+          description: How many other lines in both files moved by less. Absent from a restated step.
+        names_turnover_pp:
+          type:
+          - number
+          - 'null'
+          description: 'Half the weight that entered plus the weight that exited, in percentage points: what the change of names carried. Null on a restated step.'
+        weights_moved_pp:
+          type:
+          - number
+          - 'null'
+          description: Half the sum of the absolute changes of weight over every line of either file, in percentage points. It includes price drift, which moves every weight a little each day, so it is not turnover. Null on a restated step.
+        traded_pp:
+          type:
+          - number
+          - 'null'
+          description: What the share counts say was traded, in percentage points of assets, when both files carry them and the fund has traded_min_pairs such steps; null otherwise. A line held in both counts its weight times the change of its quantity beyond the fund's own growth, a line that entered or exited its weight, and the sum is halved.
+        splits_seen:
+          type: array
+          items:
+            type: string
+          description: The lines whose quantity moved by a split ratio while their weight did not, left out of traded_pp. Present when there is one.
+        reverted:
+          type: array
+          items:
+            type: string
+          description: The entered lines the fund held two files earlier, most often a line the issuer's file left out for a day. That exit and this entry are a glitch in the file, not trades, and so is a key of digits and a letter that stood in for the line in the file between. Present when there is one.
+        restated:
+          type:
+          - boolean
+          description: true on a step that is a change of the keys or of the reading of the files, not a trade; absent otherwise. A restated step has no entered, exited, moved or moved_below_threshold, so read them with a default. It is set on the step to a file of the current key scheme, where the parser also reads lines the old one dropped. It is set on the first file of a fund of funds that lists the funds it holds apart from their look-through, and on two files whose weights add up to totals 50 points or more apart. It is also set on the first file that keys apart the preferred shares a file writes under their issuer's common ticker (JPM.PFD rather than JPM), and on a date listed after a fix of the reading.
+        reason:
+          type:
+          - string
+          description: 'Why the step is restated. key_scheme_2: the first file in keys with a market. own_lines_separated: a fund of funds whose earlier files listed the funds it holds beside their look-through, about 200% in all. weight_total_changed: the two totals are 50 points or more apart. weights_from_market_values: weights from market values, or the reverse. preferred_keyed_apart: the preferred shares the file writes under their issuer''s common ticker are keyed as that ticker and .PFD, at the weight the common ticker carried. Otherwise, the reason given with a listed date.'
+        rekeyed:
+          type: array
+          items:
+            type: array
+            prefixItems:
+            - title: old_key
+              type: string
+            - title: keys
+              type: array
+              items:
+                type: string
+            items:
+              type:
+              - array
+              - string
+          description: On a restated step, the old keys that read as other keys today, as [old key, [new keys]]. It covers a spelling brought together (A005930 is 005930.KR), a Toronto code under its New York ticker, and a key that stood for several lines, with the lines the new file holds. It also covers a common ticker whose preferred shares took a key of their own (JPM as [JPM.PFD], or [WFC, WFC.PFD] where the fund holds both).
+        market_added:
+          type:
+          - integer
+          description: On a restated step, how many old keys only took their market (7203 became 7203.JP). Each is in the aliases of the holders shard of its first character.
+        coverage_added_pp:
+          type:
+          - number
+          - 'null'
+          description: 'On a restated step, the weight the new file covers beyond the previous one, in percentage points: lines the old reading dropped, or, below zero, weight the old reading counted twice.'
+      required:
+      - date
+      - previous
+      - names_turnover_pp
+      - weights_moved_pp
+      - traded_pp
     NotCovered:
       type: object
       additionalProperties: true
@@ -314,130 +438,26 @@ components:
         summary:
           type: string
           description: 'With not_held_by_daily_funds: the night''s flows, /api/v1/flows.json.'
-    HistoryChange:
+    Unavailable:
       type: object
       additionalProperties: true
-      properties:
-        date:
-          type:
-          - string
-          description: The date of the file the step leads to.
-        previous:
-          type:
-          - string
-          description: 'The date of the file it is compared with: the fund''s file before it in the archive, days or a month earlier.'
-        entered:
-          type: array
-          items:
-            type: array
-            prefixItems:
-            - title: key
-              type: string
-            - title: weight
-              type: number
-            items:
-              type:
-              - number
-              - string
-          description: The lines in this file that were not in the previous one, as [key, weight percent], heaviest first. Absent from a restated step, which does not say what entered or exited that day; the snapshots give only its count of positions. Read it with a default, such as step.get("entered", []). A key of digits and a letter is a code the issuer's file gives in place of a ticker. When a ticker exits and such a code enters at about the same weight, and the reverse follows, it is the same security re-keyed, not a trade.
-        exited:
-          type: array
-          items:
-            type: array
-            prefixItems:
-            - title: key
-              type: string
-            - title: weight
-              type: number
-            items:
-              type:
-              - number
-              - string
-          description: The lines in the previous file that are not in this one, as [key, weight percent in the previous file], heaviest first. Absent from a restated step.
-        moved:
-          type: array
-          items:
-            type: array
-            prefixItems:
-            - title: key
-              type: string
-            - title: before
-              type: number
-            - title: after
-              type: number
-            items:
-              type:
-              - number
-              - string
-          description: The lines in both files whose weight moved by moved_threshold_pp or more, as [key, weight before, weight after], largest move first. Absent from a restated step.
-        moved_below_threshold:
-          type:
-          - integer
-          description: How many other lines in both files moved by less. Absent from a restated step.
-        names_turnover_pp:
-          type:
-          - number
-          - 'null'
-          description: 'Half the weight that entered plus the weight that exited, in percentage points: what the change of names carried. Null on a restated step.'
-        weights_moved_pp:
-          type:
-          - number
-          - 'null'
-          description: Half the sum of the absolute changes of weight over every line of either file, in percentage points. It includes price drift, which moves every weight a little each day, so it is not turnover. Null on a restated step.
-        traded_pp:
-          type:
-          - number
-          - 'null'
-          description: What the share counts say was traded, in percentage points of assets, when both files carry them and the fund has traded_min_pairs such steps; null otherwise. A line held in both counts its weight times the change of its quantity beyond the fund's own growth, a line that entered or exited its weight, and the sum is halved.
-        splits_seen:
-          type: array
-          items:
-            type: string
-          description: The lines whose quantity moved by a split ratio while their weight did not, left out of traded_pp. Present when there is one.
-        reverted:
-          type: array
-          items:
-            type: string
-          description: The entered lines the fund held two files earlier, most often a line the issuer's file left out for a day. That exit and this entry are a glitch in the file, not trades, and so is a key of digits and a letter that stood in for the line in the file between. Present when there is one.
-        restated:
-          type:
-          - boolean
-          description: true on a step that is a change of the keys or of the reading of the files, not a trade; absent otherwise. A restated step has no entered, exited, moved or moved_below_threshold, so read them with a default. It is set on the step to a file of the current key scheme, where the parser also reads lines the old one dropped. It is set on the first file of a fund of funds that lists the funds it holds apart from their look-through, and on two files whose weights add up to totals 50 points or more apart. It is also set on the first file that keys apart the preferred shares a file writes under their issuer's common ticker (JPM.PFD rather than JPM), and on a date listed after a fix of the reading.
-        reason:
-          type:
-          - string
-          description: 'Why the step is restated. key_scheme_2: the first file in keys with a market. own_lines_separated: a fund of funds whose earlier files listed the funds it holds beside their look-through, about 200% in all. weight_total_changed: the two totals are 50 points or more apart. weights_from_market_values: weights from market values, or the reverse. preferred_keyed_apart: the preferred shares the file writes under their issuer''s common ticker are keyed as that ticker and .PFD, at the weight the common ticker carried. Otherwise, the reason given with a listed date.'
-        rekeyed:
-          type: array
-          items:
-            type: array
-            prefixItems:
-            - title: old_key
-              type: string
-            - title: keys
-              type: array
-              items:
-                type: string
-            items:
-              type:
-              - array
-              - string
-          description: On a restated step, the old keys that read as other keys today, as [old key, [new keys]]. It covers a spelling brought together (A005930 is 005930.KR), a Toronto code under its New York ticker, and a key that stood for several lines, with the lines the new file holds. It also covers a common ticker whose preferred shares took a key of their own (JPM as [JPM.PFD], or [WFC, WFC.PFD] where the fund holds both).
-        market_added:
-          type:
-          - integer
-          description: On a restated step, how many old keys only took their market (7203 became 7203.JP). Each is in the aliases of the holders shard of its first character.
-        coverage_added_pp:
-          type:
-          - number
-          - 'null'
-          description: 'On a restated step, the weight the new file covers beyond the previous one, in percentage points: lines the old reading dropped, or, below zero, weight the old reading counted twice.'
       required:
-      - date
-      - previous
-      - names_turnover_pp
-      - weights_moved_pp
-      - traded_pp
+      - error
+      - message
+      - status
+      - uptime
+      properties:
+        error:
+          type: string
+          const: unavailable
+        message:
+          type: string
+        status:
+          type: string
+          description: The nightly report.
+        uptime:
+          type: string
+          description: 'The live checks: whether the site fails its own checks.'
     FundHistory:
       type: object
       additionalProperties: true
@@ -641,26 +661,6 @@ components:
       - license
       - terms
       - attribution
-    Unavailable:
-      type: object
-      additionalProperties: true
-      required:
-      - error
-      - message
-      - status
-      - uptime
-      properties:
-        error:
-          type: string
-          const: unavailable
-        message:
-          type: string
-        status:
-          type: string
-          description: The nightly report.
-        uptime:
-          type: string
-          description: 'The live checks: whether the site fails its own checks.'
 externalDocs:
   description: The reference, with examples and recipes
   url: https://tickerinside.com/api/

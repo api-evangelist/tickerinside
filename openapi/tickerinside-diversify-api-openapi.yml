@@ -624,519 +624,6 @@ paths:
       - Diversify
 components:
   schemas:
-    BadRequest:
-      type: object
-      additionalProperties: true
-      properties:
-        error:
-          type: string
-          const: bad_request
-          description: Always bad_request.
-        reason:
-          type: string
-          enum:
-          - missing_parameter
-          - unknown_parameter
-          - repeated_parameter
-          - invalid_value
-          - too_few_funds
-          - too_many_funds
-          - too_large
-          - no_price_history
-          description: missing_parameter, unknown_parameter, repeated_parameter, invalid_value, too_few_funds, too_many_funds, too_large, a call past the limits of its endpoint (see limit and asked), or no_price_history, Find with no fund held that has weekly returns here.
-        message:
-          type: string
-          description: What to fix, in words.
-        parameter:
-          type: string
-          description: The parameter to fix. Absent with too_large.
-        min:
-          type: integer
-          description: 'With too_few_funds: the fewest funds the parameter takes.'
-        max:
-          type: integer
-          description: 'With too_many_funds: the most funds the parameter takes.'
-        limit:
-          type: object
-          additionalProperties:
-            type: integer
-          description: 'With too_large: the limit the call passed, as chars (the size of the files read, in bytes, a file of the other layers for a third of it), pairs (the holdings overlap compares), holdings (those a look-through or diversify reads), comparisons (those of diversify''s overlaps) or subrequests (the reads of files and of the edge cache one call makes).'
-        asked:
-          type: object
-          additionalProperties:
-            type: integer
-          description: 'With too_large: the call''s own figure for that limit.'
-        files:
-          type: object
-          additionalProperties:
-            type: integer
-          description: 'With too_large past limit.chars: what each fund''s file weighed, by ticker, in the units of chars (diversify''s asked.chars adds the reference file''s), so that a client can drop the largest.'
-        holdings_by_fund:
-          type: object
-          additionalProperties:
-            type: integer
-          description: 'With too_large on diversify past limit.holdings or limit.comparisons: the lines of each fund counted, by ticker (before any fund is read, those with a compact file).'
-        answered_by:
-          type: object
-          additionalProperties: true
-          description: 'With too_large from overlap or lookthrough, what answers the same question, as the message names it: mcp, the MCP server''s tool (url, tool, arguments); for two funds diversify answers, diversify and page; for a portfolio whose x-ray the site writes, page.'
-        docs:
-          type: string
-          description: The reference of this endpoint.
-      required:
-      - error
-      - reason
-      - message
-      - docs
-    Diversify:
-      type: object
-      additionalProperties: true
-      properties:
-        kind:
-          type: string
-          const: diversify
-          description: Always diversify.
-        mode:
-          type: string
-          const: compare
-          description: compare, the check of the funds of try against the funds of have. With have alone the answer is Find, mode find, another shape (DiversifyFind).
-        question:
-          type: string
-          description: 'The question answered, in words: the funds to try and the portfolio of the funds held, with their weights.'
-        answer:
-          type: string
-          description: 'The answer in one sentence, to quote as it is: of the funds to try, the one with the lowest overlap and the one with the lowest weekly correlation, with the figures and their period, or for one fund to try its two figures; the line /diversify/ prints under the question.'
-        answers:
-          type: array
-          items:
-            type: string
-          description: 'One sentence per fund to try, in the order of candidates, to quote as it is: its overlap with the portfolio, the correlation of weekly returns with the portfolio''s over the weeks both have and on the weeks the portfolio fell, and the holdings dates, or why a figure is not measured.'
-        have:
-          type: object
-          additionalProperties: true
-          required:
-          - funds
-          - weights
-          - sentence
-          properties:
-            funds:
-              type: array
-              items:
-                type: object
-                additionalProperties: true
-                properties:
-                  ticker:
-                    type: string
-                  weight_pct:
-                    type:
-                    - number
-                    - 'null'
-                  name:
-                    type:
-                    - string
-                    - 'null'
-                  holdings_as_of:
-                    type:
-                    - string
-                    - 'null'
-                  holdings_source:
-                    type: string
-                  holds_shares:
-                    type: boolean
-                  weekly_returns:
-                    type:
-                    - integer
-                    - 'null'
-            weights:
-              type: string
-              enum:
-              - given
-              - equal
-            looked_through_pct:
-              type:
-              - number
-              - 'null'
-            holds_no_shares:
-              type: array
-              items:
-                type: string
-            returns_from:
-              type: array
-              items:
-                type: string
-            no_price_history:
-              type: array
-              items:
-                type: string
-            no_breakdown:
-              type: array
-              items:
-                type: string
-            mega_cap_tech_pct:
-              type:
-              - number
-              - 'null'
-            sectors:
-              type:
-              - object
-              - 'null'
-              additionalProperties: true
-              properties:
-                known_pct:
-                  type:
-                  - number
-                  - 'null'
-                coverage_pct:
-                  type:
-                  - number
-                  - 'null'
-                stated:
-                  type: boolean
-                weights:
-                  type: array
-                  items:
-                    type: object
-                    additionalProperties: true
-                    properties:
-                      sector:
-                        type: string
-                      pct:
-                        type:
-                        - number
-                        - 'null'
-            countries:
-              type:
-              - object
-              - 'null'
-              additionalProperties: true
-              properties:
-                us_pct:
-                  type:
-                  - number
-                  - 'null'
-                weights:
-                  type: array
-                  items:
-                    type: object
-                    additionalProperties: true
-                    properties:
-                      country:
-                        type: string
-                      pct:
-                        type:
-                        - number
-                        - 'null'
-                other_pct:
-                  type:
-                  - number
-                  - 'null'
-            sentence:
-              type: string
-          description: 'The portfolio of the funds held: each fund (funds) with its weight_pct, name, holdings_as_of, holdings_source, holds_shares and weekly_returns, the number of weekly returns its file has; weights, given or equal; looked_through_pct, the part of the portfolio in funds that hold shares; holds_no_shares; returns_from, the funds its weekly returns are computed from, and no_price_history; no_breakdown, the funds holding shares whose file gives no breakdown; mega_cap_tech_pct, sectors and countries as each candidate has them, its funds'' at their weights, in percent of the whole portfolio; and its sentence.'
-        candidates:
-          type: array
-          items:
-            type: object
-            additionalProperties: true
-            properties:
-              ticker:
-                type: string
-                description: The fund to try.
-              name:
-                type:
-                - string
-                - 'null'
-                description: Its name.
-              holdings_as_of:
-                type:
-                - string
-                - 'null'
-                description: 'The date of its holdings: its issuer file, or the quarter end its filing describes.'
-              holdings_source:
-                type: string
-                description: 'Its source: issuer file, SEC Form N-PORT, trust''s own SEC filing, sponsor''s own holdings file, or prospectus, no holdings yet.'
-              fund_file:
-                type: string
-                description: The address of its fund file.
-              page_url:
-                type:
-                - string
-                - 'null'
-                description: Its page. Null without one.
-              overlap:
-                type:
-                - object
-                - 'null'
-                additionalProperties: true
-                properties:
-                  by_weight_pct:
-                    type:
-                    - number
-                    - 'null'
-                  share_of_candidate_pct:
-                    type:
-                    - number
-                    - 'null'
-                  companies_in_both:
-                    type:
-                    - integer
-                    - 'null'
-                  largest_shared:
-                    type: array
-                    items:
-                      type: object
-                      additionalProperties: true
-                      properties:
-                        ticker:
-                          type: string
-                        in_candidate_pct:
-                          type:
-                          - number
-                          - 'null'
-                        in_have_pct:
-                          type:
-                          - number
-                          - 'null'
-                        counted_pct:
-                          type:
-                          - number
-                          - 'null'
-                description: 'In percent: by_weight_pct, the sum over the companies it and the portfolio both hold of the smaller of its weight and the portfolio''s, the portfolio looked through its funds at their weights; share_of_candidate_pct, the part of the fund in those companies; companies_in_both, the holdings both have, counted by ticker; and largest_shared, up to five, each with in_candidate_pct, in_have_pct and counted_pct. Null for a fund that holds no shares, or when no fund held does (see not_measured).'
-              correlation:
-                type:
-                - object
-                - 'null'
-                additionalProperties: true
-                properties:
-                  weekly:
-                    type:
-                    - number
-                    - 'null'
-                  weeks:
-                    type:
-                    - integer
-                    - 'null'
-                  from:
-                    type:
-                    - string
-                    - 'null'
-                  to:
-                    type:
-                    - string
-                    - 'null'
-                  down_weeks:
-                    type:
-                    - number
-                    - 'null'
-                  down_weeks_count:
-                    type:
-                    - integer
-                    - 'null'
-                  with:
-                    type: array
-                    items:
-                      type: string
-                description: 'Of weekly returns, the fund''s against the portfolio''s: weekly, over weeks weeks from from to to, each the last close of its week (weeks run Saturday to Friday: a week closes on its Friday, or on the Thursday when the exchange is shut that Friday, and the last week on the data''s last close); down_weeks, the same on the down_weeks_count weeks the portfolio fell, null under 20 of them; and with, the funds held whose returns the portfolio''s are computed from. Null without 52 weeks in common (see not_measured).'
-              volatility_pct:
-                type:
-                - number
-                - 'null'
-                description: Its annualised weekly volatility over the weeks of its correlation, in percent; absent when the correlation is not measured.
-              with_10_pct:
-                type: object
-                additionalProperties: true
-                properties:
-                  volatility_pct:
-                    type:
-                    - number
-                    - 'null'
-                  instead_of_pct:
-                    type:
-                    - number
-                    - 'null'
-                  weeks:
-                    type:
-                    - integer
-                    - 'null'
-                  to:
-                    type:
-                    - string
-                    - 'null'
-                description: The portfolio's annualised weekly volatility with 10% in this ETF and 90% in the ETFs held at their weights, rebalanced weekly (volatility_pct), against the portfolio alone (instead_of_pct), over the weeks of its correlation; absent when the correlation is not measured.
-              mega_cap_tech_pct:
-                type:
-                - number
-                - 'null'
-                description: The part of the fund in the companies definitions.mega_cap_tech lists, in percent to one decimal, from its fund file's breakdown. Null for a fund that holds no shares or has no breakdown.
-              sectors:
-                type:
-                - object
-                - 'null'
-                additionalProperties: true
-                properties:
-                  known_pct:
-                    type:
-                    - number
-                    - 'null'
-                  coverage_pct:
-                    type:
-                    - number
-                    - 'null'
-                  stated:
-                    type: boolean
-                  weights:
-                    type: array
-                    items:
-                      type: object
-                      additionalProperties: true
-                      properties:
-                        sector:
-                          type: string
-                        pct:
-                          type:
-                          - number
-                          - 'null'
-                description: 'From its fund file''s breakdown: known_pct, the part of the fund whose sector is found; coverage_pct, that part of its stock weight; stated, whether coverage_pct reaches definitions.sectors_stated_from_pct; and weights, when stated, each sector with its id (sector), name and pct of the fund, largest first. Null as mega_cap_tech_pct is.'
-              countries:
-                type:
-                - object
-                - 'null'
-                additionalProperties: true
-                properties:
-                  us_pct:
-                    type:
-                    - number
-                    - 'null'
-                  weights:
-                    type: array
-                    items:
-                      type: object
-                      additionalProperties: true
-                      properties:
-                        country:
-                          type: string
-                        pct:
-                          type:
-                          - number
-                          - 'null'
-                  other_pct:
-                    type:
-                    - number
-                    - 'null'
-                description: 'From its fund file''s breakdown, in percent of the fund: us_pct, the United States; weights, up to six countries, largest first, each with its ISO code (country), name and pct; and other_pct, the rest. Null as mega_cap_tech_pct is.'
-              not_measured:
-                type: object
-                additionalProperties:
-                  type: string
-                description: 'Why a figure is null, by figure: overlap, correlation, down_weeks or profile. Absent when every figure is given.'
-              rank:
-                type: integer
-                description: Its place in the order of ranking, from 1.
-              sentence:
-                type: string
-                description: Its sentence, as answers gives it.
-            required:
-            - ticker
-            - holdings_source
-            - fund_file
-            - overlap
-            - correlation
-            - rank
-            - sentence
-          description: Each fund to try, ranked (see ranking).
-        ranking:
-          type: string
-          description: The rule of the order of candidates, in words.
-        prices_as_of:
-          type:
-          - string
-          - 'null'
-          description: The last week of the weekly returns, the date of the prices.
-        definitions:
-          type: object
-          additionalProperties: true
-          description: 'How each figure is computed, in the words /diversify/ prints: overlap, share_of_candidate (the part of the candidate in companies the portfolio holds), correlation, down_weeks, sectors and countries; the companies counted as mega-cap tech (mega_cap_tech: rule and companies, each with its name and tickers), the fixed list every fund file''s breakdown counts; and sectors_stated_from_pct.'
-        skipped:
-          type: object
-          additionalProperties: true
-          properties:
-            not_covered:
-              type: array
-              items:
-                type: string
-          description: The tickers not covered, under not_covered, left out of the answer. Absent when every ticker is covered.
-        renamed:
-          type: object
-          additionalProperties:
-            type: string
-          description: Each ticker asked that a fund had before it was renamed, with its ticker now, under which the answer reads and names it. Absent when there is none.
-        share_url:
-          type: string
-          description: The page of this answer, /diversify/ with the same query, which renders it for a person or an assistant that fetches it.
-        api_url:
-          type: string
-          description: This answer's own address.
-        source:
-          type: object
-          additionalProperties: true
-          required:
-          - provider
-          - links
-          - license
-          - cite_as
-          properties:
-            provider:
-              type: string
-            license:
-              type: string
-            cite_as:
-              type: string
-            reference_url:
-              type: string
-            links:
-              type: array
-              items:
-                type: object
-                additionalProperties: true
-                properties:
-                  ticker:
-                    type: string
-                  page_url:
-                    type:
-                    - string
-                    - 'null'
-                  api_url:
-                    type: string
-                  holdings_source:
-                    type: string
-          description: 'The files the answer is computed from: each fund''s page_url, null without a page, api_url and holdings_source; reference_url, the file of mega-cap tech and the names of the sectors and countries; license; and cite_as.'
-        note:
-          type: string
-          description: Measurement, not investment advice.
-        license:
-          type: string
-          description: The licence the data is published under.
-        attribution:
-          type: string
-          description: 'How to credit the data: a link to the page of a fund the figure comes from, or to this address, where the medium allows one, the name where it does not.'
-        docs:
-          type: string
-          description: The reference of this endpoint.
-      required:
-      - kind
-      - question
-      - answer
-      - answers
-      - have
-      - candidates
-      - ranking
-      - definitions
-      - share_url
-      - source
-      - note
-      - license
-      - attribution
-      - docs
     DiversifyFind:
       type: object
       additionalProperties: true
@@ -1743,253 +1230,70 @@ components:
       - license
       - attribution
       - docs
-    NotCovered:
+    BadRequest:
       type: object
       additionalProperties: true
-      required:
-      - error
-      - ticker
-      - message
-      - docs
       properties:
         error:
           type: string
-          const: not_covered
-          description: 'Always not_covered, whatever the reason: read reason and the next address.'
+          const: bad_request
+          description: Always bad_request.
         reason:
           type: string
           enum:
-          - has_security_file
-          - in_another_layer
-          - is_a_fund
-          - no_written_comparison
-          - not_a_shard
-          - not_held_by_daily_funds
-          - not_held
-          - earlier_key
-          - no_such_endpoint
-          - not_in_directory
-          - no_file
-          - funds_not_covered
-          - etn
-          - other_product
-          - no_filing_yet
-          - not_in_sec_list
-          - other_fund
-          - stale_filing
-          - no_prospectus_found
-          - not_in_archive
-          - holdings_at_date_not_enabled
-          - invalid_date
-          - before_history
-          description: 'Every code is explained on /contract/#reasons. not_in_directory: a fund address with no file, for a ticker not in the directory of US-listed funds; a ticker of the directory with no file gets the code universe.json gives it (etn, no_filing_yet and the others), and no_file when the directory was not read. not_held: under /sec/, no covered fund holds the key; earlier_key: an old key, with reads_as. no_such_endpoint: no endpoint at the address. funds_not_covered: several funds of /overlap or /lookthrough, with reasons. in_another_layer: sent only to the TickerInside clients released before /fund/ answered for a fund of the other layers too (see holdings_kind); etf gives the fund''s file. has_security_file: a ticker asked for as a fund has a stock file (see security). is_a_fund: a ticker asked for as a stock is a covered fund (see fund, and holders for the funds that hold it). no_written_comparison: no comparison file for this pair in either order (see fund_files and written_comparisons). not_a_shard: an address under /api/v1/holders/ that is not a shard (see holders). Under /api/v1/history/: not_in_archive: the fund has no history file (see history). holdings_at_date_not_enabled: holdings at a date are not served yet, and every valid date answers this (see changes). invalid_date: the date is not a calendar date, or is after today. before_history: the date is before the fund''s first file (see first), answered only once holdings at a date are served. Under /api/v1/flows/: reason not_held_by_daily_funds: no fund read daily from its issuer''s files held the key or moved it in the last 20 trading days; summary names the night''s summary.'
-        ticker:
-          type:
-          - string
-          - 'null'
-          description: What was asked for, upper case; null when the address names no single ticker, such as a pair under /compare/.
+          - missing_parameter
+          - unknown_parameter
+          - repeated_parameter
+          - invalid_value
+          - too_few_funds
+          - too_many_funds
+          - too_large
+          - no_price_history
+          description: missing_parameter, unknown_parameter, repeated_parameter, invalid_value, too_few_funds, too_many_funds, too_large, a call past the limits of its endpoint (see limit and asked), or no_price_history, Find with no fund held that has weekly returns here.
         message:
           type: string
-          description: What happened and where to look next, in words.
-        docs:
+          description: What to fix, in words.
+        parameter:
           type: string
-          description: The reference.
-        security:
-          type: string
-          description: 'With has_security_file: the stock file of the ticker, or its holders-only answer.'
-        reads_as:
-          type: array
-          items:
-            type: string
-          description: 'Under /sec/, for an old key written before lines listed abroad carried their market (7203): the keys it reads as now, from the aliases of holders. Absent otherwise.'
-        fund:
-          type: string
-          description: 'With is_a_fund: the fund file of the ticker.'
-        etf:
-          type: string
-          description: 'With in_another_layer: the file of the fund, /api/v1/etf/{ticker}.json.'
-        holders:
-          type: string
-          description: 'The shard of the key''s first character: /api/v1/holders/{c}.json, c a to z, or 0 for any other character (7203.JP is in 0.json). It lists the covered funds that hold the key, from issuer files and from SEC filings, with or without a stock file.'
-        pair:
-          type:
-          - array
-          - 'null'
-          items:
-            type: string
-          description: 'With no_written_comparison: the two tickers asked for, upper case, or null when the address names no pair.'
-        written_comparisons:
-          type: array
-          items:
-            type: object
-            additionalProperties: true
-            properties:
-              pair:
-                type: array
-                items:
-                  type: string
-              url:
-                type: string
-          description: 'With no_written_comparison: the pairs that have a comparison file, as index.json lists them.'
-        fund_files:
-          type: array
-          items:
-            type: string
-          description: 'With no_written_comparison: the fund files of the tickers asked for that are covered funds, to compute the overlap from.'
-        covered:
-          type: string
-          description: 'What is covered: /api/v1/securities.json after a /sec/ address with no reason, /api/v1/index.json otherwise.'
-        not_covered:
-          type: array
-          items:
-            type: string
-          description: 'Under /overlap, /lookthrough and /diversify: the tickers asked for that are not covered.'
-        reasons:
+          description: The parameter to fix. Absent with too_large.
+        min:
+          type: integer
+          description: 'With too_few_funds: the fewest funds the parameter takes.'
+        max:
+          type: integer
+          description: 'With too_many_funds: the most funds the parameter takes.'
+        limit:
           type: object
           additionalProperties:
-            type: string
-          description: 'Under /overlap, /lookthrough and /diversify: the reason code of each ticker of not_covered.'
-        covered_issuers:
-          type: array
-          items:
-            type: string
-          description: 'Under /overlap and /lookthrough: the issuers whose own files are read; the other covered funds are read from SEC filings.'
-        history:
-          type: string
-          description: 'With not_in_archive: the list of the funds that have a history.'
-        changes:
-          type: string
-          description: 'With holdings_at_date_not_enabled: the fund''s changes file, served today.'
-        first:
-          type:
-          - string
-          - 'null'
-          description: 'With before_history: the date of the fund''s oldest file. before_history is answered only once holdings at a date are served.'
-        date:
-          type: string
-          description: 'With invalid_date, holdings_at_date_not_enabled or before_history: the date asked for.'
-        summary:
-          type: string
-          description: 'With not_held_by_daily_funds: the night''s flows, /api/v1/flows.json.'
-    DiversifyWeekly:
-      type: object
-      additionalProperties: true
-      properties:
-        t:
-          type: string
-          description: Its ticker.
-        n:
-          type:
-          - string
-          - 'null'
-          description: Its name.
-        page:
-          type:
-          - string
-          - 'null'
-          description: Its page on the site. Null without one.
-        size:
-          type: integer
-          description: 'What its file counts for against the limits of an answer: a file under /fund/ its length, its compact file under /diversify/funds/ half of that file''s, a file under /etf/ a third.'
-        lines:
-          type: integer
-          description: How many holdings the overlap reads of it; 0 for an ETF that holds no shares.
-        l:
-          type: string
-          description: 'Its source layer, as source_layer in its fund file: issuer, sec_nport, sec_nport_bonds, trust_filings and the others.'
-        h:
-          type:
-          - string
-          - 'null'
-          description: The date of its holdings.
-        bd:
+            type: integer
+          description: 'With too_large: the limit the call passed, as chars (the size of the files read, in bytes, a file of the other layers for a third of it), pairs (the holdings overlap compares), holdings (those a look-through or diversify reads), comparisons (those of diversify''s overlaps) or subrequests (the reads of files and of the edge cache one call makes).'
+        asked:
+          type: object
+          additionalProperties:
+            type: integer
+          description: 'With too_large: the call''s own figure for that limit.'
+        files:
+          type: object
+          additionalProperties:
+            type: integer
+          description: 'With too_large past limit.chars: what each fund''s file weighed, by ticker, in the units of chars (diversify''s asked.chars adds the reference file''s), so that a client can drop the largest.'
+        holdings_by_fund:
+          type: object
+          additionalProperties:
+            type: integer
+          description: 'With too_large on diversify past limit.holdings or limit.comparisons: the lines of each fund counted, by ticker (before any fund is read, those with a compact file).'
+        answered_by:
           type: object
           additionalProperties: true
-          properties:
-            sectors_pct:
-              type: object
-              additionalProperties:
-                type:
-                - number
-                - 'null'
-            no_sector_pct:
-              type:
-              - number
-              - 'null'
-            sector_coverage_pct:
-              type:
-              - number
-              - 'null'
-            sectors_stated:
-              type:
-              - boolean
-              - 'null'
-            other_funds_pct:
-              type:
-              - number
-              - 'null'
-            mega_cap_tech_pct:
-              type:
-              - number
-              - 'null'
-            countries_pct:
-              type: object
-              additionalProperties:
-                type:
-                - number
-                - 'null'
-          description: 'For an ETF that holds shares, its breakdown, the one its fund file gives: sectors_pct, no_sector_pct, sector_coverage_pct, sectors_stated, other_funds_pct, mega_cap_tech_pct and countries_pct.'
-        comp:
-          type: array
-          items:
-            type: object
-            additionalProperties: true
-            properties:
-              label:
-                type: string
-              pct:
-                type:
-                - number
-                - 'null'
-          description: For an ETF that holds no shares, what it holds by kind, up to three, each with label and pct of its net assets.
-        w:
-          type: array
-          items:
-            type:
-            - integer
-            - 'null'
-          description: 'Its weekly returns as whole numbers of 0.0001 (divide by 10,000: 47 is 0.47%), oldest first, ending at end; null for a week without a return.'
-        end:
-          type:
-          - string
-          - 'null'
-          description: The last week of w, the date of the prices.
-        solo:
-          type: object
-          additionalProperties: true
-          required:
-          - list_date
-          - lowest
-          - rows
-          properties:
-            list_date:
-              type: string
-            lowest:
-              type: array
-              items:
-                type: string
-            rows:
-              type: array
-              items:
-                type: array
-          description: 'Its own ranking against the list as a one-ETF portfolio, when the list ranks it: list_date, lowest (the 3 of the answer, in order) and rows, every ETF of the list not held as [ticker, weekly correlation, on down weeks, weeks, down weeks], the correlations in hundredths (divide by 100), lowest first before rounding.'
+          description: 'With too_large from overlap or lookthrough, what answers the same question, as the message names it: mcp, the MCP server''s tool (url, tool, arguments); for two funds diversify answers, diversify and page; for a portfolio whose x-ray the site writes, page.'
+        docs:
+          type: string
+          description: The reference of this endpoint.
       required:
-      - t
-      - end
-      - size
-      - lines
-      - l
-      - w
+      - error
+      - reason
+      - message
+      - docs
     DiversifyList:
       type: object
       additionalProperties: true
@@ -2171,6 +1475,583 @@ components:
       - groups
       - funds
       - license
+    NotCovered:
+      type: object
+      additionalProperties: true
+      required:
+      - error
+      - ticker
+      - message
+      - docs
+      properties:
+        error:
+          type: string
+          const: not_covered
+          description: 'Always not_covered, whatever the reason: read reason and the next address.'
+        reason:
+          type: string
+          enum:
+          - has_security_file
+          - in_another_layer
+          - is_a_fund
+          - no_written_comparison
+          - not_a_shard
+          - not_held_by_daily_funds
+          - not_held
+          - earlier_key
+          - no_such_endpoint
+          - not_in_directory
+          - no_file
+          - funds_not_covered
+          - etn
+          - other_product
+          - no_filing_yet
+          - not_in_sec_list
+          - other_fund
+          - stale_filing
+          - no_prospectus_found
+          - not_in_archive
+          - holdings_at_date_not_enabled
+          - invalid_date
+          - before_history
+          description: 'Every code is explained on /contract/#reasons. not_in_directory: a fund address with no file, for a ticker not in the directory of US-listed funds; a ticker of the directory with no file gets the code universe.json gives it (etn, no_filing_yet and the others), and no_file when the directory was not read. not_held: under /sec/, no covered fund holds the key; earlier_key: an old key, with reads_as. no_such_endpoint: no endpoint at the address. funds_not_covered: several funds of /overlap or /lookthrough, with reasons. in_another_layer: sent only to the TickerInside clients released before /fund/ answered for a fund of the other layers too (see holdings_kind); etf gives the fund''s file. has_security_file: a ticker asked for as a fund has a stock file (see security). is_a_fund: a ticker asked for as a stock is a covered fund (see fund, and holders for the funds that hold it). no_written_comparison: no comparison file for this pair in either order (see fund_files and written_comparisons). not_a_shard: an address under /api/v1/holders/ that is not a shard (see holders). Under /api/v1/history/: not_in_archive: the fund has no history file (see history). holdings_at_date_not_enabled: holdings at a date are not served yet, and every valid date answers this (see changes). invalid_date: the date is not a calendar date, or is after today. before_history: the date is before the fund''s first file (see first), answered only once holdings at a date are served. Under /api/v1/flows/: reason not_held_by_daily_funds: no fund read daily from its issuer''s files held the key or moved it in the last 20 trading days; summary names the night''s summary.'
+        ticker:
+          type:
+          - string
+          - 'null'
+          description: What was asked for, upper case; null when the address names no single ticker, such as a pair under /compare/.
+        message:
+          type: string
+          description: What happened and where to look next, in words.
+        docs:
+          type: string
+          description: The reference.
+        security:
+          type: string
+          description: 'With has_security_file: the stock file of the ticker, or its holders-only answer.'
+        reads_as:
+          type: array
+          items:
+            type: string
+          description: 'Under /sec/, for an old key written before lines listed abroad carried their market (7203): the keys it reads as now, from the aliases of holders. Absent otherwise.'
+        fund:
+          type: string
+          description: 'With is_a_fund: the fund file of the ticker.'
+        etf:
+          type: string
+          description: 'With in_another_layer: the file of the fund, /api/v1/etf/{ticker}.json.'
+        holders:
+          type: string
+          description: 'The shard of the key''s first character: /api/v1/holders/{c}.json, c a to z, or 0 for any other character (7203.JP is in 0.json). It lists the covered funds that hold the key, from issuer files and from SEC filings, with or without a stock file.'
+        pair:
+          type:
+          - array
+          - 'null'
+          items:
+            type: string
+          description: 'With no_written_comparison: the two tickers asked for, upper case, or null when the address names no pair.'
+        written_comparisons:
+          type: array
+          items:
+            type: object
+            additionalProperties: true
+            properties:
+              pair:
+                type: array
+                items:
+                  type: string
+              url:
+                type: string
+          description: 'With no_written_comparison: the pairs that have a comparison file, as index.json lists them.'
+        fund_files:
+          type: array
+          items:
+            type: string
+          description: 'With no_written_comparison: the fund files of the tickers asked for that are covered funds, to compute the overlap from.'
+        covered:
+          type: string
+          description: 'What is covered: /api/v1/securities.json after a /sec/ address with no reason, /api/v1/index.json otherwise.'
+        not_covered:
+          type: array
+          items:
+            type: string
+          description: 'Under /overlap, /lookthrough and /diversify: the tickers asked for that are not covered.'
+        reasons:
+          type: object
+          additionalProperties:
+            type: string
+          description: 'Under /overlap, /lookthrough and /diversify: the reason code of each ticker of not_covered.'
+        covered_issuers:
+          type: array
+          items:
+            type: string
+          description: 'Under /overlap and /lookthrough: the issuers whose own files are read; the other covered funds are read from SEC filings.'
+        history:
+          type: string
+          description: 'With not_in_archive: the list of the funds that have a history.'
+        changes:
+          type: string
+          description: 'With holdings_at_date_not_enabled: the fund''s changes file, served today.'
+        first:
+          type:
+          - string
+          - 'null'
+          description: 'With before_history: the date of the fund''s oldest file. before_history is answered only once holdings at a date are served.'
+        date:
+          type: string
+          description: 'With invalid_date, holdings_at_date_not_enabled or before_history: the date asked for.'
+        summary:
+          type: string
+          description: 'With not_held_by_daily_funds: the night''s flows, /api/v1/flows.json.'
+    Diversify:
+      type: object
+      additionalProperties: true
+      properties:
+        kind:
+          type: string
+          const: diversify
+          description: Always diversify.
+        mode:
+          type: string
+          const: compare
+          description: compare, the check of the funds of try against the funds of have. With have alone the answer is Find, mode find, another shape (DiversifyFind).
+        question:
+          type: string
+          description: 'The question answered, in words: the funds to try and the portfolio of the funds held, with their weights.'
+        answer:
+          type: string
+          description: 'The answer in one sentence, to quote as it is: of the funds to try, the one with the lowest overlap and the one with the lowest weekly correlation, with the figures and their period, or for one fund to try its two figures; the line /diversify/ prints under the question.'
+        answers:
+          type: array
+          items:
+            type: string
+          description: 'One sentence per fund to try, in the order of candidates, to quote as it is: its overlap with the portfolio, the correlation of weekly returns with the portfolio''s over the weeks both have and on the weeks the portfolio fell, and the holdings dates, or why a figure is not measured.'
+        have:
+          type: object
+          additionalProperties: true
+          required:
+          - funds
+          - weights
+          - sentence
+          properties:
+            funds:
+              type: array
+              items:
+                type: object
+                additionalProperties: true
+                properties:
+                  ticker:
+                    type: string
+                  weight_pct:
+                    type:
+                    - number
+                    - 'null'
+                  name:
+                    type:
+                    - string
+                    - 'null'
+                  holdings_as_of:
+                    type:
+                    - string
+                    - 'null'
+                  holdings_source:
+                    type: string
+                  holds_shares:
+                    type: boolean
+                  weekly_returns:
+                    type:
+                    - integer
+                    - 'null'
+            weights:
+              type: string
+              enum:
+              - given
+              - equal
+            looked_through_pct:
+              type:
+              - number
+              - 'null'
+            holds_no_shares:
+              type: array
+              items:
+                type: string
+            returns_from:
+              type: array
+              items:
+                type: string
+            no_price_history:
+              type: array
+              items:
+                type: string
+            no_breakdown:
+              type: array
+              items:
+                type: string
+            mega_cap_tech_pct:
+              type:
+              - number
+              - 'null'
+            sectors:
+              type:
+              - object
+              - 'null'
+              additionalProperties: true
+              properties:
+                known_pct:
+                  type:
+                  - number
+                  - 'null'
+                coverage_pct:
+                  type:
+                  - number
+                  - 'null'
+                stated:
+                  type: boolean
+                weights:
+                  type: array
+                  items:
+                    type: object
+                    additionalProperties: true
+                    properties:
+                      sector:
+                        type: string
+                      pct:
+                        type:
+                        - number
+                        - 'null'
+            countries:
+              type:
+              - object
+              - 'null'
+              additionalProperties: true
+              properties:
+                us_pct:
+                  type:
+                  - number
+                  - 'null'
+                weights:
+                  type: array
+                  items:
+                    type: object
+                    additionalProperties: true
+                    properties:
+                      country:
+                        type: string
+                      pct:
+                        type:
+                        - number
+                        - 'null'
+                other_pct:
+                  type:
+                  - number
+                  - 'null'
+            sentence:
+              type: string
+          description: 'The portfolio of the funds held: each fund (funds) with its weight_pct, name, holdings_as_of, holdings_source, holds_shares and weekly_returns, the number of weekly returns its file has; weights, given or equal; looked_through_pct, the part of the portfolio in funds that hold shares; holds_no_shares; returns_from, the funds its weekly returns are computed from, and no_price_history; no_breakdown, the funds holding shares whose file gives no breakdown; mega_cap_tech_pct, sectors and countries as each candidate has them, its funds'' at their weights, in percent of the whole portfolio; and its sentence.'
+        candidates:
+          type: array
+          items:
+            type: object
+            additionalProperties: true
+            properties:
+              ticker:
+                type: string
+                description: The fund to try.
+              name:
+                type:
+                - string
+                - 'null'
+                description: Its name.
+              holdings_as_of:
+                type:
+                - string
+                - 'null'
+                description: 'The date of its holdings: its issuer file, or the quarter end its filing describes.'
+              holdings_source:
+                type: string
+                description: 'Its source: issuer file, SEC Form N-PORT, trust''s own SEC filing, sponsor''s own holdings file, or prospectus, no holdings yet.'
+              fund_file:
+                type: string
+                description: The address of its fund file.
+              page_url:
+                type:
+                - string
+                - 'null'
+                description: Its page. Null without one.
+              overlap:
+                type:
+                - object
+                - 'null'
+                additionalProperties: true
+                properties:
+                  by_weight_pct:
+                    type:
+                    - number
+                    - 'null'
+                  share_of_candidate_pct:
+                    type:
+                    - number
+                    - 'null'
+                  companies_in_both:
+                    type:
+                    - integer
+                    - 'null'
+                  largest_shared:
+                    type: array
+                    items:
+                      type: object
+                      additionalProperties: true
+                      properties:
+                        ticker:
+                          type: string
+                        in_candidate_pct:
+                          type:
+                          - number
+                          - 'null'
+                        in_have_pct:
+                          type:
+                          - number
+                          - 'null'
+                        counted_pct:
+                          type:
+                          - number
+                          - 'null'
+                description: 'In percent: by_weight_pct, the sum over the companies it and the portfolio both hold of the smaller of its weight and the portfolio''s, the portfolio looked through its funds at their weights; share_of_candidate_pct, the part of the fund in those companies; companies_in_both, the holdings both have, counted by ticker; and largest_shared, up to five, each with in_candidate_pct, in_have_pct and counted_pct. Null for a fund that holds no shares, or when no fund held does (see not_measured).'
+              correlation:
+                type:
+                - object
+                - 'null'
+                additionalProperties: true
+                properties:
+                  weekly:
+                    type:
+                    - number
+                    - 'null'
+                  weeks:
+                    type:
+                    - integer
+                    - 'null'
+                  from:
+                    type:
+                    - string
+                    - 'null'
+                  to:
+                    type:
+                    - string
+                    - 'null'
+                  down_weeks:
+                    type:
+                    - number
+                    - 'null'
+                  down_weeks_count:
+                    type:
+                    - integer
+                    - 'null'
+                  with:
+                    type: array
+                    items:
+                      type: string
+                description: 'Of weekly returns, the fund''s against the portfolio''s: weekly, over weeks weeks from from to to, each the last close of its week (weeks run Saturday to Friday: a week closes on its Friday, or on the Thursday when the exchange is shut that Friday, and the last week on the data''s last close); down_weeks, the same on the down_weeks_count weeks the portfolio fell, null under 20 of them; and with, the funds held whose returns the portfolio''s are computed from. Null without 52 weeks in common (see not_measured).'
+              volatility_pct:
+                type:
+                - number
+                - 'null'
+                description: Its annualised weekly volatility over the weeks of its correlation, in percent; absent when the correlation is not measured.
+              with_10_pct:
+                type: object
+                additionalProperties: true
+                properties:
+                  volatility_pct:
+                    type:
+                    - number
+                    - 'null'
+                  instead_of_pct:
+                    type:
+                    - number
+                    - 'null'
+                  weeks:
+                    type:
+                    - integer
+                    - 'null'
+                  to:
+                    type:
+                    - string
+                    - 'null'
+                description: The portfolio's annualised weekly volatility with 10% in this ETF and 90% in the ETFs held at their weights, rebalanced weekly (volatility_pct), against the portfolio alone (instead_of_pct), over the weeks of its correlation; absent when the correlation is not measured.
+              mega_cap_tech_pct:
+                type:
+                - number
+                - 'null'
+                description: The part of the fund in the companies definitions.mega_cap_tech lists, in percent to one decimal, from its fund file's breakdown. Null for a fund that holds no shares or has no breakdown.
+              sectors:
+                type:
+                - object
+                - 'null'
+                additionalProperties: true
+                properties:
+                  known_pct:
+                    type:
+                    - number
+                    - 'null'
+                  coverage_pct:
+                    type:
+                    - number
+                    - 'null'
+                  stated:
+                    type: boolean
+                  weights:
+                    type: array
+                    items:
+                      type: object
+                      additionalProperties: true
+                      properties:
+                        sector:
+                          type: string
+                        pct:
+                          type:
+                          - number
+                          - 'null'
+                description: 'From its fund file''s breakdown: known_pct, the part of the fund whose sector is found; coverage_pct, that part of its stock weight; stated, whether coverage_pct reaches definitions.sectors_stated_from_pct; and weights, when stated, each sector with its id (sector), name and pct of the fund, largest first. Null as mega_cap_tech_pct is.'
+              countries:
+                type:
+                - object
+                - 'null'
+                additionalProperties: true
+                properties:
+                  us_pct:
+                    type:
+                    - number
+                    - 'null'
+                  weights:
+                    type: array
+                    items:
+                      type: object
+                      additionalProperties: true
+                      properties:
+                        country:
+                          type: string
+                        pct:
+                          type:
+                          - number
+                          - 'null'
+                  other_pct:
+                    type:
+                    - number
+                    - 'null'
+                description: 'From its fund file''s breakdown, in percent of the fund: us_pct, the United States; weights, up to six countries, largest first, each with its ISO code (country), name and pct; and other_pct, the rest. Null as mega_cap_tech_pct is.'
+              not_measured:
+                type: object
+                additionalProperties:
+                  type: string
+                description: 'Why a figure is null, by figure: overlap, correlation, down_weeks or profile. Absent when every figure is given.'
+              rank:
+                type: integer
+                description: Its place in the order of ranking, from 1.
+              sentence:
+                type: string
+                description: Its sentence, as answers gives it.
+            required:
+            - ticker
+            - holdings_source
+            - fund_file
+            - overlap
+            - correlation
+            - rank
+            - sentence
+          description: Each fund to try, ranked (see ranking).
+        ranking:
+          type: string
+          description: The rule of the order of candidates, in words.
+        prices_as_of:
+          type:
+          - string
+          - 'null'
+          description: The last week of the weekly returns, the date of the prices.
+        definitions:
+          type: object
+          additionalProperties: true
+          description: 'How each figure is computed, in the words /diversify/ prints: overlap, share_of_candidate (the part of the candidate in companies the portfolio holds), correlation, down_weeks, sectors and countries; the companies counted as mega-cap tech (mega_cap_tech: rule and companies, each with its name and tickers), the fixed list every fund file''s breakdown counts; and sectors_stated_from_pct.'
+        skipped:
+          type: object
+          additionalProperties: true
+          properties:
+            not_covered:
+              type: array
+              items:
+                type: string
+          description: The tickers not covered, under not_covered, left out of the answer. Absent when every ticker is covered.
+        renamed:
+          type: object
+          additionalProperties:
+            type: string
+          description: Each ticker asked that a fund had before it was renamed, with its ticker now, under which the answer reads and names it. Absent when there is none.
+        share_url:
+          type: string
+          description: The page of this answer, /diversify/ with the same query, which renders it for a person or an assistant that fetches it.
+        api_url:
+          type: string
+          description: This answer's own address.
+        source:
+          type: object
+          additionalProperties: true
+          required:
+          - provider
+          - links
+          - license
+          - cite_as
+          properties:
+            provider:
+              type: string
+            license:
+              type: string
+            cite_as:
+              type: string
+            reference_url:
+              type: string
+            links:
+              type: array
+              items:
+                type: object
+                additionalProperties: true
+                properties:
+                  ticker:
+                    type: string
+                  page_url:
+                    type:
+                    - string
+                    - 'null'
+                  api_url:
+                    type: string
+                  holdings_source:
+                    type: string
+          description: 'The files the answer is computed from: each fund''s page_url, null without a page, api_url and holdings_source; reference_url, the file of mega-cap tech and the names of the sectors and countries; license; and cite_as.'
+        note:
+          type: string
+          description: Measurement, not investment advice.
+        license:
+          type: string
+          description: The licence the data is published under.
+        attribution:
+          type: string
+          description: 'How to credit the data: a link to the page of a fund the figure comes from, or to this address, where the medium allows one, the name where it does not.'
+        docs:
+          type: string
+          description: The reference of this endpoint.
+      required:
+      - kind
+      - question
+      - answer
+      - answers
+      - have
+      - candidates
+      - ranking
+      - definitions
+      - share_url
+      - source
+      - note
+      - license
+      - attribution
+      - docs
     Unavailable:
       type: object
       additionalProperties: true
@@ -2191,6 +2072,125 @@ components:
         uptime:
           type: string
           description: 'The live checks: whether the site fails its own checks.'
+    DiversifyWeekly:
+      type: object
+      additionalProperties: true
+      properties:
+        t:
+          type: string
+          description: Its ticker.
+        n:
+          type:
+          - string
+          - 'null'
+          description: Its name.
+        page:
+          type:
+          - string
+          - 'null'
+          description: Its page on the site. Null without one.
+        size:
+          type: integer
+          description: 'What its file counts for against the limits of an answer: a file under /fund/ its length, its compact file under /diversify/funds/ half of that file''s, a file under /etf/ a third.'
+        lines:
+          type: integer
+          description: How many holdings the overlap reads of it; 0 for an ETF that holds no shares.
+        l:
+          type: string
+          description: 'Its source layer, as source_layer in its fund file: issuer, sec_nport, sec_nport_bonds, trust_filings and the others.'
+        h:
+          type:
+          - string
+          - 'null'
+          description: The date of its holdings.
+        bd:
+          type: object
+          additionalProperties: true
+          properties:
+            sectors_pct:
+              type: object
+              additionalProperties:
+                type:
+                - number
+                - 'null'
+            no_sector_pct:
+              type:
+              - number
+              - 'null'
+            sector_coverage_pct:
+              type:
+              - number
+              - 'null'
+            sectors_stated:
+              type:
+              - boolean
+              - 'null'
+            other_funds_pct:
+              type:
+              - number
+              - 'null'
+            mega_cap_tech_pct:
+              type:
+              - number
+              - 'null'
+            countries_pct:
+              type: object
+              additionalProperties:
+                type:
+                - number
+                - 'null'
+          description: 'For an ETF that holds shares, its breakdown, the one its fund file gives: sectors_pct, no_sector_pct, sector_coverage_pct, sectors_stated, other_funds_pct, mega_cap_tech_pct and countries_pct.'
+        comp:
+          type: array
+          items:
+            type: object
+            additionalProperties: true
+            properties:
+              label:
+                type: string
+              pct:
+                type:
+                - number
+                - 'null'
+          description: For an ETF that holds no shares, what it holds by kind, up to three, each with label and pct of its net assets.
+        w:
+          type: array
+          items:
+            type:
+            - integer
+            - 'null'
+          description: 'Its weekly returns as whole numbers of 0.0001 (divide by 10,000: 47 is 0.47%), oldest first, ending at end; null for a week without a return.'
+        end:
+          type:
+          - string
+          - 'null'
+          description: The last week of w, the date of the prices.
+        solo:
+          type: object
+          additionalProperties: true
+          required:
+          - list_date
+          - lowest
+          - rows
+          properties:
+            list_date:
+              type: string
+            lowest:
+              type: array
+              items:
+                type: string
+            rows:
+              type: array
+              items:
+                type: array
+          description: 'Its own ranking against the list as a one-ETF portfolio, when the list ranks it: list_date, lowest (the 3 of the answer, in order) and rows, every ETF of the list not held as [ticker, weekly correlation, on down weeks, weeks, down weeks], the correlations in hundredths (divide by 100), lowest first before rounding.'
+      required:
+      - t
+      - end
+      - size
+      - lines
+      - l
+      - w
 externalDocs:
   description: The reference, with examples and recipes
   url: https://tickerinside.com/api/

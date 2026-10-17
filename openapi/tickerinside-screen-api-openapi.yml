@@ -264,6 +264,90 @@ paths:
       - Screen
 components:
   schemas:
+    BadRequest:
+      type: object
+      additionalProperties: true
+      properties:
+        error:
+          type: string
+          const: bad_request
+          description: Always bad_request.
+        reason:
+          type: string
+          enum:
+          - missing_parameter
+          - unknown_parameter
+          - repeated_parameter
+          - invalid_value
+          - too_few_funds
+          - too_many_funds
+          - too_large
+          - no_price_history
+          description: missing_parameter, unknown_parameter, repeated_parameter, invalid_value, too_few_funds, too_many_funds, too_large, a call past the limits of its endpoint (see limit and asked), or no_price_history, Find with no fund held that has weekly returns here.
+        message:
+          type: string
+          description: What to fix, in words.
+        parameter:
+          type: string
+          description: The parameter to fix. Absent with too_large.
+        min:
+          type: integer
+          description: 'With too_few_funds: the fewest funds the parameter takes.'
+        max:
+          type: integer
+          description: 'With too_many_funds: the most funds the parameter takes.'
+        limit:
+          type: object
+          additionalProperties:
+            type: integer
+          description: 'With too_large: the limit the call passed, as chars (the size of the files read, in bytes, a file of the other layers for a third of it), pairs (the holdings overlap compares), holdings (those a look-through or diversify reads), comparisons (those of diversify''s overlaps) or subrequests (the reads of files and of the edge cache one call makes).'
+        asked:
+          type: object
+          additionalProperties:
+            type: integer
+          description: 'With too_large: the call''s own figure for that limit.'
+        files:
+          type: object
+          additionalProperties:
+            type: integer
+          description: 'With too_large past limit.chars: what each fund''s file weighed, by ticker, in the units of chars (diversify''s asked.chars adds the reference file''s), so that a client can drop the largest.'
+        holdings_by_fund:
+          type: object
+          additionalProperties:
+            type: integer
+          description: 'With too_large on diversify past limit.holdings or limit.comparisons: the lines of each fund counted, by ticker (before any fund is read, those with a compact file).'
+        answered_by:
+          type: object
+          additionalProperties: true
+          description: 'With too_large from overlap or lookthrough, what answers the same question, as the message names it: mcp, the MCP server''s tool (url, tool, arguments); for two funds diversify answers, diversify and page; for a portfolio whose x-ray the site writes, page.'
+        docs:
+          type: string
+          description: The reference of this endpoint.
+      required:
+      - error
+      - reason
+      - message
+      - docs
+    Unavailable:
+      type: object
+      additionalProperties: true
+      required:
+      - error
+      - message
+      - status
+      - uptime
+      properties:
+        error:
+          type: string
+          const: unavailable
+        message:
+          type: string
+        status:
+          type: string
+          description: The nightly report.
+        uptime:
+          type: string
+          description: 'The live checks: whether the site fails its own checks.'
     Screen:
       type: object
       additionalProperties: true
@@ -432,90 +516,6 @@ components:
       - license
       - attribution
       - docs
-    BadRequest:
-      type: object
-      additionalProperties: true
-      properties:
-        error:
-          type: string
-          const: bad_request
-          description: Always bad_request.
-        reason:
-          type: string
-          enum:
-          - missing_parameter
-          - unknown_parameter
-          - repeated_parameter
-          - invalid_value
-          - too_few_funds
-          - too_many_funds
-          - too_large
-          - no_price_history
-          description: missing_parameter, unknown_parameter, repeated_parameter, invalid_value, too_few_funds, too_many_funds, too_large, a call past the limits of its endpoint (see limit and asked), or no_price_history, Find with no fund held that has weekly returns here.
-        message:
-          type: string
-          description: What to fix, in words.
-        parameter:
-          type: string
-          description: The parameter to fix. Absent with too_large.
-        min:
-          type: integer
-          description: 'With too_few_funds: the fewest funds the parameter takes.'
-        max:
-          type: integer
-          description: 'With too_many_funds: the most funds the parameter takes.'
-        limit:
-          type: object
-          additionalProperties:
-            type: integer
-          description: 'With too_large: the limit the call passed, as chars (the size of the files read, in bytes, a file of the other layers for a third of it), pairs (the holdings overlap compares), holdings (those a look-through or diversify reads), comparisons (those of diversify''s overlaps) or subrequests (the reads of files and of the edge cache one call makes).'
-        asked:
-          type: object
-          additionalProperties:
-            type: integer
-          description: 'With too_large: the call''s own figure for that limit.'
-        files:
-          type: object
-          additionalProperties:
-            type: integer
-          description: 'With too_large past limit.chars: what each fund''s file weighed, by ticker, in the units of chars (diversify''s asked.chars adds the reference file''s), so that a client can drop the largest.'
-        holdings_by_fund:
-          type: object
-          additionalProperties:
-            type: integer
-          description: 'With too_large on diversify past limit.holdings or limit.comparisons: the lines of each fund counted, by ticker (before any fund is read, those with a compact file).'
-        answered_by:
-          type: object
-          additionalProperties: true
-          description: 'With too_large from overlap or lookthrough, what answers the same question, as the message names it: mcp, the MCP server''s tool (url, tool, arguments); for two funds diversify answers, diversify and page; for a portfolio whose x-ray the site writes, page.'
-        docs:
-          type: string
-          description: The reference of this endpoint.
-      required:
-      - error
-      - reason
-      - message
-      - docs
-    Unavailable:
-      type: object
-      additionalProperties: true
-      required:
-      - error
-      - message
-      - status
-      - uptime
-      properties:
-        error:
-          type: string
-          const: unavailable
-        message:
-          type: string
-        status:
-          type: string
-          description: The nightly report.
-        uptime:
-          type: string
-          description: 'The live checks: whether the site fails its own checks.'
 externalDocs:
   description: The reference, with examples and recipes
   url: https://tickerinside.com/api/
